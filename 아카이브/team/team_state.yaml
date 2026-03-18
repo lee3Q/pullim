@@ -1,0 +1,116 @@
+# AI 의사결정 도우미 — 팀 상태 문서
+# 최종 업데이트: 2026-03-08
+# 관리자: 정하린 (COO)
+
+team_name: "풀림 (Pullim) 창업팀"
+status: "소집 완료 — Sprint 0 (킥오프)"
+created: "2026-03-08"
+
+# ─────────────────────────────────────────
+# 대표
+# ─────────────────────────────────────────
+ceo:
+  name: 이상규
+  role: 대표 / CEO
+  status: active
+  current_task: "팀 소집 승인 완료. 비전 설정 및 첫 Sprint 방향 확인"
+  blockers: []
+  notes: "아이디어 오리지네이터. 최종 승인권자. 고객 인터뷰 직접 수행."
+
+# ─────────────────────────────────────────
+# 코어 팀원 (4+1)
+# ─────────────────────────────────────────
+members:
+  - name: 한재원
+    role: CTO / Tech Lead
+    agent_file: agents/cto.md
+    status: active
+    autonomy: { L0: "보안 취약점, 인프라 장애", L1: "아키텍처 변경, 스택 추가", L2: "코드 구현, 기술 리서치" }
+    current_task: "MVP 기술 스택 환경 점검 (Next.js 15, Supabase, Vercel)"
+    blockers: []
+    sprint_velocity: null  # Sprint 0 — 아직 측정 전
+
+  - name: 서윤하
+    role: Prompt & AI Lead
+    agent_file: agents/prompt-engineer.md
+    status: active
+    autonomy: { L0: "안전 프롬프트 변경", L1: "파이프라인 구조 변경", L2: "프롬프트 튜닝, A/B 테스트" }
+    current_task: "Socratic 7단계 파이프라인 프롬프트 초안 설계"
+    blockers: []
+    sprint_velocity: null
+
+  - name: 박도현
+    role: PM & Strategy Lead
+    agent_file: agents/product-manager.md
+    status: active
+    autonomy: { L0: "피벗 제안", L1: "로드맵 변경, 기능 우선순위", L2: "사용자 리서치, 경쟁 분석" }
+    current_task: "MVP 기능 우선순위 정리 (RICE), 초기 사용자 페르소나 검증"
+    blockers: []
+    sprint_velocity: null
+
+  - name: 최서영
+    role: Domain Expert (심리학/의사결정 과학)
+    agent_file: agents/domain-expert.md
+    status: active
+    autonomy: { L0: "위기 감지 프로토콜 변경", L1: "의사결정 프레임워크 선택", L2: "학술 리서치, 안전 기준 검토" }
+    current_task: "위기 감지 키워드 목록 초안 + Socratic 질문 심리학적 검증 기준"
+    blockers: []
+    sprint_velocity: null
+
+  - name: 정하린
+    role: COO / Operations Lead
+    agent_file: agents/coo.md
+    status: active
+    autonomy: { L0: "팀 구조 변경", L1: "Sprint 목표 변경, 프로세스 변경", L2: "회의 진행, 문서 관리" }
+    current_task: "팀 운영 체계 가동 — 킥오프 회의 진행, 첫 Sprint 계획 수립"
+    blockers: []
+    sprint_velocity: null
+
+# ─────────────────────────────────────────
+# 확장 후보 (대기 중)
+# ─────────────────────────────────────────
+expansion_candidates:
+  - name: 정하은
+    role: CMO / Marketing & Sales
+    agent_file: agents/cmo.md
+    trigger: "MVP 출시 2주 전"
+    status: standby
+    prompt_ready: true
+
+  - name: 정하준
+    role: CFO / Finance & Strategy
+    agent_file: agents/cfo.md
+    trigger: "투자/지원금 신청 시"
+    status: standby
+    prompt_ready: true
+
+  - name: TBD
+    role: UX/UI Designer
+    trigger: "디자인 피드백 3건+"
+    status: not_designed
+    prompt_ready: false
+
+  - name: TBD
+    role: Legal Advisor
+    trigger: "법적 이슈 발생"
+    status: not_designed
+    prompt_ready: false
+
+  - name: TBD
+    role: Data Analyst
+    trigger: "사용자 데이터 100건+"
+    status: not_designed
+    prompt_ready: false
+
+# ─────────────────────────────────────────
+# 운영 메타데이터
+# ─────────────────────────────────────────
+operations:
+  current_sprint: "Sprint 0 (킥오프)"
+  sprint_start: "2026-03-08"
+  sprint_end: "2026-03-14"
+  meeting_cadence: daily
+  decision_framework: "Consent-Based + DACI (대표=Approver)"
+  open_blockers: 0
+  pending_proposals: 0
+  total_decisions: 1  # 팀 소집 승인

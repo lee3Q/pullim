@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>풀림 사업계획서</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="/dev/fd/11" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">풀림 사업계획서</h1>
+</header>
+<h1 id="창업동아리-사업계획서-ppt-초안">창업동아리 사업계획서 PPT
+초안</h1>
+<blockquote>
+<p>2026-03-08 | 기존 자료 기반 자동 생성 상태: 초안 — 검토 후 PPT에
+반영</p>
+</blockquote>
+<hr />
+<h2 id="슬라이드-2-창업의-계기-초안---본인-확인-필요">슬라이드 2: 창업의
+계기 [초안 - 본인 확인 필요]</h2>
+<h3 id="창업-아이디어-발상의-계기">창업 아이디어 발상의 계기</h3>
+<p>1년간 Claude를 활용해 진로 변경, 관계 분석, 학습 방식 결정 등 모든
+중요한 의사결정을 AI와 함께 했다. 그 과정에서 깨달은 것: ChatGPT에
+“이직해야 할까요?”라고 물으면 장단점만 나열하고 끝난다. 하지만 구조화된
+질문을 단계별로 받으면, 내가 진짜 뭘 고민하는지가 스스로 정리된다.</p>
+<h3 id="구체화-과정-1">구체화 과정 1</h3>
+<p>AI 에이전트 팀 토론 시스템을 직접 설계하고, 6인 전문가 에이전트 토론
+방식으로 영어 학습 방식, 창업 포지셔닝 등 실제 의사결정을 수행했다.
+“답을 주는 AI”가 아니라 “질문을 던지는 AI”가 더 효과적이라는 걸 반복
+확인했다.</p>
+<h3 id="구체화-과정-2">구체화 과정 2</h3>
+<p>한국에 “Socratic 질문 -&gt; 의사결정 정리 문서” 서비스가 없다는 걸
+확인했다. 기존 멘탈케어 앱(마인드카페, 트로스트)은 감정 케어에
+집중하지만, “상담받고 나서 뭐가 달라졌는지 모르겠다”는 공통 불만이
+있었다. 감정 정리와 의사결정 구조화를 결합하면 이 빈 자리를 채울 수
+있다고 판단했다.</p>
+<hr />
+<h2 id="슬라이드-5-시장-분석-바로-사용-가능">슬라이드 5: 시장 분석 [바로
+사용 가능]</h2>
+<h3 id="전체-시장-tam">전체 시장 (TAM)</h3>
+<p>글로벌 AI 멘탈헬스 시장: $15억(2024) -&gt; $251억(2034), CAGR 32%
+한국 디지털 헬스케어 시장: 246억 달러(2024), 연평균 8.5% 성장 출처:
+Grand View Research, Statista</p>
+<h3 id="유효-시장-sam">유효 시장 (SAM)</h3>
+<p>한국 20-30대 인구 약 1,300만명 이직 고민 직장인 76.5%, “쉬었음” 청년
+50.4만명(역대 최고) 우울증 환자 110.7만명 중 치료율 28.2% (80만명 방치)
+심리상담 1회 비용 5~20만원 -&gt; AI 기반 저비용 대안 수요 존재</p>
+<h3 id="서비스-초기-핵심-시장-som">서비스 초기 핵심 시장 (SOM)</h3>
+<p>한국 멘탈케어 앱 MAU 합산 약 16만명 (마인드카페 7.9만 + 트로스트
+8.3만) 초기 목표: 유료 사용자 1,000명 x 월 7,500원 = 월 750만원 출처:
+통계청, 건보심평원, 보건복지부, 캐치설문</p>
+<hr />
+<h2 id="슬라이드-6-경쟁사-분석-바로-사용-가능">슬라이드 6: 경쟁사 분석
+[바로 사용 가능]</h2>
+<h3 id="비교표">비교표</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 27%" />
+<col style="width: 22%" />
+<col style="width: 20%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th>분류</th>
+<th>마인드카페</th>
+<th>트로스트</th>
+<th>상담냥</th>
+<th>우리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>진입 방식</td>
+<td>감정 토로</td>
+<td>감정 기록/일기</td>
+<td>캐릭터 대화</td>
+<td>고민 입력 (자유 텍스트)</td>
+</tr>
+<tr>
+<td>AI 역할</td>
+<td>초기 케어 -&gt; 상담사 연결</td>
+<td>감정 스캐너/일기</td>
+<td>조언 제시</td>
+<td>Socratic 질문 -&gt; 구조화</td>
+</tr>
+<tr>
+<td>산출물</td>
+<td>없음 (상담 후 끝)</td>
+<td>마음정리보고서 (감정 수준)</td>
+<td>없음</td>
+<td>의사결정 정리 문서</td>
+</tr>
+<tr>
+<td>후속 관리</td>
+<td>없음</td>
+<td>없음</td>
+<td>없음</td>
+<td>추적 알림 + 패턴 분석</td>
+</tr>
+</tbody>
+</table>
+<h3 id="포지셔닝-맵">포지셔닝 맵</h3>
+<ul>
+<li>핵심가치1 (X축): 감정 케어 &lt;——-&gt; 의사결정 구조화</li>
+<li>핵심가치2 (Y축): AI 보조 &lt;——-&gt; AI 주도</li>
+<li>마인드카페: 감정 케어 + 인간 주도 (좌하)</li>
+<li>트로스트: 감정 케어 + AI 보조 (좌상)</li>
+<li>상담냥: 감정 케어 + AI 보조 (좌상, 트로스트 근처)</li>
+<li>우리: 의사결정 구조화 + AI 주도 (우상) – 빈 영역</li>
+</ul>
+<h3 id="핵심-차별점">핵심 차별점</h3>
+<p>기존 앱 사용자 공통 불만: “상담받고 나서 뭐가 달라졌는지 모르겠다”
+우리의 답: 세션 끝에 의사결정 정리 문서가 나온다.
+문제/맥락/선택지/평가/리스크/결정/근거/첫 행동이 1페이지로 정리된다.</p>
+<hr />
+<h2 id="슬라이드-7-고객-페르소나-초안---본인-확인-필요">슬라이드 7: 고객
+페르소나 [초안 - 본인 확인 필요]</h2>
+<h3 id="인적사항">인적사항</h3>
+<ul>
+<li>이름: 김 도윤</li>
+<li>나이: 만 26세</li>
+<li>거주지: 서울</li>
+<li>최근 이슈: 첫 직장 1년차, 이직 고민 시작</li>
+</ul>
+<h3 id="니즈">니즈</h3>
+<ul>
+<li>고통: 현 직장에 불만이 있지만 이직이 맞는 건지 확신이 없다. 주변에
+물어봐도 “잘 생각해봐”만 돌아온다.</li>
+<li>필요한 것: 내 상황을 객관적으로 정리해주고, 뭘 기준으로 판단해야
+하는지 알려주는 도구</li>
+</ul>
+<h3 id="활동과-경험">활동과 경험</h3>
+<ul>
+<li>전공: 경영학</li>
+<li>커리어: 중견기업 마케팅팀 1년차</li>
+<li>AI 사용: ChatGPT로 고민 상담 시도했으나 “장단점 나열”에 그침</li>
+</ul>
+<h3 id="그그녀가-할-것-같은-말">그/그녀가 할 것 같은 말</h3>
+<p>“매일 퇴사 생각하는데, 진짜 나가야 하는 건지 그냥 힘든 시기인 건지
+모르겠어”</p>
+<hr />
+<h2 id="슬라이드-8-고객-분포-현황-바로-사용-가능">슬라이드 8: 고객 분포
+현황 [바로 사용 가능]</h2>
+<h3 id="핵심고객-특징-1-진로이직-고민자">핵심고객 특징 1: 진로/이직
+고민자</h3>
+<ul>
+<li>“쉬었음” 청년(15-29세) 50.4만명 (2025.02, 역대 최고)</li>
+<li>일자리 밖 2030세대 158.9만명</li>
+<li>이직 고민 직장인 76.5%</li>
+</ul>
+<h3 id="핵심고객-특징-2-멘탈케어-수요자">핵심고객 특징 2: 멘탈케어
+수요자</h3>
+<ul>
+<li>우울증 환자 110.7만명, 치료율 28.2% (80만명 방치)</li>
+<li>20대 우울증 5년간 127% 증가</li>
+<li>심리상담 바우처: 청년 1.5만명 한정, 연 8회 (수요 대비 턱없이
+부족)</li>
+</ul>
+<h3 id="핵심고객-특징-3-ai-수용층">핵심고객 특징 3: AI 수용층</h3>
+<ul>
+<li>생성AI 경험률 33%</li>
+<li>AI 일자리 불안 65%</li>
+<li>멘탈케어 앱 다운로드 의도 1위 (검색/다운로드 의도 순위)</li>
+</ul>
+<p>출처: 통계청, 보건복지부, 건보심평원, 메디컬타임즈, 캐치,
+AI타임스</p>
+<hr />
+<h2 id="슬라이드-16-소요자금-및-예상-매출-바로-사용-가능">슬라이드 16:
+소요자금 및 예상 매출 [바로 사용 가능]</h2>
+<h3 id="소요-자금">소요 자금</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>항목</th>
+<th>금액</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM API 비용 (Claude Sonnet/Haiku)</td>
+<td>월 30~50만원 (초기 1,000세션 기준)</td>
+</tr>
+<tr>
+<td>서버/인프라 (Vercel + Supabase)</td>
+<td>월 5만원 (무료 티어 + 소규모)</td>
+</tr>
+<tr>
+<td>도메인/SSL</td>
+<td>연 3만원</td>
+</tr>
+<tr>
+<td>마케팅 (SNS/커뮤니티)</td>
+<td>월 10만원</td>
+</tr>
+<tr>
+<td>시제품 제작 (디자인/테스트)</td>
+<td>50만원 (1회성)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="예상-매출-초기-6개월">예상 매출 (초기 6개월)</h3>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>금액</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>총 비용</td>
+<td>약 320만원 (6개월)</td>
+</tr>
+<tr>
+<td>월 매출 목표 (6개월 후)</td>
+<td>750만원 (유료 1,000명 x 7,500원)</td>
+</tr>
+<tr>
+<td>월 순수익 (6개월 후)</td>
+<td>약 650만원</td>
+</tr>
+</tbody>
+</table>
+<h3 id="유닛-이코노믹스">유닛 이코노믹스</h3>
+<ul>
+<li>CAC (고객 획득 비용): SNS/커뮤니티 기반 초기 5,000원 이하</li>
+<li>LTV (생애 가치): 월 7,500원 x 평균 6개월 = 45,000원</li>
+<li>LTV/CAC &gt; 9 (건강한 구조)</li>
+</ul>
+<hr />
+<h2 id="슬라이드-19-진행-과정-바로-사용-가능">슬라이드 19: 진행 과정
+[바로 사용 가능]</h2>
+<p>현재 단계: <strong>문제/대안 검증</strong> (1단계)</p>
+<ul>
+<li>[v] 문제/대안 검증: 본인이 1년간 AI 의사결정 시스템을 직접 사용하며
+문제 확인. 5명 전문가 에이전트 + 리서치 3건으로 시장 검증 완료.</li>
+<li><label><input type="checkbox" />솔루션 검증 (낮은 수준 MVP):
+Socratic 질문 기반 테스트 준비 중 (3월 중)</label></li>
+<li><label><input type="checkbox" />제품/서비스 검증 (높은 수준 MVP):
+웹앱 프로토타입 (4-5월)</label></li>
+<li><label><input type="checkbox" />수익모델 검증: 유료 전환 테스트
+(5-6월)</label></li>
+<li><label><input type="checkbox" />핵심지표/채널/재무 타당성 검증: (6월
+이후)</label></li>
+</ul>
+<hr />
+<h2 id="슬라이드-20-비전-초안---본인-확인-필요">슬라이드 20: 비전 [초안
+- 본인 확인 필요]</h2>
+<h3 id="vision">VISION</h3>
+<p>“감정 정리하러 왔는데, 결정까지 됐다” – 멘탈케어와 의사결정을 하나로
+연결하는 AI 코치</p>
+<h3 id="value-1-socratic-questioning">Value 1: Socratic Questioning</h3>
+<p>답을 주지 않는다. 맞는 질문을 던져서 스스로 명확해지게 한다.</p>
+<h3 id="value-2-구조화된-산출물">Value 2: 구조화된 산출물</h3>
+<p>세션이 끝나면 의사결정 정리 문서가 남는다. “상담받고 뭐가 달라졌는지
+모르겠다”를 해결한다.</p>
+<h3 id="value-3-개인화-학습">Value 3: 개인화 학습</h3>
+<p>의사결정 히스토리가 쌓이면 “당신은 관계 결정에서 항상 회피하는 패턴이
+있다”를 알려준다.</p>
+<h3 id="value-4-접근성">Value 4: 접근성</h3>
+<p>심리상담 1회 5~20만원 vs AI 코치 월 7,500원. 24시간, 대기 없이.</p>
+<hr />
+<h2 id="슬라이드-21-마케팅-계획-초안---본인-확인-필요">슬라이드 21:
+마케팅 계획 [초안 - 본인 확인 필요]</h2>
+<h3 id="마케팅-방안-1-멘탈케어-키워드-seo">마케팅 방안 1: 멘탈케어
+키워드 SEO</h3>
+<p>진입 키워드: “심리상담 앱”, “멘탈케어 앱”, “고민 상담 앱” 의사결정을
+전면에 내세우지 않고, 멘탈케어로 유입 -&gt; 제품 안에서 의사결정 정리를
+체험하게 함</p>
+<h3 id="마케팅-방안-2-대학생-커뮤니티-에브리타임-대학-상담센터">마케팅
+방안 2: 대학생 커뮤니티 (에브리타임, 대학 상담센터)</h3>
+<p>“대학 상담센터 대기 2-4주” -&gt; “24시간 AI 상담 보완” 포지셔닝
+상담센터 대기 장기화 문제에 대한 보완재로 제안</p>
+<h3 id="마케팅-방안-3-의사결정-정리-문서-바이럴">마케팅 방안 3: 의사결정
+정리 문서 바이럴</h3>
+<p>세션 결과물(정리 문서)을 공유 가능한 웹 링크로 제공 “내 고민이 이렇게
+정리됐다” 자연 공유 유도</p>
+<h3 id="마케팅-방안-4-정부-사업-연계">마케팅 방안 4: 정부 사업 연계</h3>
+<p>과기부 AI 심리케어 지원사업 240억원 (2027까지) 중기부 AI 예산
+7,992억원, 창업지원 총예산 3.4조원</p>
+<h3 id="마케팅-방안-5-b2b-eap-파일럿">마케팅 방안 5: B2B EAP 파일럿</h3>
+<p>기업 직원 멘탈케어 패키지 (인당 월 3,000~5,000원) 1개 기업 파일럿
+-&gt; 사례 확보 -&gt; 확장</p>
+<hr />
+<h2 id="슬라이드-25-월별-활동-및-예산-바로-사용-가능">슬라이드 25: 월별
+활동 및 예산 [바로 사용 가능]</h2>
+<h3 id="월별-활동">월별 활동</h3>
+<table>
+<thead>
+<tr>
+<th>추진 내용</th>
+<th style="text-align: center;">3월</th>
+<th style="text-align: center;">4월</th>
+<th style="text-align: center;">5월</th>
+<th style="text-align: center;">6월</th>
+<th style="text-align: center;">7월</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시장조사/경쟁분석</td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td>Socratic 수동 테스트</td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td>웹앱 프로토타입 개발</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td>베타 테스트 (10-20명)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td>MVP 출시 (진로 특화)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td>사용자 피드백 수집/개선</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;">v</td>
+</tr>
+<tr>
+<td>마케팅 (커뮤니티/SEO)</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+<td style="text-align: center;">v</td>
+</tr>
+<tr>
+<td>B2B 파일럿 탐색</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">v</td>
+</tr>
+</tbody>
+</table>
+<h3 id="예산-사용-계획">예산 사용 계획</h3>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>사용 내역</th>
+<th style="text-align: right;">예산(만원)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>시제품 제작비</td>
+<td>LLM API + 서버 인프라 (5개월)</td>
+<td style="text-align: right;">150</td>
+</tr>
+<tr>
+<td>시제품 제작비</td>
+<td>UI/UX 디자인</td>
+<td style="text-align: right;">50</td>
+</tr>
+<tr>
+<td>마케팅</td>
+<td>SNS 광고 + 커뮤니티 운영</td>
+<td style="text-align: right;">30</td>
+</tr>
+<tr>
+<td>기타</td>
+<td>도메인/테스트 비용</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td><strong>합계</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>250</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="슬라이드-1-표지">슬라이드 1: 표지</h2>
+<h3 id="동아리명-풀림-pullim">동아리명: 풀림 (Pullim)</h3>
+<p>“꼬인 고민이 풀리다” + “마음의 풀림” – 멘탈케어 + 의사결정 AI
+코치</p>
+<hr />
+<h2 id="슬라이드-9-비즈니스-모델-바로-사용-가능">슬라이드 9: 비즈니스
+모델 [바로 사용 가능]</h2>
+<h3 id="풀림-pullim-비즈니스-모델">풀림 (Pullim) 비즈니스 모델</h3>
+<pre><code>사용자 (고민 입력)
+    |
+    |--- 무료: 월 3회 세션
+    |--- 프리미엄 구독: 월 5,000~10,000원
+    |         (무제한 세션 + 히스토리 + 패턴 분석)
+    |
+    v
+[AI 엔진] Socratic 질문 + 자동 라우팅
+    |
+    v
+의사결정 정리 문서 (공유 가능 웹 링크)
+    |
+    v
+추적 알림 (1주/1개월 후 &quot;그 결정 어떻게 됐어?&quot;)</code></pre>
+<p>수익원: - B2C 구독: 월 5,000~10,000원 (개인) - B2B EAP: 인당 월
+3,000~5,000원 (기업 직원 멘탈케어) - 정부 그랜트: 과기부 AI 심리케어
+240억 (2027까지)</p>
+<hr />
+<h2 id="슬라이드-15-고객-설문조사-바로-사용-가능">슬라이드 15: 고객
+설문조사 [바로 사용 가능]</h2>
+<h3 id="조사-기간-2026년-3월-중-동아리-활동-시작-후-본격-시행">조사
+기간: 2026년 3월 중 (동아리 활동 시작 후 본격 시행)</h3>
+<h3 id="조사-대상자-20-30대-진로이직-고민-경험자-20명-목표">조사 대상자:
+20-30대 진로/이직 고민 경험자 20명 (목표)</h3>
+<h3 id="사전-검증-정성적">사전 검증 (정성적)</h3>
+<ul>
+<li>창업자 본인이 1년간 AI 의사결정 시스템을 직접 설계/사용하며 문제와
+효과를 체험</li>
+<li>AI 에이전트 5명 + 리서치 에이전트 3명 + Perplexity 리서치 3건으로
+시장/경쟁 검증 완료</li>
+<li>기존 멘탈케어 앱 사용자 리뷰 분석: “상담 후 뭐가 달라졌는지
+모르겠다” 공통 불만 확인</li>
+</ul>
+<h3 id="동아리-활동-중-검증-계획">동아리 활동 중 검증 계획</h3>
+<ol type="1">
+<li>Socratic 질문 기반 수동 테스트 (3월, 3~5명)</li>
+<li>웹앱 프로토타입 베타 테스트 (5월, 10~20명)</li>
+<li>사용 후 만족도 설문 (NPS, 정리 문서 유용성, 재사용 의향)</li>
+</ol>
+<hr />
+<h2 id="슬라이드-17-핵심-성과지표-및-재무-목표-바로-사용-가능">슬라이드
+17: 핵심 성과지표 및 재무 목표 [바로 사용 가능]</h2>
+<h3 id="동아리-기간37월-달성-목표">동아리 기간(3~7월) 달성 목표</h3>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>목표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Socratic 수동 테스트</td>
+<td>5명 완료 (3월)</td>
+</tr>
+<tr>
+<td>웹앱 프로토타입</td>
+<td>배포 완료 (5월)</td>
+</tr>
+<tr>
+<td>베타 테스트 사용자</td>
+<td>20명 (5월)</td>
+</tr>
+<tr>
+<td>의사결정 정리 문서 생성</td>
+<td>50건 (7월까지 누적)</td>
+</tr>
+<tr>
+<td>NPS (순추천지수)</td>
+<td>40 이상</td>
+</tr>
+<tr>
+<td>유료 전환 테스트</td>
+<td>전환율 5% 이상 확인</td>
+</tr>
+</tbody>
+</table>
+<h3 id="재무-목표-동아리-종료-후-6개월">재무 목표 (동아리 종료 후
+6개월)</h3>
+<ul>
+<li>유료 사용자: 1,000명</li>
+<li>MRR (월 반복 매출): 750만원</li>
+<li>손익분기: 동아리 종료 후 3개월 내</li>
+</ul>
+<hr />
+<h2 id="슬라이드-18-팀-소개-바로-사용-가능">슬라이드 18: 팀 소개 [바로
+사용 가능]</h2>
+<h3 id="이상규">이상규</h3>
+<p><strong>Team Leader / 기획 &amp; 개발</strong></p>
+<p>한성대학교 재학. 1년간 AI 에이전트 시스템을 직접 설계하고, 자동화된
+의사결정 파이프라인을 구축/운영한 경험. 본인이 겪은 진로, 관계, 학습 등
+실제 의사결정 문제를 AI로 해결하며 서비스 아이디어를 도출. 비개발자
+출신으로 일반 사용자의 어려움을 직접 이해하고 있음.</p>
+<p>Skills: AI 프롬프트 설계, 의사결정 프레임워크, 시장 분석, 프로덕트
+기획</p>
+<hr />
+<h2 id="아직-비어있는-슬라이드-의사결정-다듬기-후">아직 비어있는
+슬라이드 (의사결정 다듬기 후)</h2>
+<ul>
+<li>슬라이드 4: 아이템 설명 (도입 전/후 비교 — 의사결정 파이프라인 확정
+후)</li>
+<li>슬라이드 22-24: 시제품 개발 현황 (MVP 개발 후 스크린샷)</li>
+</ul>
+</body>
+</html>

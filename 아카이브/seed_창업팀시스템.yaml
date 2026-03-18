@@ -1,0 +1,128 @@
+# Seed: AI 창업팀 운영 시스템
+# Generated: 2026-03-08
+# Source: Socratic Interview (conversation-based)
+# Note: 제품 스펙(seed.yaml)과 별개 — 이건 "팀 운영 방식"의 스펙
+
+goal: >
+  "AI 의사결정 도우미" 사업을 실행할 독립적 AI 창업팀(에이전트 조직)을 설계하고 즉시 가동한다.
+  Phase 1: 창업/경영 방법론 리서치 → 컨설팅 전문가 분석 → 시작 인원 소집.
+  Phase 2: 일일 회의 체계 + 제안-승인 워크플로우로 자율 운영.
+  대표(이상규)는 아이디어 오리지네이터이자 최종 승인권자.
+
+constraints:
+  - 기존 개인 시스템(전황판/세션_맥락/밤 회의)과 완전 독립. 참조 가능하나 종속 금지
+  - 대표 = 최종 승인권자. 전문성보다 방향 설정. 전문 분석은 팀원 에이전트 담당
+  - 리서치 퍼스트 — 팀 빌딩 전에 창업/경영 방법론 리서치가 선행되어야 함
+  - 민주적 제안 — HR뿐 아니라 어떤 팀원이든 제안 가능 → 회의 → 대표 승인 → 실행
+  - 에이전트 소집 시 프롬프트 설계 = 헤드헌팅급. 역할/전문성/성격/판단기준을 정밀 정의
+  - Perplexity Pro 활용 가능 — 리서치 시 팀이 판단하여 에이전트 직접 수행 or 대표에게 요청
+  - 회의 참여 방식 유연 — 대표가 실시간 참여 or 보고서만 검토, 상황에 따라 선택
+  - 사업 도메인 — AI 의사결정 도우미 (Socratic 질문 → 의사결정 정리 문서)
+  - 기존 창업 자료 활용 — ~/study/main/창업/ 폴더의 아이디어/PRD/리서치/PPT 참조
+
+acceptance_criteria:
+  # Phase 1: 리서치 & 팀 빌딩
+  - 창업 방법론 리서치 완료 (Lean Startup, Customer Development, 스테이지 프레임워크 등)
+  - 경영/조직 운영 리서치 완료 (초기 스타트업 팀 구성, 역할 분배 모범사례)
+  - 창업 컨설팅 전문가의 리서치 분석 보고서 완료
+  - 사업 도메인(AI 의사결정 도우미) 특화 시작 팀원 목록 및 근거 제안
+  - 각 팀원 에이전트의 프롬프트 정밀 설계 완료 (헤드헌팅급)
+  - 대표 승인 후 팀 소집 완료
+
+  # Phase 2: 운영 체계
+  - 일일 회의 시스템 작동 (아침 브리핑 + 저녁 리뷰)
+  - 팀 상태 저장/복원 시스템 작동 (세션 간 맥락 유지)
+  - 제안 → 회의 → 대표 승인 워크플로우 작동
+  - 창업팀 전용 기록 체계 (회의록, 의사결정 로그, 진행상황 대시보드)
+  - 팀원 누구든 시스템/프로세스 개선 제안 가능
+
+ontology_schema:
+  name: StartupTeamOS
+  description: AI 창업팀 조직 운영 시스템 도메인 모델
+  fields:
+    - name: team_members
+      type: array
+      description: >
+        팀원 에이전트 목록. 각 항목:
+        {role, name, prompt_file, expertise, status, hired_date, hired_reason}
+
+    - name: meetings
+      type: array
+      description: >
+        회의 기록. 각 항목:
+        {date, type(morning|evening|ad-hoc), attendees, agenda, discussion, decisions, action_items}
+
+    - name: decisions
+      type: array
+      description: >
+        의사결정 기록. 각 항목:
+        {id, proposer, topic, meeting_date, discussion_summary, result(approved|rejected|deferred), rationale}
+
+    - name: proposals
+      type: array
+      description: >
+        제안 대기열. 각 항목:
+        {id, proposer, title, content, status(pending|in_meeting|approved|rejected), created_date}
+
+    - name: research
+      type: array
+      description: >
+        리서치 결과물. 각 항목:
+        {topic, researcher, sources, summary, analysis, date, status}
+
+    - name: project_dashboard
+      type: object
+      description: >
+        사업 진행 대시보드:
+        {current_phase, milestones, blockers, next_actions, kpis}
+
+    - name: hr_registry
+      type: object
+      description: >
+        HR 관리: {active_members, pending_roles, prompt_versions, recruitment_log}
+
+evaluation_principles:
+  - name: 실행_즉시성
+    description: 설계에 그치지 않고 즉시 가동 가능한가. 첫 회의가 오늘 열릴 수 있는가
+    weight: 0.25
+
+  - name: 전문성_깊이
+    description: 각 에이전트가 제네릭 조언이 아닌 도메인 특화 전문 지식을 제공하는가
+    weight: 0.25
+
+  - name: 자율_운영
+    description: 대표가 매번 지시하지 않아도 팀이 자체적으로 다음 행동을 판단하고 제안하는가
+    weight: 0.25
+
+  - name: 유연성
+    description: 팀 구조/프로세스/시스템이 팀원 제안으로 변경 가능한가. 경직되지 않는가
+    weight: 0.25
+
+exit_conditions:
+  - name: 팀_가동
+    description: 시작 팀원 소집 완료 + 첫 회의 개최
+    criteria: 최소 3명 이상의 에이전트가 소집되고 첫 아침 회의가 실행됨
+
+  - name: 자율_루프
+    description: 제안-회의-승인-실행 사이클이 1회 이상 완료
+    criteria: 팀원이 자발적으로 제안 → 회의 진행 → 대표 승인 → 실행까지 완주
+
+  - name: MVP_착수
+    description: 창업팀이 제품 MVP 개발을 시작
+    criteria: MVP 스펙 확정 + 개발 착수 + 진행 추적 시작
+
+metadata:
+  version: "1.0"
+  created: "2026-03-08"
+  interview_mode: conversation_fallback
+  ambiguity_score: 0.15
+  business_domain: AI 의사결정 도우미
+  related_seed: seed.yaml  # 제품 스펙
+  existing_assets:
+    - ~/study/main/창업/AI의사결정도우미_아이디어_2026-03-06.md
+    - ~/study/main/창업/PPT_초안_2026-03-08.md
+    - ~/study/main/창업/PRD_AI_의사결정_도우미_v1.md
+    - ~/study/main/창업/리서치_종합_2026-03-07.md
+    - ~/study/main/창업/인터뷰_결과_2026-03-07.md
+    - ~/study/main/창업/포지셔닝_의사결정_기록_2026-03-07.md
+    - ~/study/main/창업/seed.yaml  # 제품 스펙

@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Next.js
+.next/
+out/
+
+# Environment (민감 정보)
+.env
+.env.*
+!.env.local.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OMC
+.omc/
+
+# Build
+/build
+/dist
+__pycache__/
