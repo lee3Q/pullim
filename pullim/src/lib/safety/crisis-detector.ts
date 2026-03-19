@@ -25,7 +25,7 @@ export interface Hotline {
 export const HOTLINES: Hotline[] = [
   {
     name: "자살예방상담전화",
-    number: "1393",
+    number: "109",
     description: "24시간 운영, 자살 위기 전문 상담",
   },
   {

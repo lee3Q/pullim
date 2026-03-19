@@ -19,10 +19,10 @@ export default function CrisisAlert({ message, hotline, onClose }: Props) {
         <p className="text-center text-sm text-gray-600 mb-6">{hotline}</p>
         <div className="flex flex-col gap-2">
           <a
-            href="tel:1393"
+            href="tel:109"
             className="block w-full text-center py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors"
           >
-            1393 전화하기
+            109 전화하기
           </a>
           <button
             onClick={onClose}

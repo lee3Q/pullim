@@ -1,8 +1,7 @@
 import { NextRequest } from "next/server";
 import { getClient, PIPELINE_MODEL } from "@/lib/llm/claude";
-import { buildSystemPrompt } from "@/lib/llm/prompts";
+import { buildListenPrompt } from "@/lib/llm/prompts-v2";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
-import { Message, ModelType, StageName } from "@/lib/types";
 
 const SAFETY_GUARD_PROMPT = `[안전 가드 — 활성]
 사용자가 심리적으로 힘든 상태일 수 있습니다.
@@ -15,24 +14,55 @@ const SAFETY_GUARD_PROMPT = `[안전 가드 — 활성]
 
 `;
 
+// 선택지 생성을 위한 추가 프롬프트
+const OPTIONS_INSTRUCTION = `
+
+[선택지 생성 규칙]
+응답 마지막에 반드시 아래 형식으로 선택지를 포함해라:
+[OPTIONS]
+선택지1
+선택지2
+선택지3
+[/OPTIONS]
+
+선택지 규칙:
+- 3~4개 제시
+- 사용자가 자연스럽게 "맞아" 하며 탭할 수 있는 짧은 문장
+- 감정 표현 또는 상황 설명 형태 (예: "맞아, 사실 그게 제일 무서워", "아직 잘 모르겠어", "다른 것도 있어")
+- 사용자의 바로 직전 말에 대한 응답 형태
+- 마지막 선택지는 항상 "다른 얘기가 있어" 또는 "아직 잘 모르겠어" 계열`;
+
+const SUMMARY_INSTRUCTION = `
+
+[중간 정리 규칙 — 3턴 이상 대화 후]
+대화 내용을 바탕으로 중간 정리를 해라.
+정리 형식: "내가 들은 걸 정리해보면, [상황 요약]. 그리고 지금 마음은 [감정 요약]인 것 같아요. 맞나요?"
+맞는지 확인하는 것도 선택지에 포함해라.
+맞다는 확인을 받았다고 가정하고, 응답 마지막에 [LISTEN_COMPLETE] 시그널을 출력해라.
+그 뒤에 1~2문장으로 상황과 감정을 요약한 텍스트를 출력해라 (이것이 listen_summary가 된다).`;
+
 export async function POST(req: NextRequest) {
-  const { messages, stage, modelType } = (await req.json()) as {
-    messages: Message[];
-    stage: StageName;
-    modelType: ModelType;
+  const { messages, toneSetting, turnCount } = (await req.json()) as {
+    messages: { role: string; content: string; timestamp: string }[];
+    toneSetting: "반말" | "해요체";
+    turnCount: number;
   };
 
   const encoder = new TextEncoder();
 
-  // [안전 레이어] 마지막 사용자 메시지 위기 감지 — LLM 호출 전
+  // Crisis detection on last user message
   const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
-  let systemPrompt = buildSystemPrompt(stage, modelType);
+  let systemPrompt = buildListenPrompt(toneSetting) + OPTIONS_INSTRUCTION;
 
-  if (lastUserMsg) {
+  // Add summary instruction if enough turns
+  if (turnCount >= 3) {
+    systemPrompt += SUMMARY_INSTRUCTION;
+  }
+
+  if (lastUserMsg && lastUserMsg.content) {
     const crisisResult = detectCrisis(lastUserMsg.content);
 
     if (crisisResult.tier === "A") {
-      // Tier A: LLM 호출 없이 즉시 위기 응답 스트림 반환
       const crisisStream = new ReadableStream({
         start(controller) {
           controller.enqueue(
@@ -55,7 +85,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (crisisResult.tier === "B") {
-      // Tier B: 시스템 프롬프트 앞에 안전 가드 prepend
       systemPrompt = SAFETY_GUARD_PROMPT + systemPrompt;
     }
   }
@@ -64,12 +93,12 @@ export async function POST(req: NextRequest) {
   try {
     client = getClient();
   } catch (error) {
-    console.error("Claude client init error:", error);
+    void error;
     const errorStream = new ReadableStream({
       start(controller) {
         controller.enqueue(
           encoder.encode(
-            `data: ${JSON.stringify({ text: "AI 서비스에 일시적인 문제가 있습니다. 잠시 후 다시 시도해주세요." })}\n\n`
+            `data: ${JSON.stringify({ text: "AI 서비스에 일시적인 문제가 있습니다." })}\n\n`
           )
         );
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
@@ -81,12 +110,21 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Build claude messages, filtering system messages and empty ones
   const claudeMessages = messages
-    .filter((m) => m.role !== "system")
+    .filter((m) => m.role !== "system" && m.content.trim() !== "")
     .map((m) => ({
       role: m.role as "user" | "assistant",
       content: m.content,
     }));
+
+  // If no messages, add a starter
+  if (claudeMessages.length === 0) {
+    claudeMessages.push({
+      role: "user",
+      content: "안녕, 고민이 있어서 왔어.",
+    });
+  }
 
   const readable = new ReadableStream({
     async start(controller) {
@@ -98,20 +136,40 @@ export async function POST(req: NextRequest) {
           messages: claudeMessages,
         });
 
+        let fullText = "";
+
         stream.on("text", (text) => {
+          fullText += text;
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
           );
         });
 
         await stream.finalMessage();
+
+        // Extract options from the response
+        const optionsMatch = fullText.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+        if (optionsMatch) {
+          const options = optionsMatch[1]
+            .trim()
+            .split("\n")
+            .map((o) => o.trim())
+            .filter((o) => o.length > 0);
+
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ options })}\n\n`
+            )
+          );
+        }
+
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (error) {
-        console.error("Streaming error:", error);
+        void error;
         controller.enqueue(
           encoder.encode(
-            `data: ${JSON.stringify({ text: "AI 서비스에 일시적인 문제가 있습니다. 잠시 후 다시 시도해주세요.", error: true })}\n\n`
+            `data: ${JSON.stringify({ text: "AI 서비스에 일시적인 문제가 있습니다.", error: true })}\n\n`
           )
         );
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));

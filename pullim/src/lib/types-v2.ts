@@ -70,12 +70,14 @@ export interface V2Session {
   current_stage: V2StageName | "ROUTING" | "COMPLETE";
   concern_type: ConcernType | null;
   routing_scores: RoutingScoresV2 | null;
-  selected_experts: ExpertName[];
+  recommended_experts: ExpertName[]; // 라우팅에서 추천된 3명 (변경 불가)
+  selected_experts: ExpertName[]; // 사용자가 최종 선택한 3명
   expert_analyses: ExpertAnalysis[];
   debate_rounds: DebateRound[];
   crisis_level: CrisisLevel;
   tone_setting: "반말" | "해요체";
   listen_summary: string | null;
+  debate_user_context: string | null; // 사용자가 토론 전 추가한 맥락
   created_at: string;
   completed_at: string | null;
 }
