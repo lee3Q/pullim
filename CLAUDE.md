@@ -5,14 +5,15 @@ AI 의사결정/멘탈케어 SaaS. 1인 창업 (대표: 이상규).
 ## 세션 시작
 
 1. `.state/project-config.md` 읽기 (불변 설정)
-2. `.state/current-phase.md` 읽기 (현재 상태)
-3. 필요 시 `.state/decisions/` 최근 결정 확인
+2. `.state/projects/` 내 active 프로젝트 파일 읽기 (복수 가능)
+3. 필요 시 `.state/decisions/` 최근 결정, `.state/handoffs/` 최근 핸드오프 확인
 
 ## 세션 종료
 
-1. `.state/current-phase.md` 갱신
-2. 주요 결정이 있었으면 `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
-3. 세션 로그: `.state/sessions/YYYY-MM-DD_session.md` 추가 (덮어쓰기 금지)
+1. 작업한 프로젝트 파일 갱신 (`.state/projects/프로젝트명.md`)
+2. 프로젝트 완료 시 → `.state/projects/_done/` 으로 이동
+3. 주요 결정이 있었으면 `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
+4. `/handoff` 실행 권장
 
 ## 핵심 자료
 
@@ -32,3 +33,20 @@ AI 의사결정/멘탈케어 SaaS. 1인 창업 (대표: 이상규).
 - 의사결정 시 교차 모델 검증 (최소 2개 이종 모델)
 - 덮어쓰기 금지: decisions/, sessions/ 는 추가만
 - 위기 안전: RED → LLM 즉시 중단 → 전문기관 안내
+
+## 워크플로우 강제 규칙
+
+**프로젝트 파일의 "단계"를 반드시 따른다.**
+- 각 프로젝트 파일(.state/projects/)에 단계가 명시되어 있음
+- 현재 단계의 방법(리서치 방식, 검증 방식 등)을 반드시 준수
+- 단계를 건너뛰거나 방법을 바꿔서 실행하지 않는다
+
+**더 효율적인 방법이 있다고 판단되면:**
+- 실행하지 말고 **제안**한다 ("이렇게 하면 더 효율적일 것 같은데, 변경할까요?")
+- 대표가 승인하면 프로젝트 파일의 단계를 갱신한 후 실행
+- 대표가 거부하면 기존 단계대로 실행
+
+**리서치 워크플로우:**
+- Claude 단독 리서치 금지
+- 최소: 대표에게 "Perplexity/Gemini 프롬프트 드릴까요?" 확인 후 병렬 진행
+- project-config.md의 워크플로우 스택 참조
