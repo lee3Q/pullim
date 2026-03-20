@@ -15,13 +15,14 @@
 ## AI 활용 구조 (워크플로우 스택)
 ```
 [대표 이상규 = 오케스트레이터]
-├── 코딩: Claude Code (Opus=복잡, Sonnet=일상, Haiku=라우팅)
-├── 리서치: Gemini Deep Research + Perplexity(GPT 5.4/Kimi/Sonnet) + Claude
-├── 의사결정 검증: 교차 모델 (Claude + GLM-5 + GPT 5.4, 최소 2종)
+├── 코딩 (단순): Claude Code 직접 (Opus=복잡, Sonnet=일상)
+├── 코딩 (복잡): Ouroboros /interview → /seed → /ralph
+├── 리서치: /research → Gemini Deep Research + Perplexity + Claude 3자 병렬
+├── 의사결정 검증: /cross-check → Claude(Opus+Sonnet) + GLM-5 (최소 2종)
 │   ├── 3인칭 프레이밍 필수
 │   └── 불일치 지점 = 핵심 의사결정 포인트
 ├── 콘텐츠/생성: Perplexity+Sonnet / GPT 5.4
-└── 품질검증: GLM-5 (Judge Agent) → 불일치 시 3자 판정
+└── 품질검증: 프로젝트 파일 체크포인트 → /cross-check
 ```
 
 ## 금지 사항
@@ -47,6 +48,11 @@
 2. **논의** — 리서치 합성, 불일치 중심
 3. **검증** — /cross-check
 4. **실행** — 산출물 제작
+   - [ ] 산출물 A
+   - [ ] 산출물 B
+   - [ ] 산출물 C
+   - ⚡ 품질검증 체크포인트 (건너뛸 수 없음)
+   - [ ] 산출물 D ...
 5. **최종 검증** — 제출/배포 전 교차검토
 ```
 각 프로젝트 성격에 따라 단계 조정 가능 (대표 승인 필요)

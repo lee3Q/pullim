@@ -124,7 +124,7 @@ $ ppl
 
 [Tier 2 — 교차검증 + 리서치]
   GLM-5              같은 환경 Judge Agent (/cross-check)
-  GPT 5.1            범용 교차검증
+  GPT 5.4            범용 교차검증
   Perplexity         리서치 + 생성 (GPT 5.4 / Kimi K2.5 / Sonnet 선택)
   Gemini             Deep Research (심층 리서치)
 
