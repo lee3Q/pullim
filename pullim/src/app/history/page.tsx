@@ -1,78 +1,59 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSessionStore } from "@/lib/store/session-store";
-import { MODEL_LABELS, ModelType } from "@/lib/types";
+import Image from "next/image";
 
 export default function HistoryPage() {
   const router = useRouter();
-  const sessions = useSessionStore((s) => s.sessions);
-
-  const sessionList = Object.values(sessions)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => router.push("/")} className="text-violet-600 text-sm font-medium">
-          &larr; 홈
+    <div className="min-h-screen flex flex-col relative">
+      {/* 배경 — 홈과 동일 */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#12101a] via-[#1a1530] to-[#1e1a28]" />
+        <div className="absolute inset-0 opacity-50">
+          <Image
+            src="/assets/home-bg.webp"
+            alt=""
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
+      </div>
+
+      {/* Header */}
+      <header className="px-4 py-3 flex items-center gap-3 relative z-10">
+        <button
+          onClick={() => router.back()}
+          className="rpg-button-ghost px-3 py-1.5 text-xs font-rpg-sm"
+        >
+          &larr; 뒤로
         </button>
-        <span className="text-sm font-semibold text-gray-900">내 기록</span>
-        <div className="w-12" />
+        <span className="text-sm font-rpg text-white/70">내 기록</span>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
-        {sessionList.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-400 mb-4">아직 기록이 없어요</p>
-            <button
-              onClick={() => router.push("/")}
-              className="text-violet-600 text-sm font-medium"
-            >
-              첫 고민 시작하기
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {sessionList.map((session) => (
-              <button
-                key={session.id}
-                onClick={() => router.push(`/session/${session.id}`)}
-                className="w-full text-left bg-white border border-gray-100 rounded-xl p-4 shadow-sm
-                           hover:border-violet-200 transition-colors"
-              >
-                <p className="text-sm text-gray-800 font-medium line-clamp-2 mb-2">
-                  {session.input_text}
-                </p>
-                <div className="flex items-center gap-3 text-xs text-gray-400">
-                  <span>
-                    {new Date(session.created_at).toLocaleDateString("ko-KR", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                  {session.model_type && (
-                    <span className="bg-violet-50 text-violet-600 px-2 py-0.5 rounded-full">
-                      {MODEL_LABELS[session.model_type as ModelType]}
-                    </span>
-                  )}
-                  <span
-                    className={`px-2 py-0.5 rounded-full ${
-                      session.current_stage === "COMPLETE"
-                        ? "bg-green-50 text-green-600"
-                        : "bg-amber-50 text-amber-600"
-                    }`}
-                  >
-                    {session.current_stage === "COMPLETE" ? "완료" : "진행중"}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
+      {/* Main */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
+        <div className="rpg-panel px-8 py-10 max-w-sm w-full text-center">
+          <p className="text-white/50 text-sm font-rpg mb-6">
+            아직 기록이 없습니다.
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="rpg-button px-6 py-2.5 text-sm font-rpg"
+          >
+            새 고민 시작하기
+          </button>
+        </div>
       </main>
+
+      {/* Footer */}
+      <footer className="text-center text-xs text-white/25 py-4 relative z-10">
+        풀림은 전문 상담을 대체하지 않습니다.
+      </footer>
     </div>
   );
 }

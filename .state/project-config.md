@@ -8,7 +8,7 @@
 
 ## 안전 규칙 (절대 불변)
 - 위기 감지 3단계: GREEN / YELLOW(Tier B) / RED(Tier A)
-- RED 시: 즉시 LLM 중단 → 전문기관 안내 (1393, 1577-0199)
+- RED 시: 즉시 LLM 중단 → 전문기관 안내 (109, 1577-0199)
 - 존재 가치 의심하게 만드는 말 금지 (톤 무관)
 - AI는 augment only — 절대 replace human judgment 아님
 
@@ -17,10 +17,10 @@
 [대표 이상규 = 오케스트레이터]
 ├── 코딩: Claude Code (Opus=복잡, Sonnet=일상, Haiku=라우팅)
 ├── 리서치: Gemini Deep Research + Perplexity(GPT 5.4/Kimi/Sonnet) + Claude
-├── 의사결정 검증: 교차 모델 (Claude + GLM-5 + GPT 5.1, 최소 2종)
+├── 의사결정 검증: 교차 모델 (Claude + GLM-5 + GPT 5.4, 최소 2종)
 │   ├── 3인칭 프레이밍 필수
 │   └── 불일치 지점 = 핵심 의사결정 포인트
-├── 콘텐츠/생성: Perplexity+Sonnet / GPT 5.1
+├── 콘텐츠/생성: Perplexity+Sonnet / GPT 5.4
 └── 품질검증: GLM-5 (Judge Agent) → 불일치 시 3자 판정
 ```
 

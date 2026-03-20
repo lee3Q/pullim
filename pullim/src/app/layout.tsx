@@ -23,6 +23,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="antialiased">
         <StoreProvider>{children}</StoreProvider>
       </body>

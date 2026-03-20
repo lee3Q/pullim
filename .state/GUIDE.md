@@ -153,7 +153,7 @@ $ ppl
 ├── .state/
 │   ├── GUIDE.md               ← 이 파일
 │   ├── project-config.md      ← 불변 (아키텍처/원칙)
-│   ├── current-phase.md       ← 매 세션 갱신
+│   ├── projects/              ← 프로젝트별 상태 파일
 │   ├── decisions/             ← 추가만 (덮어쓰기 X)
 │   ├── sessions/              ← 추가만 (덮어쓰기 X)
 │   └── handoffs/              ← 추가만 (덮어쓰기 X)
