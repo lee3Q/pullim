@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ConclusionData, ActionCommitment } from "@/lib/types-ultimate";
 
 interface Props {
@@ -142,7 +143,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
             &ldquo;{farewell}&rdquo;
           </p>
           <div className="flex gap-3 justify-center mt-4">
-            <a href="/" className="rpg-button-ghost px-4 py-2 text-xs font-rpg-sm">새 고민 시작하기</a>
+            <Link href="/" className="rpg-button-ghost px-4 py-2 text-xs font-rpg-sm">새 고민 시작하기</Link>
             <a href="/history" className="rpg-button-ghost px-4 py-2 text-xs font-rpg-sm">내 기록 보기</a>
           </div>
         </>

@@ -4,10 +4,10 @@ import Image from "next/image";
 import { CharacterName } from "@/lib/types-ultimate";
 
 const CHARACTER_ICONS: Record<CharacterName, string> = {
-  현자: "🧙",
-  비서: "🏙️",
+  현자: "🦉",
+  비서: "🐱",
   코치: "🔥",
-  친구: "🌿",
+  친구: "🐰",
 };
 
 interface Props {

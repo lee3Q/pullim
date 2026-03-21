@@ -17,20 +17,26 @@ import {
 import { getTheme } from "@/lib/themes";
 import { useBGM } from "@/hooks/useBGM";
 import ThemedBackground from "@/components/ultimate/backgrounds/ThemedBackground";
-import StageIndicator from "@/components/ultimate/StageIndicator";
-import CharacterDialogue from "@/components/ultimate/CharacterDialogue";
+import ProgressVisual from "@/components/game/ProgressVisual";
 import CrystalSelector from "@/components/ultimate/CrystalSelector";
 import DataCardList from "@/components/ultimate/DataCardList";
 import CrystalAnalysisView from "@/components/ultimate/CrystalAnalysisView";
 import ConclusionView from "@/components/ultimate/ConclusionView";
 import LoadingOverlay from "@/components/ultimate/LoadingOverlay";
-import SelectionButtons from "@/components/ultimate/SelectionButtons";
 import CrisisAlert from "@/components/CrisisAlert";
-import ChatInput from "@/components/ChatInput";
+import GameDialogue from "@/components/game/GameDialogue";
+import GameChoices from "@/components/game/GameChoices";
+import GameInput from "@/components/game/GameInput";
+import Link from "next/link";
 
 const theme = getTheme("달빛정원");
 
 const ERROR_MSG = "꽃봉오리가 잠시 잠들었어요... 다시 한번 이야기해줄 수 있어요?";
+
+type TimelineItem =
+  | { type: "dialogue"; role: "character" | "user"; text: string }
+  | { type: "research-cards" }
+  | { type: "crystal-analysis" };
 
 export default function GardenSessionPage() {
   const params = useParams();
@@ -40,9 +46,7 @@ export default function GardenSessionPage() {
   // 세션 상태
   const [stage, setStage] = useState<StageName>("ENTER");
   const [userName, setUserName] = useState<string | null>(null);
-  const [dialogues, setDialogues] = useState<
-    { role: "character" | "user"; text: string }[]
-  >([]);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [crisis, setCrisis] = useState<{
     message: string;
@@ -50,8 +54,7 @@ export default function GardenSessionPage() {
   } | null>(null);
   const [options, setOptions] = useState<string[]>([]);
   const [showInitialTyping, setShowInitialTyping] = useState(true);
-  const [researchAtIndex, setResearchAtIndex] = useState<number | null>(null);
-  const [analysisAtIndex, setAnalysisAtIndex] = useState<number | null>(null);
+
 
   // 파이프라인 데이터
   const [concern, setConcern] = useState<string>("");
@@ -78,18 +81,28 @@ export default function GardenSessionPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [dialogues, scrollToBottom]);
+  }, [timeline, scrollToBottom]);
+
+  // Show game choices after streaming ends
+  const choicesVisible = !isStreaming && options.length > 0;
 
   const addDialogue = useCallback(
     (role: "character" | "user", text: string) => {
-      setDialogues((prev) => [...prev, { role, text }]);
+      setTimeline((prev) => [...prev, { type: "dialogue", role, text }]);
+    },
+    []
+  );
+
+  const addTimelineMarker = useCallback(
+    (type: "research-cards" | "crystal-analysis") => {
+      setTimeline((prev) => [...prev, { type }]);
     },
     []
   );
 
   // 초기 입장
   useEffect(() => {
-    if (stage === "ENTER" && dialogues.length === 0) {
+    if (stage === "ENTER" && timeline.length === 0) {
       const t1 = setTimeout(() => {
         setShowInitialTyping(false);
         addDialogue("character", "...어서 와요.");
@@ -107,7 +120,7 @@ export default function GardenSessionPage() {
         clearTimeout(t2);
       };
     }
-  }, [stage, dialogues.length, addDialogue]);
+  }, [stage, timeline.length, addDialogue]);
 
   // --- API 호출 함수들 ---
 
@@ -274,11 +287,11 @@ export default function GardenSessionPage() {
       setOptions(crystalOptions);
 
       setTimeout(() => {
+        addTimelineMarker("crystal-analysis");
         addDialogue(
           "character",
           "꽃봉오리들이 이야기를 들려줬어요.\n어떤 이야기가 가장 마음에 와닿았어요?"
         );
-        setAnalysisAtIndex(dialogues.length + 1);
       }, 500);
     } catch {
       addDialogue("character", ERROR_MSG);
@@ -418,7 +431,7 @@ export default function GardenSessionPage() {
       setIsStreaming(false);
 
       addDialogue("character", "정원에서 비슷한 이야기를 찾았어요.\n어떤 이야기가 가장 마음에 걸려요?");
-      setResearchAtIndex(dialogues.length + 1);
+      addTimelineMarker("research-cards");
       setStage("DISCUSS_1");
     } catch {
       addDialogue("character", "정원의 기록이 흐려졌어요... 그래도 괜찮아요.");
@@ -575,8 +588,6 @@ export default function GardenSessionPage() {
     "DISCUSS_3",
   ].includes(stage);
   const showCrystals = stage === "CRYSTAL_SELECT";
-  const showAnalysis =
-    stage === "DISCUSS_2" || stage === "DEBATE" || stage === "DISCUSS_3";
   const showConclusion = stage === "CONCLUDE" && conclusion;
 
   return (
@@ -589,11 +600,11 @@ export default function GardenSessionPage() {
         />
       )}
 
-      <ThemedBackground theme={theme} />
+      <ThemedBackground theme={theme} currentStage={stage} />
 
       <header className="sticky top-0 px-4 py-3 flex justify-between items-center z-20 backdrop-blur-md bg-black/30">
         <div className="flex items-center gap-2">
-          <a href="/" className="text-lg hover:opacity-70 transition-opacity" aria-label="홈으로">{theme.icon}</a>
+          <Link href="/" className="text-lg hover:opacity-70 transition-opacity" aria-label="홈으로">{theme.icon}</Link>
           <span className="text-sm font-rpg text-white/60">
             {theme.title}
           </span>
@@ -616,96 +627,99 @@ export default function GardenSessionPage() {
         </div>
       </header>
       <div className="sticky top-[52px] z-20 backdrop-blur-md bg-black/30">
-        <StageIndicator
+        <ProgressVisual
           currentStage={stage}
           primaryColor={theme.colors.primary}
+          gameUI={theme.gameUI}
         />
       </div>
 
       <main className="flex-1 overflow-y-auto px-4 py-4 relative z-10">
         <div className="flex flex-col gap-4 max-w-lg mx-auto">
           {/* 초기 타이핑 인디케이터 */}
-          {showInitialTyping && stage === "ENTER" && dialogues.length === 0 && (
-            <CharacterDialogue
+          {showInitialTyping && stage === "ENTER" && timeline.length === 0 && (
+            <GameDialogue
               character={theme.character}
               text=""
               primaryColor={theme.colors.primary}
               avatarSrc={theme.assets.avatar}
               typing
+              gameUI={theme.gameUI}
             />
           )}
 
-          {/* 타임라인: 대화 → 리서치카드 → 대화 → 분석 → 대화 순서로 렌더링 */}
-          {(() => {
-            const splitR = researchAtIndex ?? dialogues.length;
-            const splitA = analysisAtIndex ?? dialogues.length;
-            const renderDialogue = (d: { role: "character" | "user"; text: string }, i: number) =>
-              d.role === "character" ? (
-                <CharacterDialogue key={`d${i}`} character={theme.character} text={d.text} primaryColor={theme.colors.primary} avatarSrc={theme.assets.avatar} />
-              ) : (
-                <div key={`d${i}`} className="self-end max-w-[80%]">
-                  <div className="rpg-panel-light rounded-2xl rounded-tr-sm px-4 py-3 text-sm text-white/90 font-rpg">{d.text}</div>
-                </div>
-              );
-
-            return (
-              <>
-                {/* 리서치 전 대화 */}
-                {dialogues.slice(0, splitR).map(renderDialogue)}
-
-                {/* 데이터 카드 */}
-                {dataCards.length > 0 && researchAtIndex !== null && (
-                  <div className="stage-enter">
+          {/* 타임라인: 모든 컨텐츠를 시간순 렌더링 (최신이 항상 아래) */}
+          {timeline.map((item, i) => {
+            switch (item.type) {
+              case "dialogue":
+                return item.role === "character" ? (
+                  <GameDialogue
+                    key={`t${i}`}
+                    character={theme.character}
+                    text={item.text}
+                    primaryColor={theme.colors.primary}
+                    avatarSrc={theme.assets.avatar}
+                    gameUI={theme.gameUI}
+                  />
+                ) : (
+                  <div key={`t${i}`} className="self-end max-w-[80%]">
+                    <div className="game-user-message px-4 py-3 text-sm text-white/90 font-rpg">{item.text}</div>
+                  </div>
+                );
+              case "research-cards":
+                return dataCards.length > 0 ? (
+                  <div key={`t${i}`} className="stage-enter garden-skin-cards">
                     <DataCardList cards={dataCards} primaryColor={theme.colors.primary} onSelect={handleDataCardSelect} />
                   </div>
-                )}
-
-                {/* 리서치 후 ~ 분석 전 대화 */}
-                {dialogues.slice(splitR, splitA).map(renderDialogue)}
-
-                {/* 꽃봉오리 선택 */}
-                {showCrystals && (
-                  <div className="stage-enter">
-                    <CrystalSelector max={3} crystalLabel={theme.crystalLabel} crystalShape={theme.crystalShape} primaryColor={theme.colors.primary} onConfirm={handleCrystalConfirm} />
-                  </div>
-                )}
-
-                {/* 꽃봉오리 분석 결과 */}
-                {showAnalysis && crystalAnalyses.length > 0 && (
-                  <div className="stage-enter">
+                ) : null;
+              case "crystal-analysis":
+                return crystalAnalyses.length > 0 ? (
+                  <div key={`t${i}`} className="stage-enter garden-skin-cards">
                     <CrystalAnalysisView analyses={crystalAnalyses} disagreements={disagreements} primaryColor={theme.colors.primary} crystalLabel={theme.crystalLabel} />
                   </div>
-                )}
+                ) : null;
+              default:
+                return null;
+            }
+          })}
 
-                {/* 분석 후 대화 */}
-                {dialogues.slice(splitA).map(renderDialogue)}
+          {/* 꽃봉오리 선택 (인터랙티브 — 항상 타임라인 아래) */}
+          {showCrystals && (
+            <div className="stage-enter garden-skin-cards">
+              <CrystalSelector max={3} crystalLabel={theme.crystalLabel} crystalShape={theme.crystalShape} primaryColor={theme.colors.primary} onConfirm={handleCrystalConfirm} />
+            </div>
+          )}
 
-                {/* 결론 */}
-                {showConclusion && (
-                  <div className="stage-enter">
-                    <ConclusionView conclusion={conclusion} tagline={theme.labels.tagline} farewell={theme.labels.farewell} primaryColor={theme.colors.primary} onCommit={handleCommit} />
-                  </div>
-                )}
-              </>
-            );
-          })()}
+          {/* 결론 */}
+          {showConclusion && (
+            <div className="stage-enter garden-skin-cards">
+              <ConclusionView conclusion={conclusion} tagline={theme.labels.tagline} farewell={theme.labels.farewell} primaryColor={theme.colors.primary} onCommit={handleCommit} />
+            </div>
+          )}
 
           {/* 스트리밍 인디케이터 */}
           {isStreaming && !loadingStage && (
-            <CharacterDialogue character={theme.character} text="" primaryColor={theme.colors.primary} avatarSrc={theme.assets.avatar} typing />
+            <GameDialogue character={theme.character} text="" primaryColor={theme.colors.primary} avatarSrc={theme.assets.avatar} typing gameUI={theme.gameUI} />
           )}
 
           {/* 로딩 오버레이 */}
           {loadingStage && (
-            <div className="stage-enter">
+            <div className="stage-enter garden-skin-cards">
               <LoadingOverlay stage={loadingStage} primaryColor={theme.colors.primary} crystalLabel={theme.crystalLabel} character={theme.character} />
             </div>
           )}
 
           {/* 선택지 버튼 */}
-          {options.length > 0 && !isStreaming && (
+          {options.length > 0 && (
             <div className="stage-enter">
-              <SelectionButtons options={options} onSelect={handleOptionSelect} primaryColor={theme.colors.primary} onCustomInput={() => setOptions([])} />
+              <GameChoices
+                options={options}
+                onSelect={handleOptionSelect}
+                primaryColor={theme.colors.primary}
+                onCustomInput={() => setOptions([])}
+                visible={choicesVisible}
+                gameUI={theme.gameUI}
+              />
             </div>
           )}
 
@@ -715,10 +729,11 @@ export default function GardenSessionPage() {
 
       {showInput && !isStreaming && options.length === 0 && (
         <div className="relative z-10">
-          <ChatInput
+          <GameInput
             onSend={handleUserInput}
-            dark
             placeholder="마음을 이야기해보세요..."
+            gameUI={theme.gameUI}
+            primaryColor={theme.colors.primary}
           />
         </div>
       )}

@@ -1,4 +1,16 @@
-import { ThemeName, CharacterName } from "@/lib/types-ultimate";
+import { ThemeName, CharacterName, StageName } from "@/lib/types-ultimate";
+
+export interface GameUIStyle {
+  dialogueStyle: "letter" | "parchment" | "card" | "default";
+  choiceStyle: "petal" | "signpost" | "card" | "default";
+  progressStyle: "garden" | "journey" | "analysis" | "default";
+  inputLabel: string;
+}
+
+export interface SceneConfig {
+  gradient: string;
+  particle: "stars" | "firefly" | "petal" | "glow" | "none";
+}
 
 export interface Theme {
   name: ThemeName;
@@ -36,7 +48,17 @@ export interface Theme {
 
   route: string; // "/adventure" | "/strategy" | "/garden"
   useCases: string; // 적합 상황 태그
+
+  gameUI?: GameUIStyle;
+  scenes?: Partial<Record<StageName, SceneConfig>>;
 }
+
+export const CHARACTER_ICONS: Record<CharacterName, string> = {
+  현자: "\uD83E\uDD89",
+  비서: "\uD83D\uDC31",
+  코치: "\uD83D\uDD25",
+  친구: "\uD83D\uDC30",
+};
 
 export const THEMES: Record<ThemeName, Theme> = {
   모험가: {
@@ -73,6 +95,67 @@ export const THEMES: Record<ThemeName, Theme> = {
     },
     route: "/adventure",
     useCases: "막막한 갈림길 \u00B7 직관적 결정",
+
+    gameUI: {
+      dialogueStyle: "parchment",
+      choiceStyle: "signpost",
+      progressStyle: "journey",
+      inputLabel: "직접 말하기",
+    },
+    scenes: {
+      ENTER: {
+        gradient: "from-[#0d1a0d] via-[#1a2e1a] to-[#1a1510]",
+        particle: "firefly",
+      },
+      LISTEN: {
+        gradient: "from-[#1a1510] via-[#2a1f15] to-[#1a1510]",
+        particle: "stars",
+      },
+      RESEARCH: {
+        gradient: "from-[#141430] via-[#1e1d45] to-[#141430]",
+        particle: "glow",
+      },
+      VERIFY: {
+        gradient: "from-[#141430] via-[#1e1d45] to-[#141430]",
+        particle: "glow",
+      },
+      DISCUSS_1: {
+        gradient: "from-[#141430] via-[#1e1d45] to-[#141430]",
+        particle: "glow",
+      },
+      CRYSTAL_SELECT: {
+        gradient: "from-[#0d1530] via-[#1a1d45] to-[#0d1530]",
+        particle: "stars",
+      },
+      CRYSTAL_ANALYZE: {
+        gradient: "from-[#0d1530] via-[#1a1d45] to-[#0d1530]",
+        particle: "stars",
+      },
+      DISCUSS_2: {
+        gradient: "from-[#0d1530] via-[#1a1d45] to-[#0d1530]",
+        particle: "stars",
+      },
+      DEBATE: {
+        gradient: "from-[#0d1a0d] via-[#1a2e1a] to-[#1a1510]",
+        particle: "petal",
+      },
+      DISCUSS_3: {
+        gradient: "from-[#0d1a0d] via-[#1a2e1a] to-[#1a1510]",
+        particle: "petal",
+      },
+      JUDGE: {
+        gradient: "from-[#0d1a0d] via-[#1a2e1a] to-[#1a1510]",
+        particle: "petal",
+      },
+      CONCLUDE: {
+        gradient: "from-[#2a1525] via-[#2e1a20] to-[#2a1f15]",
+        particle: "glow",
+      },
+      COMPLETE: {
+        gradient: "from-[#2a1525] via-[#2e1a20] to-[#2a1f15]",
+        particle: "glow",
+      },
+    },
   },
 
   전략실: {
@@ -109,6 +192,67 @@ export const THEMES: Record<ThemeName, Theme> = {
     },
     route: "/strategy",
     useCases: "데이터 \u00B7 논리 \u00B7 전문가 시각",
+
+    gameUI: {
+      dialogueStyle: "card",
+      choiceStyle: "card",
+      progressStyle: "analysis",
+      inputLabel: "메모 추가",
+    },
+    scenes: {
+      ENTER: {
+        gradient: "from-[#0a0f1e] via-[#111827] to-[#0a0f1e]",
+        particle: "glow",
+      },
+      LISTEN: {
+        gradient: "from-[#0c1225] via-[#15203a] to-[#0c1225]",
+        particle: "glow",
+      },
+      RESEARCH: {
+        gradient: "from-[#0a1028] via-[#141e40] to-[#0a1028]",
+        particle: "glow",
+      },
+      VERIFY: {
+        gradient: "from-[#0a1028] via-[#141e40] to-[#0a1028]",
+        particle: "glow",
+      },
+      DISCUSS_1: {
+        gradient: "from-[#0a1028] via-[#141e40] to-[#0a1028]",
+        particle: "glow",
+      },
+      CRYSTAL_SELECT: {
+        gradient: "from-[#0d1030] via-[#181d48] to-[#0d1030]",
+        particle: "stars",
+      },
+      CRYSTAL_ANALYZE: {
+        gradient: "from-[#0d1030] via-[#181d48] to-[#0d1030]",
+        particle: "stars",
+      },
+      DISCUSS_2: {
+        gradient: "from-[#0d1030] via-[#181d48] to-[#0d1030]",
+        particle: "stars",
+      },
+      DEBATE: {
+        gradient: "from-[#0e1225] via-[#1a1e35] to-[#0e1225]",
+        particle: "glow",
+      },
+      DISCUSS_3: {
+        gradient: "from-[#0e1225] via-[#1a1e35] to-[#0e1225]",
+        particle: "glow",
+      },
+      JUDGE: {
+        gradient: "from-[#0e1225] via-[#1a1e35] to-[#0e1225]",
+        particle: "glow",
+      },
+      CONCLUDE: {
+        gradient: "from-[#0c1530] via-[#152040] to-[#10182e]",
+        particle: "glow",
+      },
+      COMPLETE: {
+        gradient: "from-[#0c1530] via-[#152040] to-[#10182e]",
+        particle: "glow",
+      },
+    },
   },
 
   달빛정원: {
@@ -145,6 +289,67 @@ export const THEMES: Record<ThemeName, Theme> = {
     },
     route: "/garden",
     useCases: "감정 정리 \u00B7 마음 돌봄",
+
+    gameUI: {
+      dialogueStyle: "letter",
+      choiceStyle: "petal",
+      progressStyle: "garden",
+      inputLabel: "마음 적기",
+    },
+    scenes: {
+      ENTER: {
+        gradient: "from-[#0d0d2b] via-[#151540] to-[#0d0d2b]",
+        particle: "stars",
+      },
+      LISTEN: {
+        gradient: "from-[#141433] via-[#1e2550] to-[#141433]",
+        particle: "firefly",
+      },
+      RESEARCH: {
+        gradient: "from-[#1a1440] via-[#251d55] to-[#1a1440]",
+        particle: "petal",
+      },
+      VERIFY: {
+        gradient: "from-[#1a1440] via-[#251d55] to-[#1a1440]",
+        particle: "petal",
+      },
+      DISCUSS_1: {
+        gradient: "from-[#1a1440] via-[#251d55] to-[#1a1440]",
+        particle: "petal",
+      },
+      CRYSTAL_SELECT: {
+        gradient: "from-[#1e1545] via-[#2a1d50] to-[#1e1545]",
+        particle: "glow",
+      },
+      CRYSTAL_ANALYZE: {
+        gradient: "from-[#1e1545] via-[#2a1d50] to-[#1e1545]",
+        particle: "glow",
+      },
+      DISCUSS_2: {
+        gradient: "from-[#1e1545] via-[#2a1d50] to-[#1e1545]",
+        particle: "glow",
+      },
+      DEBATE: {
+        gradient: "from-[#1a0f3a] via-[#2d1850] to-[#1a0f3a]",
+        particle: "firefly",
+      },
+      DISCUSS_3: {
+        gradient: "from-[#1a0f3a] via-[#2d1850] to-[#1a0f3a]",
+        particle: "firefly",
+      },
+      JUDGE: {
+        gradient: "from-[#1a0f3a] via-[#2d1850] to-[#1a0f3a]",
+        particle: "firefly",
+      },
+      CONCLUDE: {
+        gradient: "from-[#1e1540] via-[#2a1f4a] to-[#2a1a3a]",
+        particle: "glow",
+      },
+      COMPLETE: {
+        gradient: "from-[#1e1540] via-[#2a1f4a] to-[#2a1a3a]",
+        particle: "glow",
+      },
+    },
   },
 };
 

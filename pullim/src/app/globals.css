@@ -318,3 +318,625 @@ body {
   0%, 80%, 100% { opacity: 0.3; }
   40% { opacity: 1; }
 }
+
+/* ========================================
+   Game UI — Letter dialogue box
+   ======================================== */
+.game-letter-box {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 50, 120, 0.35),
+    rgba(60, 35, 95, 0.45),
+    rgba(80, 50, 120, 0.35)
+  );
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 14px rgba(0, 0, 0, 0.12),
+    0 1px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+/* ========================================
+   Game UI — Petal choice buttons
+   ======================================== */
+.game-petal-button {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.12),
+    rgba(196, 130, 230, 0.10),
+    rgba(167, 139, 250, 0.12)
+  );
+  border: 1.5px solid rgba(167, 139, 250, 0.25);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  opacity: 0;
+  animation: game-petal-appear 0.4s ease-out forwards;
+}
+.game-petal-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.22),
+    rgba(196, 130, 230, 0.18),
+    rgba(167, 139, 250, 0.22)
+  );
+  border-color: rgba(167, 139, 250, 0.45);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.15);
+}
+.game-petal-button:active {
+  transform: scale(0.97);
+}
+.game-petal-button:disabled {
+  cursor: default;
+}
+
+@keyframes game-petal-appear {
+  0% { opacity: 0; transform: translateY(8px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ========================================
+   Game UI — Input toggle & letter textarea
+   ======================================== */
+.game-input-toggle {
+  background: rgba(167, 139, 250, 0.06);
+  border: 1.5px dashed rgba(167, 139, 250, 0.25);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.game-input-toggle:hover {
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+.game-input-toggle:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.game-letter-input {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 50, 120, 0.3),
+    rgba(60, 35, 95, 0.4),
+    rgba(80, 50, 120, 0.3)
+  );
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.game-letter-textarea {
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(167, 139, 250, 0.08) 27px,
+    rgba(167, 139, 250, 0.08) 28px
+  );
+  line-height: 28px;
+}
+.game-letter-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ========================================
+   Game UI — Cursor blink
+   ======================================== */
+@keyframes game-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ========================================
+   Game UI — User message (garden)
+   ======================================== */
+.game-user-message {
+  background: linear-gradient(
+    135deg,
+    rgba(100, 70, 140, 0.3),
+    rgba(80, 50, 120, 0.4),
+    rgba(100, 70, 140, 0.3)
+  );
+  border: 1px solid rgba(196, 181, 253, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 1px 4px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  border-radius: 16px 4px 16px 16px;
+}
+
+/* ========================================
+   Game UI — Data card (garden skin)
+   ======================================== */
+.game-data-card-garden {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 50, 120, 0.3),
+    rgba(60, 35, 95, 0.4),
+    rgba(80, 50, 120, 0.3)
+  );
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 12px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 14px;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s;
+}
+.game-data-card-garden:hover {
+  border-color: rgba(167, 139, 250, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 12px rgba(167, 139, 250, 0.12),
+    0 1px 6px rgba(0, 0, 0, 0.2);
+}
+.game-data-card-garden.selected {
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow:
+    0 0 20px rgba(167, 139, 250, 0.15),
+    inset 0 0 15px rgba(167, 139, 250, 0.06);
+}
+
+/* ========================================
+   Garden Skin — override rpg panels inside garden context
+   ======================================== */
+.garden-skin-cards .rpg-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 50, 120, 0.4),
+    rgba(60, 35, 95, 0.5),
+    rgba(80, 50, 120, 0.4)
+  );
+  border-color: rgba(167, 139, 250, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 18px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.garden-skin-cards .rpg-panel-light {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 50, 120, 0.28),
+    rgba(60, 35, 95, 0.38),
+    rgba(80, 50, 120, 0.28)
+  );
+  border-color: rgba(167, 139, 250, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 12px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+.garden-skin-cards .rpg-button {
+  background: linear-gradient(
+    to bottom,
+    rgba(167, 139, 250, 0.8),
+    rgba(139, 92, 246, 0.8)
+  );
+  border-color: rgba(196, 181, 253, 0.45);
+  color: #0f0f1a;
+}
+.garden-skin-cards .rpg-button:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(180, 155, 255, 0.9),
+    rgba(155, 110, 255, 0.9)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 12px rgba(167, 139, 250, 0.3);
+}
+.garden-skin-cards .rpg-button-ghost {
+  border-color: rgba(167, 139, 250, 0.25);
+}
+.garden-skin-cards .rpg-button-ghost:hover {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+/* ========================================
+   Petal Particle (떨어지는 꽃잎)
+   ======================================== */
+@keyframes petal-fall {
+  0% { opacity: 0; transform: translateY(0) translateX(0) rotate(0deg); }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.4; }
+  100% { opacity: 0; transform: translateY(100vh) translateX(40px) rotate(180deg); }
+}
+
+/* ========================================
+   Glow Particle (부드러운 빛)
+   ======================================== */
+@keyframes glow-drift {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  30% { opacity: 0.6; transform: translateY(-8px) scale(1); }
+  70% { opacity: 0.5; transform: translateY(-16px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-30px) scale(0.7); }
+}
+
+/* ========================================
+   Star Particle (밤하늘 별)
+   ======================================== */
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 0.9; transform: scale(1.2); }
+}
+
+/* ========================================
+   Game UI — Parchment dialogue box (모험가)
+   ======================================== */
+.game-parchment-box {
+  background: linear-gradient(
+    135deg,
+    rgba(101, 67, 33, 0.4),
+    rgba(78, 52, 26, 0.5),
+    rgba(101, 67, 33, 0.4)
+  );
+  border: 1.5px solid rgba(255, 180, 80, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 16px rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+/* ========================================
+   Game UI — Signpost choice buttons (모험가)
+   ======================================== */
+.game-signpost-button {
+  background: linear-gradient(
+    135deg,
+    rgba(101, 67, 33, 0.35),
+    rgba(78, 52, 26, 0.45),
+    rgba(101, 67, 33, 0.35)
+  );
+  border: 1.5px solid rgba(255, 159, 28, 0.3);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  opacity: 0;
+  animation: game-signpost-appear 0.4s ease-out forwards;
+}
+.game-signpost-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 90, 43, 0.45),
+    rgba(101, 67, 33, 0.55),
+    rgba(139, 90, 43, 0.45)
+  );
+  border-color: rgba(255, 159, 28, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 12px rgba(255, 159, 28, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.game-signpost-button:active {
+  transform: scale(0.97) rotate(0deg) !important;
+}
+.game-signpost-button:disabled {
+  cursor: default;
+}
+
+@keyframes game-signpost-appear {
+  0% { opacity: 0; transform: translateX(-12px) rotate(-2deg); }
+  60% { transform: translateX(2px) rotate(0.5deg); }
+  100% { opacity: 1; transform: translateX(0) rotate(0deg); }
+}
+
+/* ========================================
+   Game UI — Parchment input (모험가)
+   ======================================== */
+.game-parchment-input-toggle {
+  background: rgba(255, 159, 28, 0.06);
+  border: 1.5px dashed rgba(255, 159, 28, 0.25);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.game-parchment-input-toggle:hover {
+  background: rgba(255, 159, 28, 0.12);
+  border-color: rgba(255, 159, 28, 0.4);
+}
+.game-parchment-input-toggle:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.game-parchment-input {
+  background: linear-gradient(
+    135deg,
+    rgba(101, 67, 33, 0.35),
+    rgba(78, 52, 26, 0.45),
+    rgba(101, 67, 33, 0.35)
+  );
+  border: 1.5px solid rgba(255, 180, 80, 0.25);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.game-parchment-textarea {
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(255, 159, 28, 0.08) 27px,
+    rgba(255, 159, 28, 0.08) 28px
+  );
+  line-height: 28px;
+}
+.game-parchment-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ========================================
+   Game UI — User message (모험가)
+   ======================================== */
+.game-user-message-adventure {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 90, 43, 0.3),
+    rgba(101, 67, 33, 0.4),
+    rgba(139, 90, 43, 0.3)
+  );
+  border: 1px solid rgba(255, 180, 80, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 16px 4px 16px 16px;
+}
+
+/* ========================================
+   Adventure Skin — override rpg panels inside adventure context
+   ======================================== */
+.adventure-skin-cards .rpg-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(101, 67, 33, 0.45),
+    rgba(78, 52, 26, 0.55),
+    rgba(101, 67, 33, 0.45)
+  );
+  border-color: rgba(255, 180, 80, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 20px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.adventure-skin-cards .rpg-panel-light {
+  background: linear-gradient(
+    135deg,
+    rgba(101, 67, 33, 0.3),
+    rgba(78, 52, 26, 0.4),
+    rgba(101, 67, 33, 0.3)
+  );
+  border-color: rgba(255, 180, 80, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 12px rgba(0, 0, 0, 0.15),
+    0 1px 4px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+}
+.adventure-skin-cards .rpg-button {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 159, 28, 0.9),
+    rgba(204, 120, 0, 0.9)
+  );
+  border-color: rgba(255, 200, 100, 0.5);
+  color: #1a1a2e;
+}
+.adventure-skin-cards .rpg-button:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 180, 60, 0.95),
+    rgba(224, 140, 20, 0.95)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 12px rgba(255, 159, 28, 0.3);
+}
+.adventure-skin-cards .rpg-button-ghost {
+  border-color: rgba(255, 159, 28, 0.25);
+}
+.adventure-skin-cards .rpg-button-ghost:hover {
+  background: rgba(255, 159, 28, 0.1);
+  border-color: rgba(255, 159, 28, 0.4);
+}
+
+/* ========================================
+   Game UI — Card dialogue box (전략실)
+   ======================================== */
+.game-card-box {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.55),
+    rgba(10, 18, 36, 0.65),
+    rgba(15, 23, 42, 0.55)
+  );
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 0 12px rgba(0, 0, 0, 0.15),
+    0 1px 6px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+/* ========================================
+   Game UI — Card choice buttons (전략실)
+   ======================================== */
+.game-card-button {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.5),
+    rgba(20, 30, 55, 0.6),
+    rgba(15, 23, 42, 0.5)
+  );
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  opacity: 0;
+  animation: game-card-appear 0.35s ease-out forwards;
+}
+.game-card-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 30, 55, 0.6),
+    rgba(30, 40, 70, 0.7),
+    rgba(20, 30, 55, 0.6)
+  );
+  border-color: rgba(96, 165, 250, 0.4);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 10px rgba(96, 165, 250, 0.1),
+    0 1px 6px rgba(0, 0, 0, 0.2);
+}
+.game-card-button:active {
+  transform: scale(0.98);
+}
+.game-card-button:disabled {
+  cursor: default;
+}
+
+@keyframes game-card-appear {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   Game UI — Card input (전략실)
+   ======================================== */
+.game-card-input-toggle {
+  background: rgba(96, 165, 250, 0.04);
+  border: 1.5px dashed rgba(96, 165, 250, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.game-card-input-toggle:hover {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.35);
+}
+.game-card-input-toggle:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.game-card-input {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.5),
+    rgba(10, 18, 36, 0.6),
+    rgba(15, 23, 42, 0.5)
+  );
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
+}
+
+.game-card-textarea {
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(96, 165, 250, 0.06) 27px,
+    rgba(96, 165, 250, 0.06) 28px
+  );
+  line-height: 28px;
+}
+.game-card-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   Game UI — User message (전략실)
+   ======================================== */
+.game-user-message-strategy {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 40, 70, 0.35),
+    rgba(20, 30, 55, 0.45),
+    rgba(30, 40, 70, 0.35)
+  );
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 1px 4px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(4px);
+  border-radius: 8px 2px 8px 8px;
+}
+
+/* ========================================
+   Strategy Skin — override rpg panels inside strategy context
+   ======================================== */
+.strategy-skin-cards .rpg-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.5),
+    rgba(10, 18, 36, 0.6),
+    rgba(15, 23, 42, 0.5)
+  );
+  border-color: rgba(96, 165, 250, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 0 16px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+.strategy-skin-cards .rpg-panel-light {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.4),
+    rgba(10, 18, 36, 0.5),
+    rgba(15, 23, 42, 0.4)
+  );
+  border-color: rgba(96, 165, 250, 0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.02),
+    inset 0 0 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+}
+.strategy-skin-cards .rpg-button {
+  background: linear-gradient(
+    to bottom,
+    rgba(96, 165, 250, 0.8),
+    rgba(59, 130, 246, 0.8)
+  );
+  border-color: rgba(147, 197, 253, 0.5);
+  color: #0a0a1a;
+}
+.strategy-skin-cards .rpg-button:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(120, 180, 255, 0.9),
+    rgba(80, 150, 255, 0.9)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 12px rgba(96, 165, 250, 0.3);
+}
+.strategy-skin-cards .rpg-button-ghost {
+  border-color: rgba(96, 165, 250, 0.2);
+}
+.strategy-skin-cards .rpg-button-ghost:hover {
+  background: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.35);
+}
