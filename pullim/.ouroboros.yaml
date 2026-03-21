@@ -1,0 +1,6 @@
+checks:
+  lint: npx eslint src/components/game/ src/app/garden/ src/lib/themes/ --max-warnings 10
+  build: npx tsc --noEmit
+  test: echo "no tests configured"
+  static: ""
+  coverage: ""
