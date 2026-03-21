@@ -10,6 +10,8 @@ interface Props {
   placeholder?: string;
   gameUI?: GameUIStyle;
   primaryColor: string;
+  forceExpanded?: boolean;
+  onCollapse?: () => void;
 }
 
 export default function GameInput({
@@ -18,11 +20,18 @@ export default function GameInput({
   placeholder = "마음을 이야기해보세요...",
   gameUI,
   primaryColor,
+  forceExpanded = false,
+  onCollapse,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(forceExpanded);
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const submittingRef = useRef(false);
+
+  // forceExpanded가 바뀌면 expanded 동기화
+  useEffect(() => {
+    if (forceExpanded) setExpanded(true);
+  }, [forceExpanded]);
 
   useEffect(() => {
     if (expanded && textareaRef.current) {
@@ -106,6 +115,7 @@ export default function GameInput({
                 onClick={() => {
                   setExpanded(false);
                   setInput("");
+                  onCollapse?.();
                 }}
                 className="text-xs font-rpg text-white/40 hover:text-white/60 transition-colors"
               >

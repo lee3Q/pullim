@@ -433,6 +433,11 @@ body {
   50% { opacity: 0; }
 }
 
+@keyframes history-slide-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* ========================================
    Game UI — User message (garden)
    ======================================== */

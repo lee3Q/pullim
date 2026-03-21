@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   StageName,
   CrystalName,
@@ -28,36 +27,87 @@ import CrisisAlert from "@/components/CrisisAlert";
 import GameDialogue from "@/components/game/GameDialogue";
 import GameChoices from "@/components/game/GameChoices";
 import GameInput from "@/components/game/GameInput";
+import Link from "next/link";
 
 const theme = getTheme("전략실");
 
-const ERROR_MSG = "시스템 응답 지연입니다. 잠시 후 다시 시도해주세요.";
+// 새 에셋 (themes/index.ts 수정 금지이므로 여기서 오버라이드)
+const AVATAR_SRC = "/assets/strategy-cat.png";
+const STAGE_BACKGROUNDS: Partial<Record<string, string>> = {
+  ENTER: "/assets/strategy-bg.png",
+  LISTEN: "/assets/strategy-bg.png",
+  RESEARCH: "/assets/strategy-office-bg.png",
+  VERIFY: "/assets/strategy-office-bg.png",
+  DISCUSS_1: "/assets/strategy-office-bg.png",
+  CRYSTAL_SELECT: "/assets/strategy-office-bg.png",
+  CRYSTAL_ANALYZE: "/assets/strategy-office-bg.png",
+  DISCUSS_2: "/assets/strategy-office-bg.png",
+  DEBATE: "/assets/strategy-office-bg.png",
+  DISCUSS_3: "/assets/strategy-office-bg.png",
+  JUDGE: "/assets/strategy-office-bg.png",
+  CONCLUDE: "/assets/strategy-bg.png",
+  COMPLETE: "/assets/strategy-bg.png",
+};
 
-type TimelineItem =
-  | { type: "dialogue"; role: "character" | "user"; text: string }
-  | { type: "research-cards" }
-  | { type: "crystal-analysis" };
+const ERROR_MSG =
+  "시스템 접속이 일시 중단되었습니다. 다시 시도해주세요.";
+const FREE_INPUT_LABEL = "직접 입력";
+
+const DEFAULT_CHOICES: Partial<Record<string, string[]>> = {
+  ENTER: ["커리어 고민입니다", "의사결정이 필요합니다", FREE_INPUT_LABEL],
+  LISTEN_FALLBACK: ["추가 정보가 있습니다", "이게 전부입니다", FREE_INPUT_LABEL],
+  DISCUSS_1: ["해당 데이터가 핵심입니다", "다른 관점이 더 중요합니다"],
+  DISCUSS_3: ["분석이 적절합니다", "재검토가 필요합니다"],
+};
+
+// ─── 씬 기록 (이전 답변 탐색용) ───
+interface SceneRecord {
+  characterText: string;
+  userInput?: string;
+}
+
+interface CurrentScene {
+  characterText: string;
+  userLastInput?: string;
+}
 
 export default function StrategySessionPage() {
   const params = useParams();
   const sessionId = params.id as string;
-  const { playing, trackLabel, toggle: toggleBGM, nextTrack } = useBGM(theme.assets.bgmTracks);
+  const searchParams = useSearchParams();
+  const isGameMode = searchParams.get("mode") !== "chat";
+  const activeGameUI = isGameMode ? theme.gameUI : undefined;
+  const {
+    playing,
+    trackLabel,
+    toggle: toggleBGM,
+    nextTrack,
+  } = useBGM(theme.assets.bgmTracks);
 
-  // 세션 상태
+  // ─── 씬 상태 ───
   const [stage, setStage] = useState<StageName>("ENTER");
   const [userName, setUserName] = useState<string | null>(null);
-  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [currentScene, setCurrentScene] = useState<CurrentScene>({
+    characterText: "",
+  });
+  const currentSceneRef = useRef<CurrentScene>({ characterText: "" });
+
+  // 씬 히스토리 (◀ ▶ 탐색용)
+  const [scenes, setScenes] = useState<SceneRecord[]>([]);
+  const [viewIndex, setViewIndex] = useState(-1); // -1 = 현재(라이브) 씬
+
   const [isStreaming, setIsStreaming] = useState(false);
   const [crisis, setCrisis] = useState<{
     message: string;
     hotline: string;
   } | null>(null);
   const [options, setOptions] = useState<string[]>([]);
-  const [showInitialTyping, setShowInitialTyping] = useState(true);
+  const [showFreeInput, setShowFreeInput] = useState(false);
+  const [enterPhase, setEnterPhase] = useState(0);
 
-  // 파이프라인 데이터
-  const [concern, setConcern] = useState<string>("");
-  const [listenSummary, setListenSummary] = useState<string>("");
+  // ─── 파이프라인 데이터 (변경 없음) ───
+  const [concern, setConcern] = useState("");
+  const [listenSummary, setListenSummary] = useState("");
   const [listenMessages, setListenMessages] = useState<
     { role: string; content: string }[]
   >([]);
@@ -73,79 +123,150 @@ export default function StrategySessionPage() {
   const [selectedCrystals, setSelectedCrystals] = useState<CrystalName[]>([]);
   const [conclusion, setConclusion] = useState<ConclusionData | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // ─── 씬 전환 헬퍼 ───
+
+  const setScene = useCallback((characterText: string) => {
+    const scene: CurrentScene = { characterText };
+    currentSceneRef.current = scene;
+    setCurrentScene(scene);
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [timeline, scrollToBottom]);
-
-  // Show game choices after streaming ends
-  const choicesVisible = !isStreaming && options.length > 0;
-
-  const addDialogue = useCallback(
-    (role: "character" | "user", text: string) => {
-      setTimeline((prev) => [...prev, { type: "dialogue", role, text }]);
-    },
-    []
-  );
-
-  const addTimelineMarker = useCallback(
-    (type: "research-cards" | "crystal-analysis") => {
-      setTimeline((prev) => [...prev, { type }]);
-    },
-    []
-  );
-
-  // 초기 입장
-  useEffect(() => {
-    if (stage === "ENTER" && timeline.length === 0) {
-      const t1 = setTimeout(() => {
-        setShowInitialTyping(false);
-        addDialogue("character", "접수되었습니다.");
-      }, 1000);
-      const t2 = setTimeout(
-        () =>
-          addDialogue(
-            "character",
-            theme.labels.enter + "\n" + theme.labels.askConcern
-          ),
-        2500
-      );
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
+  const advanceScene = useCallback((characterText: string) => {
+    const prev = currentSceneRef.current;
+    if (prev.characterText) {
+      setScenes((s) => [...s, { characterText: prev.characterText }]);
     }
-  }, [stage, timeline.length, addDialogue]);
+    const scene: CurrentScene = { characterText };
+    currentSceneRef.current = scene;
+    setCurrentScene(scene);
+    setViewIndex(-1);
+  }, []);
 
-  // --- API 호출 함수들 ---
+  // ─── 씬 내비게이션 ───
+  const isViewingPast = viewIndex >= 0;
+  const canGoBack = isViewingPast ? viewIndex > 0 : scenes.length > 0;
+  const canGoForward = isViewingPast;
+  const totalScenes = scenes.length + (currentScene.characterText ? 1 : 0);
+  const currentPageNum = isViewingPast ? viewIndex + 1 : totalScenes;
 
-  const callListenAPI = async (messages: { role: string; content: string }[], turns: number) => {
+  const displayText = isViewingPast
+    ? scenes[viewIndex]?.characterText || ""
+    : currentScene.characterText;
+
+  const displayUserInput = isViewingPast
+    ? scenes[viewIndex]?.userInput
+    : undefined;
+
+  const goBack = useCallback(() => {
+    if (viewIndex === -1 && scenes.length > 0) {
+      setViewIndex(scenes.length - 1);
+    } else if (viewIndex > 0) {
+      setViewIndex(viewIndex - 1);
+    }
+  }, [viewIndex, scenes.length]);
+
+  const goForward = useCallback(() => {
+    if (viewIndex >= 0 && viewIndex < scenes.length - 1) {
+      setViewIndex(viewIndex + 1);
+    } else {
+      setViewIndex(-1);
+    }
+  }, [viewIndex, scenes.length]);
+
+  // ─── 컨텐츠 표시 조건 ───
+  const showDataCards =
+    !isViewingPast && stage === "DISCUSS_1" && dataCards.length > 0;
+  const showCrystalAnalysis =
+    !isViewingPast && stage === "DISCUSS_2" && crystalAnalyses.length > 0;
+  const showCrystals = !isViewingPast && stage === "CRYSTAL_SELECT";
+  const showConclusion = !isViewingPast && stage === "CONCLUDE" && conclusion;
+  const choicesVisible =
+    !isViewingPast && !isStreaming && options.length > 0 && !showFreeInput;
+
+  const getLoadingStage = ():
+    | "research"
+    | "analyze"
+    | "debate"
+    | "conclude"
+    | null => {
+    if (!isStreaming || isViewingPast) return null;
+    if (stage === "RESEARCH") return "research";
+    if (stage === "CRYSTAL_ANALYZE") return "analyze";
+    if (stage === "DEBATE") return "debate";
+    if (stage === "CONCLUDE") return "conclude";
+    return null;
+  };
+  const loadingStage = getLoadingStage();
+
+  const showDialogue =
+    displayText ||
+    (!isViewingPast && stage === "ENTER" && enterPhase === 0) ||
+    (!isViewingPast && isStreaming && !loadingStage);
+
+  const isDialogueTyping =
+    !isViewingPast &&
+    ((stage === "ENTER" && enterPhase === 0) ||
+      (isStreaming && !loadingStage));
+
+  // 특수 컨텐츠가 없을 때만 캐릭터 초상화 표시
+  const showPortrait =
+    !showDataCards &&
+    !showCrystalAnalysis &&
+    !showCrystals &&
+    !showConclusion &&
+    !loadingStage;
+
+  // ─── ENTER 페이즈 ───
+  useEffect(() => {
+    if (stage === "ENTER" && enterPhase === 0) {
+      const t = setTimeout(() => {
+        setEnterPhase(1);
+        setScene("...접속 완료.");
+      }, 1000);
+      return () => clearTimeout(t);
+    }
+  }, [stage, enterPhase, setScene]);
+
+  const handleTypingComplete = useCallback(() => {
+    if (stage === "ENTER" && enterPhase === 1) {
+      setTimeout(() => {
+        setEnterPhase(2);
+        setScene(theme.labels.enter + "\n" + theme.labels.askConcern);
+      }, 800);
+    } else if (stage === "ENTER" && enterPhase === 2) {
+      setOptions(DEFAULT_CHOICES.ENTER || []);
+    }
+  }, [stage, enterPhase, setScene]);
+
+  // ─── API 호출 (로직 동일) ───
+
+  const callListenAPI = async (
+    messages: { role: string; content: string }[],
+    turns: number
+  ) => {
     setIsStreaming(true);
-
     try {
       const response = await fetch("/api/ultimate/listen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages, userName, turnCount: turns, theme: "전략실" }),
+        body: JSON.stringify({
+          messages,
+          userName,
+          turnCount: turns,
+          theme: "전략실",
+        }),
       });
-
       if (!response.ok) {
-        addDialogue("character", ERROR_MSG);
+        setScene(ERROR_MSG);
         setIsStreaming(false);
         return;
       }
-
       const reader = response.body?.getReader();
       if (!reader) {
-        addDialogue("character", ERROR_MSG);
+        setScene(ERROR_MSG);
         setIsStreaming(false);
         return;
       }
-
       const decoder = new TextDecoder();
       let fullText = "";
       let listenComplete = false;
@@ -154,19 +275,13 @@ export default function StrategySessionPage() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         const chunk = decoder.decode(value);
-        const lines = chunk.split("\n");
-
-        for (const line of lines) {
+        for (const line of chunk.split("\n")) {
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6);
-
           if (data === "[DONE]") break;
-
           try {
             const parsed = JSON.parse(data);
-
             if (parsed.crisis) {
               setCrisis({
                 message: parsed.text || parsed.hotlines?.[0]?.name || "",
@@ -175,39 +290,31 @@ export default function StrategySessionPage() {
               setIsStreaming(false);
               return;
             }
-
-            if (parsed.text) {
-              fullText += parsed.text;
-            }
-
+            if (parsed.text) fullText += parsed.text;
             if (parsed.listenSummary) {
               newSummary = parsed.listenSummary;
               setListenSummary(parsed.listenSummary);
             }
-
-            if (parsed.recommendedCrystals) {
-              void parsed.recommendedCrystals;
-            }
-
-            if (parsed.listenComplete) {
-              listenComplete = true;
-            }
+            if (parsed.recommendedCrystals) void parsed.recommendedCrystals;
+            if (parsed.listenComplete) listenComplete = true;
           } catch {
-            // 파싱 실패 무시
+            /* ignore */
           }
         }
       }
 
-      const optionsMatch = fullText.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
+      const optionsMatch = fullText.match(
+        /\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/
+      );
       if (optionsMatch) {
-        const optionLines = optionsMatch[1]
+        const apiOptions = optionsMatch[1]
           .trim()
           .split("\n")
           .map((l) => l.trim())
           .filter((l) => l.length > 0);
-        setOptions(optionLines);
+        setOptions([...apiOptions, FREE_INPUT_LABEL]);
       } else {
-        setOptions([]);
+        setOptions(DEFAULT_CHOICES.LISTEN_FALLBACK || []);
       }
 
       const displayText = fullText
@@ -216,227 +323,61 @@ export default function StrategySessionPage() {
         .replace(/\[CRYSTALS\][\s\S]*?\[\/CRYSTALS\]/, "")
         .replace(/\[LISTEN_COMPLETE\]/, "")
         .trim();
-
-      if (displayText) {
-        addDialogue("character", displayText);
-      }
-
+      if (displayText) setScene(displayText);
       setIsStreaming(false);
 
       if (listenComplete && newSummary) {
         setTimeout(() => {
-          addDialogue(
-            "character",
-            "안건을 파악했습니다.\n관련 자료를 조회하겠습니다..."
+          advanceScene(
+            "분석 패턴이 감지되었습니다.\n데이터베이스를 검색합니다..."
           );
+          setOptions([]);
           setStage("RESEARCH");
           callResearchAPI(newSummary);
         }, 1500);
       }
     } catch {
-      addDialogue("character", ERROR_MSG);
-      setIsStreaming(false);
-    }
-  };
-
-  const callAnalyzeAPI = async (crystals: CrystalName[]) => {
-    setIsStreaming(true);
-
-    try {
-      const response = await fetch("/api/ultimate/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          selectedCrystals: crystals,
-          listenSummary,
-          concern,
-        }),
-      });
-
-      if (!response.ok) {
-        addDialogue("character", ERROR_MSG);
-        setIsStreaming(false);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.crisis) {
-        setCrisis({
-          message: data.message,
-          hotline: data.hotlines?.[0]?.number || "109",
-        });
-        setIsStreaming(false);
-        return;
-      }
-
-      const analyses = data.analyses || [];
-      setCrystalAnalyses(analyses);
-      setDisagreements(data.disagreements || []);
-      setCrystalModelMap(data.crystalModelMap || {});
-      setStage("DISCUSS_2");
-      setIsStreaming(false);
-
-      // 전문가 이름으로 선택지 표시
-      const crystalOptions = analyses.map((a: CrystalAnalysis) => {
-        const c = CRYSTALS.find(c => c.name === a.crystal);
-        return `${c?.icon || "🔮"} ${c?.expertLabel || a.crystal}`;
-      });
-      setOptions(crystalOptions);
-
-      setTimeout(() => {
-        addTimelineMarker("crystal-analysis");
-        addDialogue(
-          "character",
-          "분석이 완료되었습니다.\n어떤 관점이 가장 유효하다고 보십니까?"
-        );
-      }, 500);
-    } catch {
-      addDialogue("character", ERROR_MSG);
-      setIsStreaming(false);
-    }
-  };
-
-  const callDebateAPI = async (selectedCrystal: CrystalName) => {
-    setIsStreaming(true);
-
-    try {
-      const response = await fetch("/api/ultimate/debate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          analyses: crystalAnalyses,
-          disagreements,
-          selectedCrystal,
-          listenSummary,
-          crystalModelMap,
-          theme: "전략실",
-        }),
-      });
-
-      if (!response.ok) {
-        addDialogue("character", ERROR_MSG);
-        setIsStreaming(false);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.crisis || data.debateBlocked) {
-        addDialogue(
-          "character",
-          "이 안건은 분석보다 다른 도움이 필요해 보입니다."
-        );
-        setIsStreaming(false);
-        return;
-      }
-
-      if (data.skipped) {
-        setDebateRounds([]);
-        setDebateSynthesis(data.synthesis || "");
-        setStage("DISCUSS_3");
-        setIsStreaming(false);
-        addDialogue("character", data.synthesis || "분석 결과를 정리하겠습니다.\n\n검토 부탁드립니다.");
-        return;
-      }
-
-      setDebateRounds(data.rounds || []);
-      setDebateSynthesis(data.synthesis || "");
-      setStage("DISCUSS_3");
-      setIsStreaming(false);
-
-      setTimeout(() => {
-        const synthesisText = data.synthesis || "토론이 완료되었습니다.";
-        addDialogue("character", synthesisText + "\n\n검토 부탁드립니다.");
-      }, 500);
-    } catch {
-      addDialogue("character", ERROR_MSG);
-      setIsStreaming(false);
-    }
-  };
-
-  const callConcludeAPI = async () => {
-    setIsStreaming(true);
-
-    try {
-      const response = await fetch("/api/ultimate/conclude", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          concern,
-          listenSummary,
-          analyses: crystalAnalyses,
-          disagreements,
-          debateRounds,
-          debateSynthesis,
-          userName,
-          theme: "전략실",
-        }),
-      });
-
-      if (!response.ok) {
-        addDialogue("character", ERROR_MSG);
-        setIsStreaming(false);
-        return;
-      }
-
-      const data = await response.json();
-      setConclusion(data.conclusion);
-      setIsStreaming(false);
-    } catch {
-      addDialogue("character", ERROR_MSG);
+      setScene(ERROR_MSG);
       setIsStreaming(false);
     }
   };
 
   const callResearchAPI = async (summary: string) => {
     setIsStreaming(true);
-
     try {
       const response = await fetch("/api/ultimate/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ concern, listenSummary: summary }),
       });
-
       if (!response.ok) {
-        addDialogue("character", "자료 조회에 실패했습니다. 기록 없이 진행합니다.");
+        advanceScene("데이터 접근에 실패했습니다. 계속 진행합니다.");
         setDataCards([]);
         setStage("CRYSTAL_SELECT");
         setIsStreaming(false);
         return;
       }
-
       const data = await response.json();
-
       if (data.crisis) {
-        setCrisis({
-          message: data.message,
-          hotline: data.hotlines?.[0]?.number || "109",
-        });
+        setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109" });
         setIsStreaming(false);
         return;
       }
-
       if (data.skipped || !data.cards || data.cards.length === 0) {
-        addDialogue("character", "관련 자료가 부족합니다.\n전문가 관점로 진행하겠습니다.");
+        advanceScene("관련 데이터가 제한적입니다.\n전문가에게 직접 분석을 요청합니다.");
         setDataCards([]);
         setStage("CRYSTAL_SELECT");
         setIsStreaming(false);
         return;
       }
-
       await callJudgeFactcheck(data.cards);
-
       setDataCards(data.cards);
       setIsStreaming(false);
-
-      addDialogue("character", "관련 자료를 수집했습니다.\n어떤 데이터가 이 안건에 가장 크게 작용합니까?");
-      addTimelineMarker("research-cards");
+      advanceScene("관련 데이터를 수집했습니다.\n어떤 데이터가 핵심이라고 보십니까?");
       setStage("DISCUSS_1");
+      setOptions(DEFAULT_CHOICES.DISCUSS_1 || []);
     } catch {
-      addDialogue("character", "자료 조회에 실패했습니다. 기록 없이 진행합니다.");
+      advanceScene("데이터 접근에 실패했습니다.");
       setDataCards([]);
       setStage("CRYSTAL_SELECT");
       setIsStreaming(false);
@@ -450,9 +391,70 @@ export default function StrategySessionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "factcheck", cards, concern }),
       });
-    } catch {
-      // Judge 실패해도 세션 중단하지 않음
-    }
+    } catch { /* ignore */ }
+  };
+
+  const callAnalyzeAPI = async (crystals: CrystalName[]) => {
+    setIsStreaming(true);
+    try {
+      const response = await fetch("/api/ultimate/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, selectedCrystals: crystals, listenSummary, concern }),
+      });
+      if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
+      const data = await response.json();
+      if (data.crisis) { setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109" }); setIsStreaming(false); return; }
+      const analyses = data.analyses || [];
+      setCrystalAnalyses(analyses);
+      setDisagreements(data.disagreements || []);
+      setCrystalModelMap(data.crystalModelMap || {});
+      setIsStreaming(false);
+      const crystalOptions = analyses.map((a: CrystalAnalysis) => {
+        const c = CRYSTALS.find((cr) => cr.name === a.crystal);
+        return `${c?.icon || "🌸"} ${a.crystal}의 분석 관점`;
+      });
+      setOptions(crystalOptions);
+      setStage("DISCUSS_2");
+      advanceScene("전문가 분석이 완료되었습니다.\n어떤 관점이 가장 유효하다고 판단하십니까?");
+    } catch { setScene(ERROR_MSG); setIsStreaming(false); }
+  };
+
+  const callDebateAPI = async (selectedCrystal: CrystalName) => {
+    setIsStreaming(true);
+    try {
+      const response = await fetch("/api/ultimate/debate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analyses: crystalAnalyses, disagreements, selectedCrystal, listenSummary, crystalModelMap, theme: "전략실" }),
+      });
+      if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
+      const data = await response.json();
+      if (data.crisis || data.debateBlocked) { advanceScene("이 안건은 다른 접근이 필요해 보입니다."); setIsStreaming(false); return; }
+      if (data.skipped) {
+        setDebateRounds([]); setDebateSynthesis(data.synthesis || ""); setStage("DISCUSS_3"); setIsStreaming(false);
+        advanceScene(data.synthesis || "분석이 완료되었습니다.\n\n어떻게 느껴져요?");
+        setOptions(DEFAULT_CHOICES.DISCUSS_3 || []); return;
+      }
+      setDebateRounds(data.rounds || []); setDebateSynthesis(data.synthesis || ""); setStage("DISCUSS_3"); setIsStreaming(false);
+      advanceScene((data.synthesis || "전문가 검토가 완료되었습니다.") + "\n\n어떻게 느껴져요?");
+      setOptions(DEFAULT_CHOICES.DISCUSS_3 || []);
+    } catch { setScene(ERROR_MSG); setIsStreaming(false); }
+  };
+
+  const callConcludeAPI = async () => {
+    setIsStreaming(true);
+    try {
+      const response = await fetch("/api/ultimate/conclude", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concern, listenSummary, analyses: crystalAnalyses, disagreements, debateRounds, debateSynthesis, userName, theme: "전략실" }),
+      });
+      if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
+      const data = await response.json();
+      setConclusion(data.conclusion);
+      setIsStreaming(false);
+    } catch { setScene(ERROR_MSG); setIsStreaming(false); }
   };
 
   const callJudgeLogic = async (): Promise<boolean> => {
@@ -460,140 +462,94 @@ export default function StrategySessionPage() {
       const response = await fetch("/api/ultimate/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "logic",
-          concern,
-          listenSummary,
-          analyses: crystalAnalyses,
-          disagreements,
-          debateRounds,
-          debateSynthesis,
-        }),
+        body: JSON.stringify({ mode: "logic", concern, listenSummary, analyses: crystalAnalyses, disagreements, debateRounds, debateSynthesis }),
       });
-
       if (!response.ok) return true;
-
       const data = await response.json();
-      if (!data.passed && data.issues?.length > 0) {
-        addDialogue("character", `추가 확인 사항이 있습니다.\n${data.issues[0]}`);
-      }
+      if (!data.passed && data.issues?.length > 0) advanceScene(`추가 확인 사항이 있습니다.\n${data.issues[0]}`);
       return data.passed !== false;
-    } catch {
-      return true;
-    }
+    } catch { return true; }
   };
 
+  // ─── 사용자 입력 처리 ───
+
   const handleUserInput = async (text: string) => {
-    addDialogue("user", text);
+    const prev = currentSceneRef.current;
+    if (prev.characterText) {
+      setScenes((s) => [
+        ...s,
+        { characterText: prev.characterText, userInput: text },
+      ]);
+    }
+    const emptyScene: CurrentScene = { characterText: "", userLastInput: text };
+    currentSceneRef.current = emptyScene;
+    setCurrentScene(emptyScene);
     setOptions([]);
+    setShowFreeInput(false);
+    setViewIndex(-1);
 
     switch (stage) {
       case "ENTER":
         setConcern(text);
         setStage("LISTEN");
-        {
-          const newMessages = [{ role: "user", content: text }];
-          setListenMessages(newMessages);
-          setTurnCount(1);
-          await callListenAPI(newMessages, 1);
-        }
+        { const m = [{ role: "user", content: text }]; setListenMessages(m); setTurnCount(1); await callListenAPI(m, 1); }
         break;
-
       case "LISTEN": {
-        const updatedMessages = [
-          ...listenMessages,
-          { role: "user", content: text },
-        ];
-        setListenMessages(updatedMessages);
-        const newTurnCount = turnCount + 1;
-        setTurnCount(newTurnCount);
-        await callListenAPI(updatedMessages, newTurnCount);
+        const m = [...listenMessages, { role: "user", content: text }];
+        setListenMessages(m);
+        const tc = turnCount + 1; setTurnCount(tc);
+        await callListenAPI(m, tc);
         break;
       }
-
       case "DISCUSS_1":
-        setTimeout(() => {
-          addDialogue("character", `확인했습니다.\n전문가 관점를 준비하겠습니다.`);
-          setStage("CRYSTAL_SELECT");
-        }, 800);
+        setTimeout(() => { setScene("해당 포인트를 파악했습니다.\n전문가 관점을 준비합니다."); setStage("CRYSTAL_SELECT"); }, 800);
         break;
-
-      case "DISCUSS_2":
-        {
-          const matchedCrystal = crystalAnalyses.find((a) =>
-            text.includes(a.crystal)
-          );
-          const selectedForDebate = matchedCrystal
-            ? matchedCrystal.crystal
-            : crystalAnalyses[0]?.crystal;
-
-          if (selectedForDebate) {
-            addDialogue("character", "해당 관점으로 교차 분석을 진행하겠습니다.");
-            setStage("DEBATE");
-            await callDebateAPI(selectedForDebate);
-          }
-        }
+      case "DISCUSS_2": {
+        const mc = crystalAnalyses.find((a) => text.includes(a.crystal));
+        const sel = mc ? mc.crystal : crystalAnalyses[0]?.crystal;
+        if (sel) { setScene("전문가 간 교차 검증을 시작합니다."); setStage("DEBATE"); await callDebateAPI(sel); }
         break;
-
+      }
       case "DISCUSS_3":
-        addDialogue("character", "브리핑을 정리하겠습니다.");
-        setStage("JUDGE");
-        await callJudgeLogic();
-        setStage("CONCLUDE");
-        await callConcludeAPI();
+        setScene("브리핑을 정리합니다.");
+        setStage("JUDGE"); await callJudgeLogic(); setStage("CONCLUDE"); await callConcludeAPI();
         break;
-
-      default:
-        break;
+      default: break;
     }
   };
 
   const handleOptionSelect = (option: string) => {
+    if (option === FREE_INPUT_LABEL) { setShowFreeInput(true); return; }
     handleUserInput(option);
   };
 
+  const handleFreeInputSend = (text: string) => { setShowFreeInput(false); handleUserInput(text); };
+  const handleFreeInputCollapse = () => { setShowFreeInput(false); };
+
   const handleCrystalConfirm = (crystals: CrystalName[]) => {
     setSelectedCrystals(crystals);
-    addDialogue("user", `${crystals.join(", ")}을 선택했습니다`);
-    addDialogue("character", "전문가 관점를 가동합니다. 잠시 기다려주십시오.");
+    if (currentSceneRef.current.characterText) {
+      setScenes((s) => [...s, { characterText: currentSceneRef.current.characterText, userInput: `${crystals.join(", ")} 선택` }]);
+    }
+    setScene("전문가 분석을 실행 중입니다. 잠시 대기해주세요.");
     setStage("CRYSTAL_ANALYZE");
     callAnalyzeAPI(crystals);
   };
 
   const handleDataCardSelect = (index: number) => {
     const card = dataCards[index];
-    if (card) {
-      addDialogue("character", `"${card.fact}"... 해당 데이터를 중점으로 분석하겠습니다.`);
-    }
+    if (card) setScene(`"${card.fact}"... 해당 포인트를 기록했습니다.`);
   };
 
   const handleCommit = (commitment: ActionCommitment) => {
-    addDialogue("character", `${commitment.deadline}에 후속 브리핑을 잡겠습니다.\n${theme.labels.farewell}`);
+    advanceScene(`${commitment.deadline}에 다시 만나요.\n${theme.labels.farewell}`);
     setStage("COMPLETE");
   };
 
-  const getLoadingStage = (): "research" | "analyze" | "debate" | "conclude" | null => {
-    if (!isStreaming) return null;
-    if (stage === "RESEARCH") return "research";
-    if (stage === "CRYSTAL_ANALYZE") return "analyze";
-    if (stage === "DEBATE") return "debate";
-    if (stage === "CONCLUDE") return "conclude";
-    return null;
-  };
-  const loadingStage = getLoadingStage();
-
-  const showInput = [
-    "ENTER",
-    "LISTEN",
-    "DISCUSS_1",
-    "DISCUSS_2",
-    "DISCUSS_3",
-  ].includes(stage);
-  const showCrystals = stage === "CRYSTAL_SELECT";
-  const showConclusion = stage === "CONCLUDE" && conclusion;
+  // ─── 렌더링 ───
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
       {crisis && (
         <CrisisAlert
           message={crisis.message}
@@ -604,141 +560,178 @@ export default function StrategySessionPage() {
 
       <ThemedBackground theme={theme} currentStage={stage} />
 
+      {/* 씬 배경 일러스트 + 그라디언트 (게임 모드만) */}
+      {isGameMode && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={STAGE_BACKGROUNDS[stage] || "/assets/strategy-bg.png"}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            style={{ zIndex: 2, opacity: 0.85, transition: "opacity 0.8s ease" }}
+          />
+          <div
+            className="absolute inset-x-0 bottom-0 pointer-events-none"
+            style={{
+              height: "70%",
+              background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.25) 50%, transparent 100%)",
+              zIndex: 5,
+            }}
+          />
+        </>
+      )}
+
+      {/* 캐릭터 초상화 — 배경 씬 위에 표시 */}
+      {isGameMode && showPortrait && AVATAR_SRC && (
+        <div
+          className="absolute inset-x-0 flex justify-center pointer-events-none transition-opacity duration-500"
+          style={{ top: "22%", zIndex: 6, opacity: isViewingPast ? 0.4 : 0.75 }}
+        >
+          <div
+            className="w-36 h-36 rounded-3xl overflow-hidden"
+            style={{
+              boxShadow: `0 4px 30px ${theme.colors.primary}20`,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={AVATAR_SRC}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 헤더 */}
       <header className="sticky top-0 px-4 py-3 flex justify-between items-center z-20 backdrop-blur-md bg-black/30">
         <div className="flex items-center gap-2">
-          <Link href="/" className="text-lg hover:opacity-70 transition-opacity" aria-label="홈으로">{theme.icon}</Link>
-          <span className="text-sm font-rpg text-white/60">
-            {theme.title}
-          </span>
+          <Link href="/" className="text-lg hover:opacity-70 transition-opacity" aria-label="홈으로">
+            {theme.icon}
+          </Link>
+          <span className="text-sm font-rpg text-white/60">{theme.title}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <button
-            onClick={nextTrack}
-            className="rpg-button-ghost px-2 py-1.5 text-[10px] font-rpg-sm"
-            aria-label="곡 변경"
-          >
-            {"\uD83C\uDFB5"} {trackLabel}
+          <button onClick={nextTrack} className="rpg-button-ghost px-2 py-1.5 text-[10px] font-rpg-sm" aria-label="곡 변경">
+            🎵 {trackLabel}
           </button>
-          <button
-            onClick={toggleBGM}
-            className="rpg-button-ghost px-2 py-1.5 text-xs"
-            aria-label={playing ? "음악 끄기" : "음악 켜기"}
-          >
-            {playing ? "\uD83D\uDD0A" : "\uD83D\uDD07"}
+          <button onClick={toggleBGM} className="rpg-button-ghost px-2 py-1.5 text-xs" aria-label={playing ? "음악 끄기" : "음악 켜기"}>
+            {playing ? "🔊" : "🔇"}
           </button>
         </div>
       </header>
+
+      {/* 진행 표시 */}
       <div className="sticky top-[52px] z-20 backdrop-blur-md bg-black/30">
-        <ProgressVisual
-          currentStage={stage}
-          primaryColor={theme.colors.primary}
-          gameUI={theme.gameUI}
-        />
+        <ProgressVisual currentStage={stage} primaryColor={theme.colors.primary} gameUI={activeGameUI} />
       </div>
 
-      <main className="flex-1 overflow-y-auto px-4 py-4 relative z-10">
-        <div className="flex flex-col gap-4 max-w-lg mx-auto">
-          {/* 초기 타이핑 인디케이터 */}
-          {showInitialTyping && stage === "ENTER" && timeline.length === 0 && (
-            <GameDialogue
-              character={theme.character}
-              text=""
-              primaryColor={theme.colors.primary}
-              avatarSrc={theme.assets.avatar}
-              typing
-              gameUI={theme.gameUI}
-            />
-          )}
+      {/* 메인 씬 영역 */}
+      <main className="flex-1 flex flex-col justify-end px-4 pb-4 pt-8 relative z-10 min-h-0">
+        <div className="max-w-lg mx-auto w-full flex flex-col gap-4">
 
-          {/* 타임라인: 모든 컨텐츠를 시간순 렌더링 (최신이 항상 아래) */}
-          {timeline.map((item, i) => {
-            switch (item.type) {
-              case "dialogue":
-                return item.role === "character" ? (
-                  <GameDialogue
-                    key={`t${i}`}
-                    character={theme.character}
-                    text={item.text}
-                    primaryColor={theme.colors.primary}
-                    avatarSrc={theme.assets.avatar}
-                    gameUI={theme.gameUI}
-                  />
-                ) : (
-                  <div key={`t${i}`} className="self-end max-w-[80%]">
-                    <div className="game-user-message-strategy px-4 py-3 text-sm text-white/90 font-rpg">{item.text}</div>
-                  </div>
-                );
-              case "research-cards":
-                return dataCards.length > 0 ? (
-                  <div key={`t${i}`} className="stage-enter strategy-skin-cards">
-                    <DataCardList cards={dataCards} primaryColor={theme.colors.primary} onSelect={handleDataCardSelect} />
-                  </div>
-                ) : null;
-              case "crystal-analysis":
-                return crystalAnalyses.length > 0 ? (
-                  <div key={`t${i}`} className="stage-enter strategy-skin-cards">
-                    <CrystalAnalysisView analyses={crystalAnalyses} disagreements={disagreements} primaryColor={theme.colors.primary} crystalLabel={theme.crystalLabel} useExpertLabels />
-                  </div>
-                ) : null;
-              default:
-                return null;
-            }
-          })}
-
-          {/* 전문가 관점 선택 (인터랙티브 — 항상 타임라인 아래) */}
-          {showCrystals && (
-            <div className="stage-enter strategy-skin-cards">
-              <CrystalSelector max={3} crystalLabel={theme.crystalLabel} crystalShape={theme.crystalShape} primaryColor={theme.colors.primary} onConfirm={handleCrystalConfirm} useExpertLabels />
+          {/* 스테이지별 특수 컨텐츠 (현재 씬에서만) */}
+          {showDataCards && (
+            <div className="stage-enter garden-skin-cards">
+              <DataCardList cards={dataCards} primaryColor={theme.colors.primary} onSelect={handleDataCardSelect} />
             </div>
           )}
-
-          {/* 결론 */}
+          {showCrystalAnalysis && (
+            <div className="stage-enter garden-skin-cards">
+              <CrystalAnalysisView analyses={crystalAnalyses} disagreements={disagreements} primaryColor={theme.colors.primary} crystalLabel={theme.crystalLabel} />
+            </div>
+          )}
+          {showCrystals && (
+            <div className="stage-enter garden-skin-cards">
+              <CrystalSelector max={3} crystalLabel={theme.crystalLabel} crystalShape={theme.crystalShape} primaryColor={theme.colors.primary} onConfirm={handleCrystalConfirm} />
+            </div>
+          )}
           {showConclusion && (
-            <div className="stage-enter strategy-skin-cards">
+            <div className="stage-enter garden-skin-cards">
               <ConclusionView conclusion={conclusion} tagline={theme.labels.tagline} farewell={theme.labels.farewell} primaryColor={theme.colors.primary} onCommit={handleCommit} />
             </div>
           )}
 
-          {/* 스트리밍 인디케이터 */}
-          {isStreaming && !loadingStage && (
-            <GameDialogue character={theme.character} text="" primaryColor={theme.colors.primary} avatarSrc={theme.assets.avatar} typing gameUI={theme.gameUI} />
-          )}
-
-          {/* 로딩 오버레이 */}
+          {/* 로딩 — 배경 위에서 직접 */}
           {loadingStage && (
-            <div className="stage-enter strategy-skin-cards">
+            <div className="stage-enter garden-skin-cards">
               <LoadingOverlay stage={loadingStage} primaryColor={theme.colors.primary} crystalLabel={theme.crystalLabel} character={theme.character} />
             </div>
           )}
 
-          {/* 선택지 버튼 */}
-          {options.length > 0 && (
+          {/* 게임 텍스트 — 배경 위에 직접 렌더링 */}
+          {showDialogue && (
+            <GameDialogue
+              character={theme.character}
+              text={isDialogueTyping ? "" : displayText}
+              primaryColor={theme.colors.primary}
+              avatarSrc={AVATAR_SRC}
+              typing={isDialogueTyping}
+              gameUI={activeGameUI}
+              onTypingComplete={isViewingPast ? undefined : handleTypingComplete}
+            />
+          )}
+
+          {/* 과거 씬 열람 시: 유저 응답 표시 */}
+          {isViewingPast && displayUserInput && (
+            <div className="text-xs font-rpg text-white/30 text-right pr-2">
+              💬 {displayUserInput}
+            </div>
+          )}
+
+          {/* ◀ ▶ 씬 내비게이션 */}
+          {scenes.length > 0 && (
+            <div className="flex items-center justify-center gap-6 py-1">
+              <button
+                onClick={goBack}
+                disabled={!canGoBack}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white/70 disabled:text-white/10 transition-colors text-lg"
+                aria-label="이전 답변"
+              >
+                ‹
+              </button>
+              <span className="text-[10px] text-white/25 font-rpg tabular-nums min-w-[40px] text-center">
+                {currentPageNum} / {totalScenes}
+              </span>
+              <button
+                onClick={goForward}
+                disabled={!canGoForward}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white/40 hover:text-white/70 disabled:text-white/10 transition-colors text-lg"
+                aria-label="다음 답변"
+              >
+                ›
+              </button>
+            </div>
+          )}
+
+          {/* 선택지 (현재 씬, 직접 말하기 모드 아닐 때) */}
+          {choicesVisible && (
             <div className="stage-enter">
               <GameChoices
                 options={options}
                 onSelect={handleOptionSelect}
                 primaryColor={theme.colors.primary}
-                onCustomInput={() => setOptions([])}
                 visible={choicesVisible}
-                gameUI={theme.gameUI}
+                gameUI={activeGameUI}
               />
             </div>
           )}
 
-          <div ref={messagesEndRef} />
+          {/* 자유입력 */}
+          {!isViewingPast && showFreeInput && (
+            <div style={{ animation: "stage-fade-in 0.25s ease-out" }}>
+              <GameInput
+                onSend={handleFreeInputSend}
+                placeholder="안건을 입력해주세요..."
+                gameUI={activeGameUI}
+                primaryColor={theme.colors.primary}
+                forceExpanded
+                onCollapse={handleFreeInputCollapse}
+              />
+            </div>
+          )}
         </div>
       </main>
-
-      {showInput && !isStreaming && options.length === 0 && (
-        <div className="relative z-10">
-          <GameInput
-            onSend={handleUserInput}
-            placeholder="안건을 말씀해주세요..."
-            gameUI={theme.gameUI}
-            primaryColor={theme.colors.primary}
-          />
-        </div>
-      )}
     </div>
   );
 }
