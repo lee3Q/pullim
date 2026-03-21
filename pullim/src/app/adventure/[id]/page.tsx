@@ -56,7 +56,7 @@ const FREE_INPUT_LABEL = "직접 말하기";
 const DEFAULT_CHOICES: Partial<Record<string, string[]>> = {
   ENTER: ["갈림길에 서있어", "답을 못 찾겠어", FREE_INPUT_LABEL],
   LISTEN_FALLBACK: ["더 이야기하겠네", "이게 전부일세", FREE_INPUT_LABEL],
-  DISCUSS_1: ["그 기록이 눈에 들어오는군", "다른 것이 더 신경 쓰이네"],
+  DISCUSS_1: ["도움이 될 기록이군", "내 상황과는 좀 다르네", FREE_INPUT_LABEL],
   DISCUSS_3: ["정리가 되었네", "다시 생각해보겠네"],
 };
 
@@ -113,6 +113,12 @@ export default function AdventureSessionPage() {
   >([]);
   const [turnCount, setTurnCount] = useState(0);
   const [dataCards, setDataCards] = useState<DataCard[]>([]);
+  const [factcheckResult, setFactcheckResult] = useState<{
+    confidence: "high" | "medium" | "low";
+    issues: string[];
+    passed: boolean;
+  } | null>(null);
+  const [userResearchOpinion, setUserResearchOpinion] = useState("");
   const [crystalAnalyses, setCrystalAnalyses] = useState<CrystalAnalysis[]>([]);
   const [disagreements, setDisagreements] = useState<Disagreement[]>([]);
   const [debateRounds, setDebateRounds] = useState<DebateRound[]>([]);
@@ -370,10 +376,13 @@ export default function AdventureSessionPage() {
         setIsStreaming(false);
         return;
       }
-      await callJudgeFactcheck(data.cards);
+      const fcResult = await callJudgeFactcheck(data.cards);
       setDataCards(data.cards);
       setIsStreaming(false);
-      advanceScene("오래된 기록에서 비슷한 이야기를 찾았네.\n어떤 이야기가 자네 마음에 걸리는가?");
+      const discuss1Text = fcResult && !fcResult.passed && fcResult.issues.length > 0
+        ? "두루마리를 검증해봤네.\n주의할 점이 있네.\n\n어떻게 보는가?"
+        : "두루마리를 검증해봤네.\n어떻게 보는가?";
+      advanceScene(discuss1Text);
       setStage("DISCUSS_1");
       setOptions(DEFAULT_CHOICES.DISCUSS_1 || []);
     } catch {
@@ -386,21 +395,30 @@ export default function AdventureSessionPage() {
 
   const callJudgeFactcheck = async (cards: DataCard[]) => {
     try {
-      await fetch("/api/ultimate/judge", {
+      const res = await fetch("/api/ultimate/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "factcheck", cards, concern }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        setFactcheckResult(data);
+        return data as { confidence: string; issues: string[]; passed: boolean };
+      }
     } catch { /* ignore */ }
+    return null;
   };
 
   const callAnalyzeAPI = async (crystals: CrystalName[]) => {
     setIsStreaming(true);
+    const enrichedSummary = userResearchOpinion
+      ? `${listenSummary}\n\n[리서치 후 사용자 의견]\n${userResearchOpinion}`
+      : listenSummary;
     try {
       const response = await fetch("/api/ultimate/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, selectedCrystals: crystals, listenSummary, concern }),
+        body: JSON.stringify({ sessionId, selectedCrystals: crystals, listenSummary: enrichedSummary, concern }),
       });
       if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
       const data = await response.json();
@@ -502,6 +520,7 @@ export default function AdventureSessionPage() {
         break;
       }
       case "DISCUSS_1":
+        setUserResearchOpinion(text);
         setTimeout(() => { setScene("그 마음이 보이네.\n수정구슬을 보여주겠네."); setStage("CRYSTAL_SELECT"); }, 800);
         break;
       case "DISCUSS_2": {
@@ -633,7 +652,7 @@ export default function AdventureSessionPage() {
           {/* 스테이지별 특수 컨텐츠 (현재 씬에서만) */}
           {showDataCards && (
             <div className="stage-enter garden-skin-cards">
-              <DataCardList cards={dataCards} primaryColor={theme.colors.primary} onSelect={handleDataCardSelect} />
+              <DataCardList cards={dataCards} primaryColor={theme.colors.primary} onSelect={handleDataCardSelect} factcheckResult={factcheckResult} />
             </div>
           )}
           {showCrystalAnalysis && (
