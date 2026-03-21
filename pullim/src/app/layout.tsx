@@ -30,7 +30,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased overflow-x-hidden w-full max-w-screen">
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>

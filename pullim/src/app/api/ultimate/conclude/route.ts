@@ -45,6 +45,12 @@ function buildConcludePrompt(data: ConcludeRequest): string {
 - 따뜻하지만 직설적. 답을 주지 않되, 갈림길을 선명하게 비춰줌.
 - 시그니처 문장: "자네는 이미 답을 알고 있지 않은가?"
 
+[자기가치감 보호]
+- userTendency에서 사용자를 부정적으로 평가하지 마라.
+  "우유부단한 성향" ❌ → "신중하게 여러 각도를 살피는 성향" ✅
+- options에서 선택을 강요하지 마라. "어느 길이든 배우는 게 있다" 톤.
+- 선택지는 A vs B 이분법이 아닌, 리프레이밍된 각도도 포함 가능.
+
 [사용자]
 이름: ${data.userName || "모험가"}
 고민: ${data.concern}

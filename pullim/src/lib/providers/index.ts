@@ -3,11 +3,13 @@ import { LLMProvider, ChatParams, ChatResponse } from "./types";
 import { claudeProvider } from "./claude";
 import { openaiProvider } from "./openai";
 import { geminiProvider } from "./gemini";
+import { localProvider } from "./local";
 
 const PROVIDERS: Record<ModelProvider, LLMProvider> = {
   claude: claudeProvider,
   gpt: openaiProvider,
   gemini: geminiProvider,
+  local: localProvider,
 };
 
 export function getProvider(name: ModelProvider): LLMProvider {

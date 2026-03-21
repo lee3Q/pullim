@@ -41,7 +41,7 @@ export default function CrystalSelector({
   return (
     <div className="w-full max-w-md mx-auto">
       {/* 구슬 그리드 */}
-      <div className="grid grid-cols-3 gap-4 justify-items-center">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 justify-items-center">
         {visibleCrystals.map((crystal) => {
           const isSelected = selected.includes(crystal.name);
           const isRecommended = recommended.includes(crystal.name);
@@ -57,7 +57,7 @@ export default function CrystalSelector({
               {/* 구슬/렌즈/봉오리 */}
               <div
                 className={`
-                  w-[72px] h-[72px] flex items-center justify-center text-[28px]
+                  w-[56px] h-[56px] sm:w-[72px] sm:h-[72px] flex items-center justify-center text-[24px] sm:text-[28px]
                   transition-all duration-300
                   ${crystalShape === "orb" ? "rounded-full" : ""}
                   ${crystalShape === "lens" ? "rounded-xl" : ""}
@@ -93,7 +93,7 @@ export default function CrystalSelector({
                 <p className={`text-xs font-rpg-sm ${isSelected ? "text-white/90" : "text-white/50"}`}>
                   {useExpertLabels ? crystal.expertLabel : crystal.name}
                 </p>
-                <p className={`text-[11px] mt-0.5 max-w-[90px] leading-tight ${isSelected ? "text-white/60" : "text-white/35"}`}>
+                <p className={`text-[10px] sm:text-[11px] mt-0.5 max-w-[80px] sm:max-w-[90px] leading-tight ${isSelected ? "text-white/60" : "text-white/35"}`}>
                   {useExpertLabels ? crystal.expertDescription : crystal.description}
                 </p>
                 {isRecommended && !isSelected && (

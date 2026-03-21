@@ -34,20 +34,22 @@ interface Props {
   currentStage: StageName;
   primaryColor: string;
   gameUI?: GameUIStyle;
+  progressStyle?: "garden" | "journey" | "analysis" | "default";
 }
 
-export default function ProgressVisual({ currentStage, primaryColor, gameUI }: Props) {
-  if (!gameUI || (gameUI.progressStyle !== "garden" && gameUI.progressStyle !== "journey" && gameUI.progressStyle !== "analysis")) {
+export default function ProgressVisual({ currentStage, primaryColor, gameUI, progressStyle }: Props) {
+  const style = gameUI?.progressStyle || progressStyle;
+  if (!style || (style !== "garden" && style !== "journey" && style !== "analysis")) {
     return <StageIndicator currentStage={currentStage} primaryColor={primaryColor} />;
   }
 
-  const icons = gameUI.progressStyle === "analysis" ? ANALYSIS_ICONS : gameUI.progressStyle === "journey" ? JOURNEY_ICONS : GARDEN_ICONS;
+  const icons = style === "analysis" ? ANALYSIS_ICONS : style === "journey" ? JOURNEY_ICONS : GARDEN_ICONS;
   const currentDisplay = STAGE_TO_DISPLAY[currentStage];
   const currentIndex = DISPLAY_STAGES.indexOf(currentDisplay);
   const isComplete = currentStage === "COMPLETE";
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto px-4 py-3 scrollbar-hide">
+    <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto px-2 sm:px-4 py-3 scrollbar-hide">
       {DISPLAY_STAGES.map((stage, i) => {
         const isCurrent = stage === currentDisplay && !isComplete;
         const isCompleted = isComplete || currentIndex > i;
@@ -62,7 +64,7 @@ export default function ProgressVisual({ currentStage, primaryColor, gameUI }: P
               />
             )}
             <div
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-rpg-sm whitespace-nowrap transition-all duration-500"
+              className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-rpg-sm whitespace-nowrap transition-all duration-500"
               style={{
                 background: isCurrent
                   ? `${primaryColor}20`

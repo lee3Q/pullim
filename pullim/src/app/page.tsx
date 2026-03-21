@@ -29,7 +29,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-[100dvh] flex flex-col relative overflow-x-hidden">
       {crisis && (
         <CrisisAlert
           message={crisis.message}
@@ -39,7 +39,7 @@ export default function HomePage() {
       )}
 
       {/* 배경 — 세 갈래 길 */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="fixed inset-0 -z-10 overflow-hidden" style={{ height: "100dvh" }}>
         <div className="absolute inset-0 bg-gradient-to-b from-[#12101a] via-[#1a1530] to-[#1e1a28]" />
         <div className="absolute inset-0 opacity-50">
           <Image

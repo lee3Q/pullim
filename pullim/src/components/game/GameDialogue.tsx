@@ -132,7 +132,7 @@ export default function GameDialogue({
 
       {/* 대화 텍스트 — 배경 위에 직접 표시, 텍스트 쉐도우로 가독성 확보 */}
       <div
-        className="text-[15px] leading-[1.8] font-rpg"
+        className="text-[14px] sm:text-[15px] leading-[1.7] sm:leading-[1.8] font-rpg"
         style={{
           color: "rgba(255,255,255,0.93)",
           textShadow:

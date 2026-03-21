@@ -231,7 +231,20 @@ export default function GardenSessionPage() {
       }, 1000);
       return () => clearTimeout(t);
     }
-  }, [stage, enterPhase, setScene]);
+    if (!activeGameUI && stage === "ENTER" && enterPhase === 1) {
+      const t = setTimeout(() => {
+        setEnterPhase(2);
+        setScene(theme.labels.enter + "\n" + theme.labels.askConcern);
+      }, 1500);
+      return () => clearTimeout(t);
+    }
+    if (!activeGameUI && stage === "ENTER" && enterPhase === 2) {
+      const t = setTimeout(() => {
+        setOptions(DEFAULT_CHOICES.ENTER || []);
+      }, 1000);
+      return () => clearTimeout(t);
+    }
+  }, [stage, enterPhase, setScene, activeGameUI]);
 
   const handleTypingComplete = useCallback(() => {
     if (stage === "ENTER" && enterPhase === 1) {
@@ -248,7 +261,8 @@ export default function GardenSessionPage() {
 
   const callListenAPI = async (
     messages: { role: string; content: string }[],
-    turns: number
+    turns: number,
+    currentConcern?: string
   ) => {
     setIsStreaming(true);
     try {
@@ -333,13 +347,14 @@ export default function GardenSessionPage() {
       setIsStreaming(false);
 
       if (listenComplete && newSummary) {
+        const concernForResearch = currentConcern || concern;
         setTimeout(() => {
           advanceScene(
             "마음이 보이기 시작해요.\n잠깐, 정원에서 찾아볼게요..."
           );
           setOptions([]);
           setStage("RESEARCH");
-          callResearchAPI(newSummary);
+          callResearchAPI(newSummary, concernForResearch);
         }, 1500);
       }
     } catch {
@@ -348,13 +363,14 @@ export default function GardenSessionPage() {
     }
   };
 
-  const callResearchAPI = async (summary: string) => {
+  const callResearchAPI = async (summary: string, currentConcern?: string) => {
+    const effectiveConcern = currentConcern || concern;
     setIsStreaming(true);
     try {
       const response = await fetch("/api/ultimate/research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ concern, listenSummary: summary }),
+        body: JSON.stringify({ concern: effectiveConcern, listenSummary: summary }),
       });
       if (!response.ok) {
         advanceScene("정원의 기록이 흐려졌어요... 그래도 괜찮아요, 계속 이야기해요.");
@@ -376,7 +392,7 @@ export default function GardenSessionPage() {
         setIsStreaming(false);
         return;
       }
-      const fcResult = await callJudgeFactcheck(data.cards);
+      const fcResult = await callJudgeFactcheck(data.cards, effectiveConcern);
       setDataCards(data.cards);
       setIsStreaming(false);
       const discuss1Text = fcResult && !fcResult.passed && fcResult.issues.length > 0
@@ -393,12 +409,13 @@ export default function GardenSessionPage() {
     }
   };
 
-  const callJudgeFactcheck = async (cards: DataCard[]) => {
+  const callJudgeFactcheck = async (cards: DataCard[], currentConcern?: string) => {
+    const effectiveConcern = currentConcern || concern;
     try {
       const res = await fetch("/api/ultimate/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "factcheck", cards, concern }),
+        body: JSON.stringify({ mode: "factcheck", cards, concern: effectiveConcern }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -510,7 +527,7 @@ export default function GardenSessionPage() {
       case "ENTER":
         setConcern(text);
         setStage("LISTEN");
-        { const m = [{ role: "user", content: text }]; setListenMessages(m); setTurnCount(1); await callListenAPI(m, 1); }
+        { const m = [{ role: "user", content: text }]; setListenMessages(m); setTurnCount(1); await callListenAPI(m, 1, text); }
         break;
       case "LISTEN": {
         const m = [...listenMessages, { role: "user", content: text }];
@@ -526,13 +543,34 @@ export default function GardenSessionPage() {
       case "DISCUSS_2": {
         const mc = crystalAnalyses.find((a) => text.includes(a.crystal));
         const sel = mc ? mc.crystal : crystalAnalyses[0]?.crystal;
-        if (sel) { setScene("꽃봉오리들끼리 이야기를 나눠볼게요."); setStage("DEBATE"); await callDebateAPI(sel); }
+        if (sel) {
+          if (disagreements.length === 0) {
+            setScene("꽃봉오리들이 같은 방향을 바라보고 있어.\n마음이 정리되고 있는 것 같아.");
+            setStage("DISCUSS_3");
+            setOptions(["맞아, 확신이 들어", "다른 면도 보고 싶어", "잘 모르겠어"]);
+          } else {
+            const intro = disagreements.length >= 3
+              ? "꽃봉오리들이 서로 다른 이야기를 하고 있어.\n복잡한 고민이구나. 좀 더 들어볼게."
+              : "꽃봉오리들끼리 이야기를 나눠볼게요.";
+            setScene(intro);
+            await new Promise(r => setTimeout(r, 1000));
+            setStage("DEBATE"); await callDebateAPI(sel);
+          }
+        }
         break;
       }
-      case "DISCUSS_3":
+      case "DISCUSS_3": {
         setScene("오늘 나눈 이야기를 정리해볼게요.");
-        setStage("JUDGE"); await callJudgeLogic(); setStage("CONCLUDE"); await callConcludeAPI();
+        await new Promise(r => setTimeout(r, 1000));
+        const judgePassed = await callJudgeLogic();
+        if (!judgePassed) {
+          setStage("DISCUSS_3");
+          setOptions(DEFAULT_CHOICES.DISCUSS_3 || []);
+          break;
+        }
+        setStage("CONCLUDE"); await callConcludeAPI();
         break;
+      }
       default: break;
     }
   };
@@ -568,7 +606,7 @@ export default function GardenSessionPage() {
   // ─── 렌더링 ───
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div className="min-h-[100dvh] flex flex-col relative overflow-x-hidden overflow-y-auto w-full max-w-[100vw]">
       {crisis && (
         <CrisisAlert
           message={crisis.message}
@@ -607,7 +645,7 @@ export default function GardenSessionPage() {
           style={{ top: "22%", zIndex: 6, opacity: isViewingPast ? 0.4 : 0.75 }}
         >
           <div
-            className="w-36 h-36 rounded-3xl overflow-hidden"
+            className="w-24 h-24 sm:w-36 sm:h-36 rounded-3xl overflow-hidden"
             style={{
               boxShadow: `0 4px 30px ${theme.colors.primary}20`,
             }}
@@ -642,12 +680,12 @@ export default function GardenSessionPage() {
 
       {/* 진행 표시 */}
       <div className="sticky top-[52px] z-20 backdrop-blur-md bg-black/30">
-        <ProgressVisual currentStage={stage} primaryColor={theme.colors.primary} gameUI={activeGameUI} />
+        <ProgressVisual currentStage={stage} primaryColor={theme.colors.primary} gameUI={activeGameUI} progressStyle={theme.gameUI?.progressStyle} />
       </div>
 
       {/* 메인 씬 영역 */}
-      <main className="flex-1 flex flex-col justify-end px-4 pb-4 pt-8 relative z-10 min-h-0">
-        <div className="max-w-lg mx-auto w-full flex flex-col gap-4">
+      <main className="flex-1 flex flex-col justify-end px-3 sm:px-4 pb-4 pt-8 relative z-10 min-h-0">
+        <div className="max-w-lg mx-auto w-full flex flex-col gap-3 sm:gap-4">
 
           {/* 스테이지별 특수 컨텐츠 (현재 씬에서만) */}
           {showDataCards && (

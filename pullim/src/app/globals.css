@@ -237,10 +237,10 @@ body {
    Stage transition fade
    ======================================== */
 .stage-enter {
-  animation: stage-fade-in 0.3s ease-out;
+  animation: stage-fade-in 0.6s ease-out;
 }
 @keyframes stage-fade-in {
-  0% { opacity: 0; transform: translateY(8px); }
+  0% { opacity: 0; transform: translateY(14px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 

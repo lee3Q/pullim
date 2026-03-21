@@ -14,6 +14,7 @@ import {
 } from "./types-ultimate";
 
 export function isDemoMode(): boolean {
+  if (process.env.LLM_MODE === "local") return false;
   return !process.env.ANTHROPIC_API_KEY;
 }
 

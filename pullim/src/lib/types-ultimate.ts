@@ -4,7 +4,7 @@ export type CrystalName =
   | "금화" | "나침반" | "거울" | "저울" | "모닥불"
   | "타인" | "심연" | "전략" | "뒤집기" | "몸";
 
-export type ModelProvider = "claude" | "gpt" | "gemini";
+export type ModelProvider = "claude" | "gpt" | "gemini" | "local";
 
 export type CharacterName = "현자" | "비서" | "코치" | "친구";
 

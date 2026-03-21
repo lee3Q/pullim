@@ -65,7 +65,7 @@ export default function GameChoices({
             key={i}
             onClick={() => handleSelect(option)}
             disabled={disabled || (selected !== null && !isSelected)}
-            className={`${btnClass} w-full text-left px-5 py-3.5 text-sm font-rpg transition-all duration-300`}
+            className={`${btnClass} w-full text-left px-3 py-2.5 sm:px-5 sm:py-3.5 text-sm font-rpg transition-all duration-300`}
             style={{
               opacity: isFaded ? 0.25 : 1,
               animationDelay: `${0.3 + i * 0.1}s`,
@@ -86,7 +86,7 @@ export default function GameChoices({
         <button
           onClick={onCustomInput}
           disabled={disabled}
-          className={`${btnClass} w-full text-left px-5 py-3.5 text-sm font-rpg transition-all duration-300 text-white/35`}
+          className={`${btnClass} w-full text-left px-3 py-2.5 sm:px-5 sm:py-3.5 text-sm font-rpg transition-all duration-300 text-white/35`}
           style={{ animationDelay: `${0.3 + options.length * 0.1}s` }}
         >
           {isCard ? "직접 입력" : isSignpost ? "직접 말하기" : "직접 입력하기"}

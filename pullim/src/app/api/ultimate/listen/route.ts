@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getClient, PIPELINE_MODEL } from "@/lib/llm/claude";
+import { isLocalMode, localStream } from "@/lib/llm/local";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { CRYSTALS, CrystalName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
@@ -34,6 +35,24 @@ function getPersona(theme: ThemeName): PersonaConfig {
 - 사용자 고민을 경청하고 핵심을 파악한다.
 - 한 번에 질문 1개만. 상황 정리 후 질문.
 - 답을 주지 않는다. 질문으로 사용자가 스스로 명확화하게 한다.
+
+[Socratic 질문 기법]
+1. Powerful Question: 30자 이내, 즉답 불가(네/아니오 금지), 관점을 전환시키는 질문만.
+   (O) "그 리스크를 감수하는 대신 얻으려는 것은 무엇입니까?"
+   (X) "리스크가 크다고 생각하십니까?" — 즉답 가능, 금지.
+2. Mirroring: 사용자의 핵심 단어를 그대로 반사. "~라고 하셨는데" 형식. 분석/해석 추가 금지.
+3. Reframing: "~해야 합니다", "~밖에 없습니다" 감지 시 → 다른 프레임의 질문으로 전환.
+
+[침묵 적응 — 2턴 이후 적용]
+사용자 발화 분석:
+1. 표면 질문 vs 실제 질문 구분 ("빨리 결정하고 싶다"=표면, "뭔가 불안하다"=실제)
+2. 회피 신호: 언급했다가 바로 넘어간 주제
+3. 감정-텍스트 불일치: 내용은 "괜찮다"인데 문체는 긴장
+감지 시 → 표면에 직접 대응하지 말고, 실제 질문을 향한 리프레이밍 질문 1개.
+
+[자기가치감 보호]
+- 사용자의 존재 가치/자기 평가를 흔드는 방향 금지.
+- "우유부단하시네요" ❌ → "신중하게 접근하고 계시군요" ✅
 
 [선택지 생성 규칙]
 응답 마지막에 반드시 아래 형식으로 선택지를 포함:
@@ -96,6 +115,24 @@ ${CRYSTALS.map((c) => `- ${c.name}: ${c.analysisFocus}`).join("\n")}
 - 한 번에 질문 1개만. 감정 반영 후 질문.
 - 답을 주지 않는다. 질문으로 사용자가 스스로 명확화하게 한다.
 
+[Socratic 질문 기법]
+1. Powerful Question: 30자 이내, 즉답 불가(응/아니 금지), 관점을 바꿔주는 질문만.
+   (O) "그걸 포기하면 대신 뭘 얻게 되는 거야?"
+   (X) "그게 힘들었어?" — 즉답 가능, 금지.
+2. Mirroring: 사용자의 핵심 단어를 그대로 돌려줘. "~라고 했잖아" 형식. 분석 추가 금지.
+3. Reframing: "~해야 해", "~밖에 없어" 감지 시 → 다른 각도의 질문으로 전환.
+
+[침묵 적응 — 2턴 이후 적용]
+사용자 발화 분석:
+1. 표면 질문 vs 진짜 질문 구분 ("빨리 정하고 싶어"=표면, "뭔가 불안해"=진짜)
+2. 회피 신호: 얘기하다가 갑자기 넘어간 주제
+3. 감정-텍스트 불일치: 말로는 "괜찮아"인데 문체는 긴장
+감지 시 → 표면에 바로 답하지 말고, 진짜 질문을 향한 리프레이밍 질문 1개.
+
+[자기가치감 보호]
+- 존재 가치/자기 평가를 흔드는 방향 금지.
+- "넌 우유부단해" ❌ → "신중하게 고민하고 있구나" ✅
+
 [선택지 생성 규칙]
 응답 마지막에 반드시 아래 형식으로 선택지를 포함:
 [OPTIONS]
@@ -157,6 +194,24 @@ ${CRYSTALS.map((c) => `- ${c.name}: ${c.analysisFocus}`).join("\n")}
 - 사용자 고민을 경청하고 핵심을 파악한다.
 - 한 번에 질문 1개만. 감정 반영 후 질문.
 - 답을 주지 않는다. 질문으로 사용자가 스스로 명확화하게 한다.
+
+[Socratic 질문 기법]
+1. Powerful Question: 30자 이내, 즉답 불가(예/아니오 금지), 관점을 전환시키는 질문만.
+   (O) "그 리스크를 감수하고서라도 얻으려는 것은 무엇인가?"
+   (X) "그것이 힘들었는가?" — 즉답 가능, 금지.
+2. Mirroring: 사용자의 핵심 단어를 그대로 반사. "~라 했지" 형식. 해석/분석 추가 금지.
+3. Reframing: "~해야 한다", "~밖에 없다" 감지 시 → 다른 프레임의 질문으로 전환.
+
+[침묵 적응 — 2턴 이후 적용]
+사용자 발화 분석:
+1. 표면 질문 vs 깊은 질문 구분 ("빨리 결정하고 싶다"=표면, "뭔가 불안하다"=깊음)
+2. 회피 신호: 언급했다가 바로 넘어간 주제
+3. 감정-텍스트 불일치: 말로는 "괜찮다"인데 문체는 긴장
+감지 시 → 표면에 직접 대응하지 말고, 빈칸을 향한 리프레이밍 질문 1개.
+
+[자기가치감 보호]
+- 사용자의 존재 가치/자기 평가를 흔드는 방향 금지.
+- "자네는 우유부단하군" ❌ → "자네는 신중한 결정을 하려는 사람이로군" ✅
 
 [선택지 생성 규칙]
 응답 마지막에 반드시 아래 형식으로 선택지를 포함:
@@ -302,27 +357,30 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let client;
-  try {
-    client = getClient();
-  } catch {
-    const errorStream = new ReadableStream({
-      start(controller) {
-        controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({ text: persona.errorMessage, error: true })}\n\n`
-          )
-        );
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
-      },
-    });
-    return new Response(errorStream, {
-      headers: { "Content-Type": "text/event-stream" },
-    });
+  const useLocal = isLocalMode();
+
+  if (!useLocal) {
+    try {
+      getClient();
+    } catch {
+      const errorStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ text: persona.errorMessage, error: true })}\n\n`
+            )
+          );
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(errorStream, {
+        headers: { "Content-Type": "text/event-stream" },
+      });
+    }
   }
 
-  const claudeMessages = messages
+  const chatMessages = messages
     .filter((m) => m.role !== "system" && m.content.trim() !== "")
     .filter((m) => typeof m.content === "string" && m.content.length < 10000)
     .slice(-20)
@@ -331,30 +389,46 @@ export async function POST(req: NextRequest) {
       content: m.content,
     }));
 
-  if (claudeMessages.length === 0) {
-    claudeMessages.push({ role: "user", content: "고민이 있어서 왔어." });
+  if (chatMessages.length === 0) {
+    chatMessages.push({ role: "user", content: "고민이 있어서 왔어." });
   }
 
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        const stream = client.messages.stream({
-          model: PIPELINE_MODEL,
-          max_tokens: 1024,
-          system: systemPrompt,
-          messages: claudeMessages,
-        });
-
         let fullText = "";
 
-        stream.on("text", (text) => {
-          fullText += text;
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
-          );
-        });
+        if (useLocal) {
+          fullText = await localStream({
+            system: systemPrompt,
+            messages: chatMessages,
+            maxTokens: 1024,
+            callbacks: {
+              onText: (text) => {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
+                );
+              },
+            },
+          });
+        } else {
+          const client = getClient();
+          const stream = client.messages.stream({
+            model: PIPELINE_MODEL,
+            max_tokens: 1024,
+            system: systemPrompt,
+            messages: chatMessages,
+          });
 
-        await stream.finalMessage();
+          stream.on("text", (text) => {
+            fullText += text;
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
+            );
+          });
+
+          await stream.finalMessage();
+        }
 
         // Extract options
         const optionsMatch = fullText.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
