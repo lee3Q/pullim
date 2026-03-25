@@ -28,6 +28,7 @@ import GameDialogue from "@/components/game/GameDialogue";
 import GameChoices from "@/components/game/GameChoices";
 import GameInput from "@/components/game/GameInput";
 import Link from "next/link";
+import LadderSessionPage from "@/components/session/LadderSessionPage";
 
 const theme = getTheme("달빛정원");
 
@@ -75,6 +76,11 @@ export default function GardenSessionPage() {
   const params = useParams();
   const sessionId = params.id as string;
   const searchParams = useSearchParams();
+
+  if (searchParams.get("mode") === "ladder") {
+    return <LadderSessionPage theme="달빛정원" bgImage="/assets/garden-listen-bg.png" />;
+  }
+
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
   const {

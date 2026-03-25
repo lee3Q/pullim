@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { getClient, PIPELINE_MODEL } from "@/lib/llm/claude";
 import { isLocalMode, localStream } from "@/lib/llm/local";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
+import { readBehavior, type BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { CRYSTALS, CrystalName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
 
@@ -263,11 +264,14 @@ function resolveTheme(theme?: string): ThemeName {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages, userName, turnCount, theme } = (await req.json()) as {
+  const { messages, userName, turnCount, theme, behaviorSignals, personalizationContext, sensoryLadderContext } = (await req.json()) as {
     messages: { role: string; content: string }[];
     userName: string | null;
     turnCount: number;
     theme?: string;
+    behaviorSignals?: BehaviorSignals;
+    personalizationContext?: string;
+    sensoryLadderContext?: string;
   };
 
   const resolvedTheme = resolveTheme(theme);
@@ -354,6 +358,24 @@ export async function POST(req: NextRequest) {
 
     if (crisisResult.tier === "B") {
       systemPrompt = persona.safetyGuard + systemPrompt;
+    }
+  }
+
+  // 개인화 컨텍스트 주입 (프로필 기반 톤 조정)
+  if (personalizationContext) {
+    systemPrompt += "\n\n" + personalizationContext;
+  }
+
+  // 양방향 감각화 사다리 (프로필 기반 선택지 생성 지시)
+  if (sensoryLadderContext) {
+    systemPrompt += "\n\n" + sensoryLadderContext;
+  }
+
+  // 행동 신호 기반 태도 조정 (crisis detector 이후, LLM 호출 전)
+  if (behaviorSignals) {
+    const behaviorContext = readBehavior(behaviorSignals);
+    if (behaviorContext) {
+      systemPrompt += "\n\n" + behaviorContext;
     }
   }
 

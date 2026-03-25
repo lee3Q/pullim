@@ -28,6 +28,7 @@ import GameDialogue from "@/components/game/GameDialogue";
 import GameChoices from "@/components/game/GameChoices";
 import GameInput from "@/components/game/GameInput";
 import Link from "next/link";
+import LadderSessionPage from "@/components/session/LadderSessionPage";
 
 const theme = getTheme("전략실");
 
@@ -75,6 +76,11 @@ export default function StrategySessionPage() {
   const params = useParams();
   const sessionId = params.id as string;
   const searchParams = useSearchParams();
+
+  if (searchParams.get("mode") === "ladder") {
+    return <LadderSessionPage theme="전략실" bgImage="/assets/strategy-bg.png" />;
+  }
+
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
   const {

@@ -16,6 +16,11 @@ import {
 } from "@/lib/types-ultimate";
 import { getTheme } from "@/lib/themes";
 import { useBGM } from "@/hooks/useBGM";
+import { useBehaviorSignals } from "@/hooks/useBehaviorSignals";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { buildHistoryContext } from "@/lib/personalization/history-reader";
+import { buildSensoryLadderContext } from "@/lib/personalization/sensory-ladder";
+import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
 import ThemedBackground from "@/components/ultimate/backgrounds/ThemedBackground";
 import ProgressVisual from "@/components/game/ProgressVisual";
 import CrystalSelector from "@/components/ultimate/CrystalSelector";
@@ -27,7 +32,10 @@ import CrisisAlert from "@/components/CrisisAlert";
 import GameDialogue from "@/components/game/GameDialogue";
 import GameChoices from "@/components/game/GameChoices";
 import GameInput from "@/components/game/GameInput";
+import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import SatisfactionRating from "@/components/discovery/SatisfactionRating";
 import Link from "next/link";
+import LadderSessionPage from "@/components/session/LadderSessionPage";
 
 const theme = getTheme("모험가");
 
@@ -75,6 +83,12 @@ export default function AdventureSessionPage() {
   const params = useParams();
   const sessionId = params.id as string;
   const searchParams = useSearchParams();
+
+  // 양방향 사다리 모드
+  if (searchParams.get("mode") === "ladder") {
+    return <LadderSessionPage theme="모험가" bgImage="/assets/adventure-listen-bg.png" />;
+  }
+
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
   const {
@@ -83,6 +97,56 @@ export default function AdventureSessionPage() {
     toggle: toggleBGM,
     nextTrack,
   } = useBGM(theme.assets.bgmTracks);
+
+  // ─── 행동 기반 개인화 ───
+  const behavior = useBehaviorSignals();
+  const userProfile = useUserProfile();
+  const [discoveryDone, setDiscoveryDone] = useState(false);
+  const [showSatisfaction, setShowSatisfaction] = useState(false);
+
+  // 온보딩 필요 여부 (첫 방문 + 온보딩 미완료)
+  const needsOnboarding = !userProfile.loading && userProfile.isNewUser && !discoveryDone;
+
+  // 개인화 컨텍스트 (재방문 시 프로필 기반)
+  const personalizationContextRef = useRef<string>("");
+  const sensoryLadderContextRef = useRef<string>("");
+
+  useEffect(() => {
+    if (userProfile.profile && !userProfile.isNewUser) {
+      const history = {
+        sessionCount: userProfile.sessionCount,
+        lastSatisfaction: userProfile.lastSatisfaction,
+        completionRate: userProfile.sessionCount > 0
+          ? userProfile.completedSessions / userProfile.sessionCount
+          : 1,
+      };
+      personalizationContextRef.current = buildHistoryContext(userProfile.profile, history);
+      sensoryLadderContextRef.current = buildSensoryLadderContext(userProfile.profile);
+
+      // 재방문 시 저장된 이름 사용
+      if (userProfile.profile.userName) {
+        setUserName(userProfile.profile.userName);
+      }
+    }
+  }, [userProfile.profile, userProfile.isNewUser, userProfile.sessionCount, userProfile.lastSatisfaction, userProfile.completedSessions]);
+
+  const handleOnboardingComplete = useCallback((profile: ProbabilityProfile) => {
+    setDiscoveryDone(true);
+    userProfile.saveProfile(profile);
+    setUserName(profile.userName);
+    // 새 프로필로 컨텍스트 바로 생성
+    personalizationContextRef.current = buildHistoryContext(profile, {
+      sessionCount: 1,
+      lastSatisfaction: null,
+      completionRate: 1,
+    });
+    sensoryLadderContextRef.current = buildSensoryLadderContext(profile);
+  }, [userProfile]);
+
+  const handleSatisfactionRate = useCallback((score: number | null) => {
+    userProfile.saveSatisfaction(score);
+    setShowSatisfaction(false);
+  }, [userProfile]);
 
   // ─── 씬 상태 ───
   const [stage, setStage] = useState<StageName>("ENTER");
@@ -224,6 +288,9 @@ export default function AdventureSessionPage() {
 
   // ─── ENTER 페이즈 ───
   useEffect(() => {
+    // 온보딩 진행 중이면 ENTER 페이즈 진행하지 않음
+    if (needsOnboarding) return;
+
     if (stage === "ENTER" && enterPhase === 0) {
       const t = setTimeout(() => {
         setEnterPhase(1);
@@ -245,7 +312,7 @@ export default function AdventureSessionPage() {
       }, 1000);
       return () => clearTimeout(t);
     }
-  }, [stage, enterPhase, setScene, activeGameUI]);
+  }, [stage, enterPhase, setScene, activeGameUI, needsOnboarding]);
 
   const handleTypingComplete = useCallback(() => {
     if (stage === "ENTER" && enterPhase === 1) {
@@ -275,6 +342,9 @@ export default function AdventureSessionPage() {
           userName,
           turnCount: turns,
           theme: "모험가",
+          behaviorSignals: behavior.getSignals(),
+          personalizationContext: personalizationContextRef.current || undefined,
+          sensoryLadderContext: sensoryLadderContextRef.current || undefined,
         }),
       });
       if (!response.ok) {
@@ -510,6 +580,9 @@ export default function AdventureSessionPage() {
   // ─── 사용자 입력 처리 ───
 
   const handleUserInput = async (text: string) => {
+    // 행동 신호 기록
+    behavior.recordMessage(text);
+
     const prev = currentSceneRef.current;
     if (prev.characterText) {
       setScenes((s) => [
@@ -593,6 +666,8 @@ export default function AdventureSessionPage() {
   const handleCommit = (commitment: ActionCommitment) => {
     advanceScene(`${commitment.deadline}에 다시 만나요.\n${theme.labels.farewell}`);
     setStage("COMPLETE");
+    // 만족도 수집 표시
+    setTimeout(() => setShowSatisfaction(true), 2000);
   };
 
   // ─── 렌더링 ───
@@ -678,6 +753,22 @@ export default function AdventureSessionPage() {
       {/* 메인 씬 영역 */}
       <main className="flex-1 flex flex-col justify-end px-3 sm:px-4 pb-4 pt-8 relative z-10 min-h-0">
         <div className="max-w-lg mx-auto w-full flex flex-col gap-3 sm:gap-4">
+
+          {/* 온보딩 (첫 방문 사용자) */}
+          {needsOnboarding && stage === "ENTER" && (
+            <OnboardingFlow
+              onComplete={handleOnboardingComplete}
+              primaryColor={theme.colors.primary}
+            />
+          )}
+
+          {/* 만족도 수집 (세션 완료 후) */}
+          {showSatisfaction && (
+            <SatisfactionRating
+              onRate={handleSatisfactionRate}
+              primaryColor={theme.colors.primary}
+            />
+          )}
 
           {/* 스테이지별 특수 컨텐츠 (현재 씬에서만) */}
           {showDataCards && (

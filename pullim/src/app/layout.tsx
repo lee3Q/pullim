@@ -13,6 +13,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
   themeColor: "#7c3aed",
 };
 
@@ -28,6 +29,17 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css"
           crossOrigin="anonymous"
+        />
+        {/* PWA — iOS standalone */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="풀림" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        {/* Service Worker 등록 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js')})}`,
+          }}
         />
       </head>
       <body className="antialiased overflow-x-hidden w-full max-w-screen">
