@@ -4,7 +4,7 @@
 #
 # 사용: cd ~/study/main/pullim && bash scripts/start-batch-sequential.sh
 
-set -uo pipefail
+set -o pipefail
 cd "$(dirname "$0")/.."
 PROJ_DIR=$(pwd)
 CLAUDE="/Users/sanggyulee/.local/bin/claude"
