@@ -58,8 +58,7 @@ export default function TextInputLevel({
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || isLoading}
-          className="absolute right-3 bottom-3 disabled:opacity-30 transition-colors"
-          style={{ color: "var(--fantasy-gold)" }}
+          className="absolute right-2 bottom-2 rpg-button-ghost px-3 py-1 text-sm disabled:opacity-30 disabled:pointer-events-none"
         >
           ↑
         </button>
@@ -69,7 +68,7 @@ export default function TextInputLevel({
         <button
           onClick={onSwitchToChoices}
           className="text-xs font-rpg-sm transition-colors"
-          style={{ color: "rgba(192,163,116,0.35)" }}
+          style={{ color: "rgba(192,163,116,0.65)" }}
         >
           선택지 보여줘
         </button>

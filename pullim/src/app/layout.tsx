@@ -18,10 +18,25 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "풀림 — 고민이 정리되는 곳",
-  description:
-    "감정 정리하러 왔는데, 결정까지 됐다. AI와 함께 고민을 풀어보세요.",
+  title: "풀림 — 3분이면 나를 알 수 있어요",
+  description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
+  },
+  openGraph: {
+    title: "풀림 — 3분이면 나를 알 수 있어요",
+    description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+    images: [{ url: "/icons/icon-512.png" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "풀림 — 3분이면 나를 알 수 있어요",
+    description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+    images: ["/icons/icon-512.png"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -29,7 +44,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#7c3aed",
+  themeColor: "#12101a",
 };
 
 export default function RootLayout({

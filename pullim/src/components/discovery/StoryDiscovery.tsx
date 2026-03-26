@@ -259,7 +259,7 @@ export default function StoryDiscovery({
               />
             ) : (
               <div className="flex items-end justify-center h-full p-3">
-                <p className="text-[11px] text-white/25 text-center italic">
+                <p className="text-[11px] text-white/50 text-center italic">
                   {currentScene.illustration}
                 </p>
               </div>

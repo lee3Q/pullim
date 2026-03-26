@@ -33,20 +33,9 @@ export default function ChoiceLevel({
           <button
             key={opt.id}
             onClick={() => onSelect(opt.id)}
-            className="w-full text-left py-3 px-4 rounded-xl transition-all active:scale-[0.98] font-rpg"
-            style={{
-              background: opt.isFallback
-                ? "rgba(26,22,18,0.4)"
-                : "linear-gradient(145deg, var(--fantasy-leather), var(--fantasy-leather-deep))",
-              border: opt.isFallback
-                ? "1px solid rgba(192,163,116,0.15)"
-                : "1px solid var(--fantasy-gold-dark)",
-              color: opt.isFallback ? "rgba(192,167,136,0.45)" : "var(--fantasy-button-text)",
-              boxShadow: opt.isFallback
-                ? "none"
-                : "0 2px 0 var(--fantasy-leather-darkest), 0 3px 8px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)",
-              textShadow: opt.isFallback ? "none" : "0 1px 0 var(--fantasy-leather-darkest)",
-            }}
+            className={`w-full text-left py-3 px-4 transition-all active:scale-[0.98] ${
+              opt.isFallback ? "rpg-button-ghost opacity-60" : "rpg-button"
+            }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -67,7 +56,7 @@ export default function ChoiceLevel({
         <button
           onClick={onFreeText}
           className="text-xs font-rpg-sm transition-colors"
-          style={{ color: "rgba(192,163,116,0.35)" }}
+          style={{ color: "rgba(192,163,116,0.65)" }}
         >
           직접 쓸게
         </button>

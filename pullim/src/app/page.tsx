@@ -78,7 +78,7 @@ const MOOD_OPTIONS: {
     sub: "재미있는 거 없나",
     theme: "adventure",
     entry: "bored",
-    color: "#fbbf24",
+    color: "#ff9f1c",
   },
 ];
 
@@ -195,14 +195,14 @@ export default function HomePage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowSettings((v) => !v)}
-            className="text-sm text-white/40 hover:text-white/60 transition-colors"
+            className="text-sm text-white/60 hover:text-white/80 transition-colors p-2"
             aria-label="설정"
           >
             &#9881;
           </button>
           <button
             onClick={() => router.push("/history")}
-            className="text-sm text-white/40 hover:text-white/60 transition-colors font-rpg-sm"
+            className="text-sm text-white/60 hover:text-white/80 transition-colors font-rpg-sm p-2"
           >
             내 기록
           </button>
@@ -275,7 +275,7 @@ export default function HomePage() {
               >
                 오늘 어떤 마음이야?
               </h1>
-              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.5)" }}>편하게 골라봐</p>
+              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.70)" }}>편하게 골라봐</p>
             </div>
 
             <div className="space-y-3">

@@ -426,7 +426,7 @@ export default function LadderSession({
           >
             오늘은 어떻게 시작할까?
           </h2>
-          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.5)" }}>편한 방식을 골라봐</p>
+          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.70)" }}>편한 방식을 골라봐</p>
         </div>
 
         <div className="space-y-3">
@@ -443,7 +443,7 @@ export default function LadderSession({
                     <p className="text-sm font-medium font-rpg" style={{ color: "var(--fantasy-text)" }}>
                       {opt.label}
                     </p>
-                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.45)" }}>{opt.sub}</p>
+                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>{opt.sub}</p>
                   </div>
                 </div>
                 {opt.recommended && (
@@ -492,15 +492,15 @@ export default function LadderSession({
               }}
             />
           ))}
-          <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(192,167,136,0.4)" }}>
+          <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
             {LEVEL_LABELS[level]}
           </span>
         </div>
         <button
           onClick={generateSummary}
           disabled={isLoading}
-          className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30"
-          style={{ color: "rgba(192,163,116,0.3)" }}
+          className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
+          style={{ color: "rgba(192,163,116,0.55)" }}
         >
           오늘은 여기까지
         </button>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #fafaf8;
+  --color-background: #12101a;
   --color-foreground: #1a1a1a;
 }
 
