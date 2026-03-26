@@ -10,7 +10,8 @@ import type { ThemeType } from "@/lib/personalization/story-scenes";
 import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
 import type { StorySelectionRecord } from "@/lib/personalization/discovery-engine";
 import ThemeSelector from "@/components/ultimate/ThemeSelector";
-import StoryDiscovery from "@/components/discovery/StoryDiscovery";
+import dynamic from "next/dynamic";
+const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscovery"));
 import CrisisAlert from "@/components/CrisisAlert";
 import { useSettings } from "@/hooks/useSettings";
 

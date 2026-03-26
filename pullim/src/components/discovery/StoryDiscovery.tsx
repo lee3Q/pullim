@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import Image from "next/image";
 import type { ThemeType } from "@/lib/personalization/story-scenes";
 import type { StorySelectionRecord } from "@/lib/personalization/discovery-engine";
 import { getThemeStory } from "@/lib/personalization/story-scenes";
@@ -72,8 +73,9 @@ export default function StoryDiscovery({
         if (nextIndex >= story.scenes.length) {
           // 마지막 장면
           finish();
-        } else if (nextIndex >= story.minScenes && nextIndex === story.minScenes) {
+        } else if (nextIndex === story.minScenes) {
           // 기본 장면 끝 → 계속할지 물어보기
+          sceneStartTime.current = Date.now();
           setSceneIndex(nextIndex);
           setPhase("continue-prompt");
         } else {
@@ -89,6 +91,26 @@ export default function StoryDiscovery({
     setPhase("scene");
     sceneStartTime.current = Date.now();
   }, []);
+
+  // intro 단계: 첫 장면 이미지 프리로드
+  useEffect(() => {
+    const firstScene = story.scenes[0];
+    if (firstScene?.imagePath) {
+      const img = new window.Image();
+      img.src = firstScene.imagePath;
+    }
+  }, [story.scenes]);
+
+  // 다음 2장면 이미지 프리로드
+  useEffect(() => {
+    const nextScenes = story.scenes.slice(sceneIndex + 1, sceneIndex + 3);
+    nextScenes.forEach(scene => {
+      if (scene.imagePath) {
+        const img = new window.Image();
+        img.src = scene.imagePath;
+      }
+    });
+  }, [sceneIndex, story.scenes]);
 
   // ─── 인트로 ───
   if (phase === "intro") {
@@ -126,13 +148,15 @@ export default function StoryDiscovery({
         <SceneCard primaryColor={primaryColor} bgImage={story.bgImage}>
           {story.outroImagePath && (
             <div
-              className="rounded-xl overflow-hidden"
+              className="rounded-xl overflow-hidden relative"
               style={{ height: 140, border: "1px solid rgba(192,163,116,0.3)" }}
             >
-              <img
+              <Image
                 src={story.outroImagePath}
                 alt="outro"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, 384px"
+                style={{ objectFit: "cover" }}
               />
             </div>
           )}
@@ -211,13 +235,13 @@ export default function StoryDiscovery({
         >
           {/* 진행 바 */}
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(192,163,116,0.15)" }}>
+            <div className="flex-1 h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(192,163,116,0.15)" }}>
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${progress * 100}%`, background: "linear-gradient(90deg, #b8860b, #C0A374)" }}
+                style={{ width: `${progress * 100}%`, background: primaryColor }}
               />
             </div>
-            <span className="text-[10px]" style={{ color: "rgba(192,167,136,0.4)" }}>
+            <span className="text-[10px] opacity-60" style={{ color: "rgba(192,167,136,1)" }}>
               {sceneIndex + 1}/{story.scenes.length}
             </span>
           </div>
@@ -232,10 +256,13 @@ export default function StoryDiscovery({
             }}
           >
             {currentScene.imagePath ? (
-              <img
+              <Image
                 src={currentScene.imagePath}
                 alt={currentScene.illustration}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 640px) 100vw, 384px"
+                style={{ objectFit: "cover" }}
+                priority={sceneIndex === 0}
               />
             ) : (
               <div className="flex items-end justify-center h-full p-3">
