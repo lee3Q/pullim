@@ -23,23 +23,12 @@
 **항상**:
 - [ ] 두어스 소재 감지 → `아산두어스_신청.md` 수집 로그에 추가 (04-20까지)
 
-## 즉시 실행 (승인 불필요)
+## 밤 배치 실행 중 (2026-03-27)
 
-- [ ] **위기 안전 시스템 사다리 적용 확인** — 사다리 세션에서 RED 감지가 작동하는지 코드 확인. crisis-detector가 sensoryLadderContext 경로에서도 호출되는지 검증. 안 되면 수정.
-  - 참고: `pullim/src/lib/safety/crisis-detector.ts`, `pullim/src/app/api/ultimate/listen/route.ts`
-  - 프로젝트: 풀림_핵심UX_설계.md
-
-- [ ] **디자인 판타지 매칭** — 현재 모던 UI(둥근 카드, 시스템 폰트)가 판타지 일러스트와 안 어울림. 폰트/카드 배경/버튼 스타일을 판타지 세계관에 맞게 수정. CC로 검증.
-  - 참고: StoryDiscovery.tsx의 SceneCard, 홈 화면 page.tsx
-  - 프로젝트: 풀림_핵심UX_설계.md
-
-- [ ] **내면사고 LLM 검증** — behind-llm.ts 구현 완료됐으나 실제 Gemini API 호출 테스트 미수행. .env.local에 GEMINI_API_KEY가 있는지 확인하고, 없으면 데모 모드에서 폴백 작동하는지 확인.
-  - 참고: `pullim/src/lib/session/behind-llm.ts`, `behind-the-scenes.ts`
-  - 프로젝트: 풀림_핵심UX_설계.md
-
-- [ ] **StoryDiscovery continue-prompt 조건 버그** — `nextIndex >= story.minScenes && nextIndex === story.minScenes`는 중복 조건. `sceneStartTime` 리셋 누락. CC에서 Sonnet이 발견.
-  - 참고: StoryDiscovery.tsx line 73 부근
-  - 프로젝트: 풀림_핵심UX_설계.md
+> 28개 태스크 순차 실행 (scripts/start-batch-sequential.sh)
+> 브랜치: overnight/20260327, 그룹마다 빌드+커밋 체크포인트
+> 모니터: `cat scripts/batch_sequential.log`
+> 포함 항목: 버그수정, 위기안전, 내면사고검증, 유형결과화면, 피드백폼, 이미지최적화 등 28건
 
 ## 대표 확인 후 실행
 
@@ -52,12 +41,13 @@
 
 ## 보류 (5/23 이후)
 
-- [ ] Supabase 연결 + 세션 영속화
-- [ ] Vercel 배포 + 모바일 테스트
+- [x] ~~Supabase 연결~~ — feedback 테이블 + 환경변수 Vercel 설정 완료 (2026-03-27)
+- [x] ~~Vercel 배포~~ — pullim.vercel.app 배포 완료 (2026-03-27)
 - [ ] 고민 라우팅 실행 (사다리 기준 재설계 완료)
 - [ ] 모델 저비용화 실행 (사다리 기준 재설계 완료)
 - [ ] 감각 레벨 이미지 카드 (현재 이모지+텍스트)
-- [ ] PWA 아이콘 생성 (192px, 512px)
+- [x] ~~PWA 아이콘 생성~~ — 512px+192px PNG 완료 (2026-03-27)
+- [ ] Supabase 세션 영속화 (feedback만 연결, 세션 저장은 미구현)
 
 ## 완료
 
