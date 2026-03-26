@@ -97,22 +97,19 @@ export default function HomePage() {
   const handleMoodSelect = (mood: (typeof MOOD_OPTIONS)[number]) => {
     setSelectedEntry(mood.entry);
     if (mood.theme === null) {
+      // "고민이 있어" → 테마 선택 후 파악
       setPhase("session-entry");
     } else {
       setSelectedTheme(mood.theme);
-      // 심심/궁금은 파악 건너뛰고 바로 세션 (고민이 없으니까)
-      if (mood.entry === "bored" || mood.entry === "curious") {
-        handleStartSession(THEME_TO_NAME[mood.theme], mood.entry);
-      } else {
-        setPhase("discover");
-      }
+      // 모든 경로가 파악을 거친다. 건너뛰기 선택도 데이터.
+      setPhase("discover");
     }
   };
 
   const handleDiscoveryComplete = useCallback(
     (profile: ProbabilityProfile, selections: StorySelectionRecord[]) => {
       try {
-        localStorage.setItem("pullim_profile", JSON.stringify(profile));
+        localStorage.setItem("pullim_user_profile", JSON.stringify({ profile, sessionCount: 0, lastSessionAt: new Date().toISOString(), lastSatisfaction: null, completedSessions: 0 }));
         localStorage.setItem("pullim_discovery", JSON.stringify(selections));
       } catch {
         // localStorage 실패 무시
@@ -139,7 +136,10 @@ export default function HomePage() {
     [selectedTheme]
   );
 
+  const [isNavigating, setIsNavigating] = useState(false);
+
   const handleStartSession = (themeName: ThemeName, entry: "concern" | "bored" | "curious" = "concern") => {
+    setIsNavigating(true);
     const sessionId = nanoid(12);
     const route = THEMES[themeName].route;
     router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=${entry}`);
@@ -178,7 +178,8 @@ export default function HomePage() {
       <header className="px-6 py-4 flex justify-between items-center relative z-10">
         <button
           onClick={() => setPhase("mood")}
-          className="text-lg font-bold text-white/80 font-rpg"
+          className="text-lg font-bold font-rpg-lg"
+          style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 12px rgba(192,163,116,0.3)" }}
         >
           풀림
         </button>
@@ -234,10 +235,16 @@ export default function HomePage() {
         {phase === "mood" && (
           <div className="w-full max-w-sm space-y-8 animate-in fade-in duration-500">
             <div className="text-center">
-              <h1 className="text-xl font-bold text-white/90 mb-2">
+              <h1
+                className="text-xl font-bold mb-2 font-rpg-lg"
+                style={{
+                  color: "var(--fantasy-gold-bright)",
+                  textShadow: "0 0 20px rgba(192,163,116,0.4), 0 0 40px rgba(192,163,116,0.15)",
+                }}
+              >
                 오늘 어떤 마음이야?
               </h1>
-              <p className="text-sm text-white/40">편하게 골라봐</p>
+              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.5)" }}>편하게 골라봐</p>
             </div>
 
             <div className="space-y-3">
@@ -245,20 +252,16 @@ export default function HomePage() {
                 <button
                   key={mood.label}
                   onClick={() => handleMoodSelect(mood)}
-                  className="w-full text-left py-4 px-5 rounded-2xl border transition-all
+                  className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
                              hover:scale-[1.01] active:scale-[0.98]"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    borderColor: `${mood.color}25`,
-                  }}
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">{mood.emoji}</span>
                     <div>
-                      <p className="text-sm font-medium text-white/85">
+                      <p className="text-sm font-medium font-rpg" style={{ color: "var(--fantasy-text)" }}>
                         {mood.label}
                       </p>
-                      <p className="text-xs text-white/35 mt-0.5">{mood.sub}</p>
+                      <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.45)" }}>{mood.sub}</p>
                     </div>
                   </div>
                 </button>
@@ -285,7 +288,7 @@ export default function HomePage() {
         {phase === "discover-done" && (
           <div className="w-full max-w-sm space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-2">
-              <p className="text-white/60 text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
                 너에 대해 조금 알게 된 것 같아.
               </p>
             </div>
@@ -295,14 +298,21 @@ export default function HomePage() {
                 onClick={() =>
                   handleStartSession(THEME_TO_NAME[selectedTheme], selectedEntry)
                 }
-                className="w-full py-4 px-5 rounded-2xl text-sm font-medium transition-all active:scale-[0.98]"
-                style={{ background: primaryColor, color: "white" }}
+                className="w-full py-4 px-5 rounded-2xl text-sm font-medium font-rpg transition-all active:scale-[0.98]"
+                style={{
+                  background: "linear-gradient(145deg, var(--fantasy-leather), var(--fantasy-leather-deep))",
+                  border: "1px solid var(--fantasy-gold-dark)",
+                  color: "var(--fantasy-button-text)",
+                  boxShadow: "0 2px 0 var(--fantasy-leather-darkest), 0 3px 8px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  textShadow: "0 1px 0 var(--fantasy-leather-darkest)",
+                }}
               >
                 고민도 풀어볼래?
               </button>
               <button
                 onClick={() => setPhase("mood")}
-                className="w-full py-3 text-center text-sm text-white/30 hover:text-white/50 transition-colors"
+                className="w-full py-3 text-center text-sm font-rpg-sm transition-colors"
+                style={{ color: "rgba(192,163,116,0.4)" }}
               >
                 오늘은 여기까지
               </button>
@@ -314,23 +324,48 @@ export default function HomePage() {
         {phase === "session-entry" && (
           <div className="w-full max-w-sm space-y-6 animate-in fade-in duration-500">
             <div className="text-center">
-              <h2 className="text-lg font-bold text-white/90 mb-2">
+              <h2
+                className="text-lg font-bold mb-2 font-rpg-lg"
+                style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 20px rgba(192,163,116,0.3)" }}
+              >
                 어디서 이야기할까?
               </h2>
-              <p className="text-sm text-white/40">분위기를 골라봐</p>
+              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.5)" }}>분위기를 골라봐</p>
             </div>
 
-            <ThemeSelector onSelect={handleStartSession} disabled={false} />
+            <ThemeSelector onSelect={(themeName) => {
+              // 테마 선택 후 파악으로 이동 (모든 경로가 파악을 거친다)
+              const themeKey = Object.entries(THEME_TO_NAME).find(([, v]) => v === themeName)?.[0] as ThemeType | undefined;
+              if (themeKey) {
+                setSelectedTheme(themeKey);
+                setPhase("discover");
+              }
+            }} disabled={false} />
 
             <button
               onClick={() => setPhase("mood")}
-              className="w-full text-center text-xs text-white/25 hover:text-white/40 transition-colors pt-2"
+              className="w-full text-center text-xs font-rpg-sm transition-colors pt-2"
+              style={{ color: "rgba(192,163,116,0.35)" }}
             >
               ← 돌아가기
             </button>
           </div>
         )}
       </main>
+
+      {/* 로딩 오버레이 */}
+      {isNavigating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="text-center space-y-4 animate-in fade-in duration-300">
+            <div className="flex gap-2 justify-center">
+              <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:200ms]" />
+              <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:400ms]" />
+            </div>
+            <p className="text-sm text-white/40">준비하고 있어...</p>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="text-center text-xs text-white/25 py-4 relative z-10">

@@ -33,7 +33,19 @@
      - Gap 수정 2건: 심심/궁금 진입경로 추가, 추천거부→ProbabilityProfile 반영
    - [x] **PWA 모바일 앱 설정** — manifest.json 보강 + Service Worker + iOS Apple 메타태그
      - 아이콘 파일(icons/icon-192.png, icon-512.png) 생성 필요 (디자인 에셋)
-5. **최종 검증** — 대표 확인 + 교차검토
+   - [x] **Capacitor iOS 셋업** — 네이티브 앱 껍데기, 코드 수정에 영향 없음
+   - [x] **진입 UX 버그 수정 (CC 3-model 검증)** — 2026-03-26
+     - localStorage 키 통일 (`pullim_profile` → `pullim_user_profile` 포맷)
+     - 아웃트로 버튼 onClick 추가
+     - 모든 경로가 파악을 거치도록 수정 (심심/궁금/고민있어 포함)
+     - adventure_1.png 90도 회전 (세로→가로)
+   - [x] **사다리 세션 데모 모드** — API 키 없이 전체 UX 흐름 테스트 가능
+   - ⚡ 품질검증 체크포인트
+   - [x] **내면사고 LLM** — if/else → Gemini Flash Lite LLM 추론 (비용 0원, 3초 타임아웃+폴백)
+   - [x] **디자인 판타지 매칭** — 폰트(Gowun Batang+Noto Serif KR)/카드/버튼/색상 판타지화 완료. CSS 변수 통일. 3-model CC 통과.
+   - [x] **위기 안전 시스템** — 클라이언트 Tier A 위기 감지 연결 완료 (SSE crisis 플래그 → CrisisAlert 모달). 빌드 통과.
+   - [ ] **Claude API 실제 테스트** — 프롬프트 빌더 → 실제 응답 품질 확인
+5. **최종 검증** — 대표 확인 + 교차검토 (배포 목표: 5/23 이후)
 
 ## 대표 피드백 (2026-03-25, 반드시 반영)
 - 온보딩이 모험가 안에 있으면 안 됨 → **홈 화면에서 길잡이가 시작**
@@ -62,3 +74,4 @@
 ## 상태
 - 시작일: 2026-03-25 (분리)
 - 상태: 진행 중
+- 최종 갱신: 2026-03-26

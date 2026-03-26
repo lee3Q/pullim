@@ -46,6 +46,18 @@ fi
 # 이전 영구 실패 목록 초기화 (새 배치는 클린 스타트)
 rm -f scripts/.permafail
 
+# Branch 격리: overnight 브랜치에서 작업 (main 보호)
+BRANCH_NAME="overnight/$(date '+%Y%m%d')"
+CURRENT_BRANCH=$(git branch --show-current)
+if [[ "$CURRENT_BRANCH" != "$BRANCH_NAME" ]]; then
+  git stash --include-untracked -m "batch-stash-$(date '+%Y%m%d_%H%M')" 2>/dev/null || true
+  git checkout -B "$BRANCH_NAME" 2>/dev/null
+  git stash pop 2>/dev/null || true
+  echo "✅ 브랜치: $BRANCH_NAME (main 보호)"
+else
+  echo "✅ 브랜치: $BRANCH_NAME (이미 존재)"
+fi
+
 # 배치 시작 (-dis: idle+display+system sleep 모두 방지)
 caffeinate -dis nohup bash scripts/batch_claude.sh > scripts/nohup.out 2>&1 &
 BATCH_PID=$!

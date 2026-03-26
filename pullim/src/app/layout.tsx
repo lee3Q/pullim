@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Gowun_Batang, Noto_Serif_KR } from "next/font/google";
 import StoreProvider from "@/components/StoreProvider";
 import "./globals.css";
+
+const gowunBatang = Gowun_Batang({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-gowun",
+  display: "swap",
+});
+
+const notoSerifKR = Noto_Serif_KR({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-noto-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "풀림 — 고민이 정리되는 곳",
@@ -23,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={`${gowunBatang.variable} ${notoSerifKR.variable}`}>
       <head>
         <link
           rel="stylesheet"

@@ -5,6 +5,7 @@ import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { readBehavior, type BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { CRYSTALS, CrystalName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
+import { getDemoLadderResponse } from "@/lib/session/demo-ladder";
 
 type ThemeName = "모험가" | "전략실" | "달빛정원";
 
@@ -280,6 +281,35 @@ export async function POST(req: NextRequest) {
 
   // Demo mode — API 키 없으면 mock 응답
   if (isDemoMode()) {
+    // 사다리 세션 데모
+    if (sensoryLadderContext) {
+      const levelMatch = sensoryLadderContext.match(/\[LADDER_LEVEL:\s*(\d)\]/);
+      const level = levelMatch ? (parseInt(levelMatch[1]) as 1 | 2 | 3 | 4 | 5) : 4;
+      const isSummaryMode = sensoryLadderContext.includes("[SESSION_SUMMARY_MODE]");
+
+      const { getDemoLadderResponse } = await import("@/lib/session/demo-ladder");
+      const demoText = getDemoLadderResponse(level, turnCount, isSummaryMode);
+
+      const demoStream = new ReadableStream({
+        async start(controller) {
+          const chars = demoText.split("");
+          for (let i = 0; i < chars.length; i += 3) {
+            const chunk = chars.slice(i, i + 3).join("");
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`)
+            );
+            await new Promise((r) => setTimeout(r, 25));
+          }
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(demoStream, {
+        headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" },
+      });
+    }
+
+    // 기존 파이프라인 데모
     const demo = getDemoListenResponse(turnCount, resolvedTheme);
     const demoStream = new ReadableStream({
       async start(controller) {

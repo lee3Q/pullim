@@ -5,15 +5,20 @@ AI 의사결정/멘탈케어 SaaS. 1인 창업 (대표: 이상규).
 ## 세션 시작
 
 1. `.state/project-config.md` 읽기 (불변 설정)
-2. `.state/projects/` 내 active 프로젝트 파일 읽기 (복수 가능)
-3. 필요 시 `.state/decisions/` 최근 결정, `.state/handoffs/` 최근 핸드오프 확인
+2. `.state/routines.md` 읽기 (아침/밤 루틴 정의)
+3. `.state/projects/` 내 active 프로젝트 파일 읽기 (복수 가능)
+4. 필요 시 `.state/decisions/` 최근 결정, `.state/handoffs/` 최근 핸드오프 확인
+5. **아침 루틴 실행**: 일일 리포트 생성 → `.state/daily/YYYY-MM-DD_morning.md`
 
-## 세션 종료
+## 세션 종료 ("마무리", "밤 루틴" 시)
 
-1. 작업한 프로젝트 파일 갱신 (`.state/projects/프로젝트명.md`)
-2. 프로젝트 완료 시 → `.state/projects/_done/` 으로 이동
-3. 주요 결정이 있었으면 `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
-4. `/handoff` 실행 권장
+1. **밤 루틴 실행**: `.state/routines.md` 참조
+2. 작업한 프로젝트 파일 갱신 (`.state/projects/프로젝트명.md`)
+3. `.state/queue.md` 갱신 (완료 항목 [x] 처리, 새 작업 발견 시 추가)
+4. 프로젝트 완료 시 → `.state/projects/_done/` 으로 이동
+5. 주요 결정이 있었으면 `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
+6. `/handoff` 실행
+7. 밤 리포트 생성 → `.state/daily/YYYY-MM-DD_evening.md`
 
 ## 핵심 자료
 
@@ -27,6 +32,7 @@ AI 의사결정/멘탈케어 SaaS. 1인 창업 (대표: 이상규).
 | 신청서, PPT | ./신청서/ |
 | 테스트 세션 기록 | ./테스트/ |
 | 아카이브 (이전 팀 자료) | ./archive/ |
+| 일일 루틴/리포트 | ./.state/routines.md, ./.state/daily/ |
 
 ## 원칙
 

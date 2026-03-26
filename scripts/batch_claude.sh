@@ -13,11 +13,12 @@ set -uo pipefail
 
 # === 설정 ===
 PROJ_DIR="/Users/sanggyulee/study/main/pullim"
-TASK_DIR="$PROJ_DIR/scripts/tasks"
-OUT_DIR="$PROJ_DIR/scripts/output"
-ERR_DIR="$PROJ_DIR/scripts/errors"
-LOG="$PROJ_DIR/scripts/batch.log"
-LOCKFILE="$PROJ_DIR/scripts/.batch.lock"
+BATCH_GROUP="${BATCH_GROUP:-}"
+TASK_DIR="${BATCH_TASK_DIR:-$PROJ_DIR/scripts/tasks}"
+OUT_DIR="${BATCH_OUT_DIR:-$PROJ_DIR/scripts/output}${BATCH_GROUP:+_$BATCH_GROUP}"
+ERR_DIR="${BATCH_ERR_DIR:-$PROJ_DIR/scripts/errors}${BATCH_GROUP:+_$BATCH_GROUP}"
+LOG="${BATCH_LOG:-$PROJ_DIR/scripts/batch${BATCH_GROUP:+_$BATCH_GROUP}.log}"
+LOCKFILE="$PROJ_DIR/scripts/.batch${BATCH_GROUP:+_$BATCH_GROUP}.lock"
 CLAUDE="/Users/sanggyulee/.local/bin/claude"
 
 MODEL="${BATCH_MODEL:-sonnet}"
@@ -263,3 +264,37 @@ if [[ -d "$ERR_DIR" ]] && ls "$ERR_DIR"/*.json > /dev/null 2>&1; then
   log "  에러 로그: $ERR_DIR/ (${err_count}개)"
 fi
 log "========================================"
+
+# === 실패 감지 + 알림 ===
+BATCH_RESULT="$PROJ_DIR/.state/daily/$(date '+%Y-%m-%d')_batch.md"
+{
+  echo "# 밤 배치 결과 — $(date '+%Y-%m-%d %H:%M')"
+  echo ""
+  if (( failed == 0 )); then
+    echo "## 정상 완료"
+    echo "성공: ${final_count}/${total}"
+  else
+    echo "## ⚠️ 실패 ${failed}건 발생"
+    echo "성공: ${final_count}/${total}, 실패: ${failed}"
+    echo ""
+    echo "### 실패 목록"
+    if [[ -f "$SKIPFILE" ]]; then
+      while IFS= read -r line; do
+        echo "- $line"
+      done < "$SKIPFILE"
+    fi
+  fi
+  echo ""
+  echo "브랜치: $(git branch --show-current 2>/dev/null || echo 'unknown')"
+  echo "로그: scripts/batch.log"
+} > "$BATCH_RESULT"
+
+# Telegram 알림 (설정되어 있으면)
+NOTIFY_SCRIPT="$PROJ_DIR/scripts/notify-telegram.sh"
+if [[ -f "$NOTIFY_SCRIPT" ]]; then
+  if (( failed == 0 )); then
+    bash "$NOTIFY_SCRIPT" "✅ *밤 배치 완료* — ${final_count}/${total} 성공" 2>/dev/null || true
+  else
+    bash "$NOTIFY_SCRIPT" "⚠️ *밤 배치* — ${final_count}/${total} 성공, *${failed}건 실패*. 확인 필요." 2>/dev/null || true
+  fi
+fi

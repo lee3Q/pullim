@@ -32,3 +32,4 @@ Thumbs.db
 /dist
 __pycache__/
 .claude/
+.vercel

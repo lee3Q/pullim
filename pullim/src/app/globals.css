@@ -17,7 +17,7 @@ body {
 }
 
 /* ========================================
-   RPG CSS Variables
+   RPG / Fantasy CSS Variables
    ======================================== */
 :root {
   --rpg-gold: rgba(255, 159, 28, 1);
@@ -27,19 +27,31 @@ body {
   --rpg-gold-light: rgba(255, 200, 100, 0.5);
   --rpg-brown-dark: rgba(78, 52, 26, 0.2);
   --rpg-brown: rgba(139, 90, 43, 0.12);
+
+  /* Fantasy palette (리서치 합성) */
+  --fantasy-card: #1a1612;
+  --fantasy-card-deep: #0d0b08;
+  --fantasy-gold: #C0A374;
+  --fantasy-gold-bright: #F1E1C5;
+  --fantasy-gold-dark: #b8860b;
+  --fantasy-text: #C0A788;
+  --fantasy-leather: #4b2b1a;
+  --fantasy-leather-deep: #2a140c;
+  --fantasy-leather-darkest: #1a0b06;
+  --fantasy-button-text: #f3e3c4;
 }
 
 /* ========================================
-   RPG Font
+   RPG / Fantasy Font
    ======================================== */
 .font-rpg {
-  font-family: 'Galmuri11', 'Pretendard Variable', monospace;
+  font-family: var(--font-gowun), 'Gowun Batang', 'Galmuri11', serif;
 }
 .font-rpg-sm {
-  font-family: 'Galmuri9', 'Pretendard Variable', monospace;
+  font-family: var(--font-gowun), 'Gowun Batang', 'Galmuri9', serif;
 }
 .font-rpg-lg {
-  font-family: 'Galmuri14', 'Pretendard Variable', monospace;
+  font-family: var(--font-noto-serif), 'Noto Serif KR', 'Galmuri14', serif;
 }
 
 /* ========================================
@@ -54,31 +66,21 @@ body {
    RPG Panel — 양피지/나무판 스타일
    ======================================== */
 .rpg-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(101, 67, 33, 0.45),
-    rgba(78, 52, 26, 0.55),
-    rgba(101, 67, 33, 0.45)
-  );
-  border: 1.5px solid rgba(255, 180, 80, 0.3);
+  background: linear-gradient(145deg, var(--fantasy-card), var(--fantasy-card-deep));
+  border: 1.5px solid var(--fantasy-gold);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 0 20px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.4);
+    inset 0 0 30px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(241, 225, 197, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.9);
   border-radius: 12px;
 }
 .rpg-panel-light {
-  background: linear-gradient(
-    135deg,
-    rgba(101, 67, 33, 0.3),
-    rgba(78, 52, 26, 0.4),
-    rgba(101, 67, 33, 0.3)
-  );
-  border: 1px solid rgba(255, 180, 80, 0.2);
+  background: linear-gradient(145deg, rgba(26, 22, 18, 0.75), rgba(13, 11, 8, 0.85));
+  border: 1px solid rgba(192, 163, 116, 0.35);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 0 12px rgba(0, 0, 0, 0.15),
-    0 1px 4px rgba(0, 0, 0, 0.3);
+    inset 0 0 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(241, 225, 197, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.6);
   border-radius: 12px;
 }
 
@@ -86,39 +88,34 @@ body {
    RPG Button
    ======================================== */
 .rpg-button {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 159, 28, 0.9),
-    rgba(204, 120, 0, 0.9)
-  );
-  border: 2px solid rgba(255, 200, 100, 0.5);
+  background: linear-gradient(145deg, var(--fantasy-leather), var(--fantasy-leather-deep));
+  border: 1px solid var(--fantasy-gold-dark);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.4);
-  color: #1a1a2e;
-  font-family: 'Galmuri11', monospace;
+    0 2px 0 var(--fantasy-leather-darkest),
+    0 3px 8px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #f3e3c4;
+  font-family: var(--font-noto-serif), 'Noto Serif KR', serif;
   font-weight: 700;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 0 var(--fantasy-leather-darkest);
   transition: all 0.2s;
   border-radius: 8px;
   cursor: pointer;
 }
 .rpg-button:hover {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 180, 60, 0.95),
-    rgba(224, 140, 20, 0.95)
-  );
+  background: linear-gradient(145deg, #5a3520, #33180e);
+  border-color: var(--fantasy-gold);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 0 12px rgba(255, 159, 28, 0.4),
-    0 2px 4px rgba(0, 0, 0, 0.4);
+    0 2px 0 var(--fantasy-leather-darkest),
+    0 3px 12px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(192, 163, 116, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 .rpg-button:active {
   transform: translateY(1px);
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 1px 2px rgba(0, 0, 0, 0.3);
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.4);
 }
 .rpg-button:disabled {
   opacity: 0.3;
@@ -131,19 +128,19 @@ body {
 
 /* RPG Button — 보조 (투명) */
 .rpg-button-ghost {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid rgba(255, 159, 28, 0.25);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  color: rgba(255, 255, 255, 0.6);
-  font-family: 'Galmuri11', monospace;
+  background: rgba(26, 22, 18, 0.5);
+  border: 1.5px solid rgba(192, 163, 116, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  color: var(--fantasy-text);
+  font-family: var(--font-gowun), 'Gowun Batang', serif;
   transition: all 0.2s;
   border-radius: 8px;
   cursor: pointer;
 }
 .rpg-button-ghost:hover {
-  background: rgba(255, 159, 28, 0.1);
-  border-color: rgba(255, 159, 28, 0.4);
-  color: rgba(255, 255, 255, 0.8);
+  background: rgba(75, 43, 26, 0.3);
+  border-color: rgba(192, 163, 116, 0.5);
+  color: var(--fantasy-gold-bright);
 }
 .rpg-button-ghost:focus-visible {
   outline: 2px solid var(--rpg-gold-25);
@@ -154,20 +151,20 @@ body {
    RPG Input — 다크 입력창
    ======================================== */
 .rpg-input {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 159, 28, 0.2);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(13, 11, 8, 0.6);
+  border: 1.5px solid rgba(192, 163, 116, 0.3);
+  color: var(--fantasy-gold-bright);
   border-radius: 12px;
-  font-family: 'Galmuri11', monospace;
+  font-family: var(--font-gowun), 'Gowun Batang', serif;
   transition: all 0.2s;
 }
 .rpg-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: rgba(192, 167, 136, 0.35);
 }
 .rpg-input:focus {
   outline: none;
-  border-color: var(--rpg-gold-50);
-  box-shadow: 0 0 12px var(--rpg-gold-15);
+  border-color: var(--fantasy-gold);
+  box-shadow: 0 0 12px rgba(192, 163, 116, 0.2);
 }
 
 /* ========================================

@@ -1,0 +1,39 @@
+---
+
+## 구현 결과 요약
+
+### 새 파일 (10개)
+
+| 파일 | 역할 |
+|------|------|
+| `lib/supabase/client.ts` | Supabase 클라이언트 (환경변수 없으면 null 반환) |
+| `lib/user-id.ts` | localStorage 기반 익명 사용자 ID |
+| `lib/personalization/discovery-engine.ts` | 파악 게임 질문 5개 + 프로필 생성 (Big Five 기반, consistency 측정 포함) |
+| `lib/personalization/behavior-reader.ts` | 실시간 행동 신호 → `[BEHAVIOR_CONTEXT]` 지시문 변환 |
+| `lib/personalization/history-reader.ts` | 세션 간 프로필 기반 `[PERSONALIZATION_CONTEXT]` 생성 |
+| `hooks/useBehaviorSignals.ts` | 프론트엔드 행동 수집 (응답 시간, 메시지 길이, 추세, 망설임) |
+| `hooks/useUserProfile.ts` | 프로필 조회/저장 (Supabase → localStorage 폴백) |
+| `app/api/profile/route.ts` | GET/POST 프로필 API |
+| `app/api/session-summary/route.ts` | POST 세션 요약 저장 API |
+| `components/discovery/DiscoveryGame.tsx` | 파악 게임 UI (인트로 → 5선택 → 완료) |
+| `components/discovery/DiscoveryChoice.tsx` | 선택지 카드 컴포넌트 |
+| `components/discovery/SatisfactionRating.tsx` | 별점 만족도 수집 (스킵 가능) |
+
+### 기존 파일 변경 (2개, 최소 수정)
+
+- **`listen/route.ts`** — `behaviorSignals` + `personalizationContext` 파라미터 추가, crisis detection 이후 `[BEHAVIOR_CONTEXT]` 주입. behaviorSignals 없이도 기존대로 동작.
+- **`adventure/[id]/page.tsx`** — `useBehaviorSignals`, `useUserProfile` 훅 추가. 첫 방문 시 파악 게임 분기, 세션 완료 후 만족도 수집, listen API에 behaviorSignals/personalizationContext 전송.
+
+### 검증 결과
+
+- **`npx tsc --noEmit`** — 타입 에러 0
+- **`npm run build`** — 빌드 성공 (Compiled successfully)
+- 기존 파이프라인 — behaviorSignals 없이도 동작 (optional 파라미터)
+
+### AC 매핑
+
+1. **파악 게임 3~5선택 → 톤 변화** — DiscoveryGame 5선택 → buildProfile → personalizationContext → 시스템프롬프트 주입
+2. **선택 쉬움** — "숲 vs 산길" 수준의 직감 선택지
+3. **망설임 감지 → 방식 변경** — useBehaviorSignals → behavior-reader → `[BEHAVIOR_CONTEXT]` (45초+ 멈춤, 단답, 추세 등)
+4. **세션 간 기억** — useUserProfile (Supabase/localStorage) + history-reader
+5. **대표 직접 체험** — 빌드 성공, dev 서버에서 바로 테스트 가능
