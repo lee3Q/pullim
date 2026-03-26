@@ -160,22 +160,15 @@ export default function StoryDiscovery({
               />
             </div>
           )}
-          <p className="text-sm leading-relaxed whitespace-pre-line font-rpg" style={{ color: "var(--fantasy-text)" }}>
-            {story.outroNarrative}
+          <p className="text-sm leading-relaxed whitespace-pre-line font-rpg text-center" style={{ color: "var(--fantasy-text)" }}>
+            당신의 이야기를 읽고 있어요...
           </p>
-          <button
-            onClick={() => outroCompleter.current?.()}
-            className="w-full py-3 rounded-xl text-sm font-medium font-rpg transition-all active:scale-[0.98]"
-            style={{
-              background: "linear-gradient(145deg, var(--fantasy-leather), var(--fantasy-leather-deep))",
-              border: "1px solid var(--fantasy-gold-dark)",
-              color: "var(--fantasy-button-text)",
-              boxShadow: "0 2px 0 var(--fantasy-leather-darkest), 0 3px 8px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)",
-              textShadow: "0 1px 0 var(--fantasy-leather-darkest)",
-            }}
-          >
-            {story.outroButtonText}
-          </button>
+          <div className="flex items-center justify-center gap-2 py-3">
+            <span className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.55)" }}>분석 중</span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,167,136,0.55)" }} />
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:300ms]" style={{ background: "rgba(192,167,136,0.55)" }} />
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:600ms]" style={{ background: "rgba(192,167,136,0.55)" }} />
+          </div>
         </SceneCard>
       </div>
     );

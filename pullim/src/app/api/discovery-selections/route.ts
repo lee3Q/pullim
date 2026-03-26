@@ -18,16 +18,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, storage: "local" });
   }
 
-  const { error } = await supabase.from("discovery_selections").insert({
-    id: nanoid(),
-    user_id: userId,
-    theme: theme || "garden",
-    selections, // JSONB — StorySelectionRecord[]
-    profile, // JSONB — ProbabilityProfile
-  });
+  try {
+    const { error } = await supabase.from("discovery_selections").insert({
+      id: nanoid(),
+      user_id: userId,
+      theme: theme || "garden",
+      selections, // JSONB — StorySelectionRecord[]
+      profile, // JSONB — ProbabilityProfile
+    });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error("[discovery-selections] insert error:", error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  } catch (err) {
+    console.error("[discovery-selections] unexpected error:", err);
+    return NextResponse.json({ error: "storage failed" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, storage: "supabase" });

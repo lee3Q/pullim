@@ -9,9 +9,12 @@ import { THEMES } from "@/lib/themes";
 import type { ThemeType } from "@/lib/personalization/story-scenes";
 import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
 import type { StorySelectionRecord } from "@/lib/personalization/discovery-engine";
+import { getPersonalityType } from "@/lib/personalization/personality-type";
+import type { PersonalityType } from "@/lib/personalization/personality-type";
 import ThemeSelector from "@/components/ultimate/ThemeSelector";
 import dynamic from "next/dynamic";
 const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscovery"));
+const PersonalityResult = dynamic(() => import("@/components/discovery/PersonalityResult"));
 import CrisisAlert from "@/components/CrisisAlert";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -79,13 +82,15 @@ const MOOD_OPTIONS: {
   },
 ];
 
-type Phase = "mood" | "discover" | "discover-done" | "session-entry";
+type Phase = "mood" | "discover" | "result" | "discover-done" | "session-entry";
 
 export default function HomePage() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("mood");
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>("garden");
   const [selectedEntry, setSelectedEntry] = useState<"concern" | "bored" | "curious">("concern");
+  const [personalityType, setPersonalityType] = useState<PersonalityType | null>(null);
+  const [savedProfile, setSavedProfile] = useState<ProbabilityProfile | null>(null);
   const [crisis, setCrisis] = useState<{
     message: string;
     hotline: string;
@@ -132,7 +137,10 @@ export default function HomePage() {
         }),
       }).catch(() => {});
 
-      setPhase("discover-done");
+      const type = getPersonalityType(profile);
+      setPersonalityType(type);
+      setSavedProfile(profile);
+      setPhase("result");
     },
     [selectedTheme]
   );
@@ -235,6 +243,28 @@ export default function HomePage() {
         {/* ── 기분 선택 ── */}
         {phase === "mood" && (
           <div className="w-full max-w-sm space-y-8 animate-in fade-in duration-500">
+            {/* 데모 유도 카피 */}
+            <div className="text-center space-y-2 pt-2">
+              <h2
+                className="text-2xl font-bold leading-snug font-rpg-lg"
+                style={{
+                  background: "linear-gradient(135deg, #c0a374 0%, #a78bfa 55%, #93c5fd 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 0 16px rgba(167,139,250,0.45))",
+                }}
+              >
+                3분이면 나를 알 수 있어요
+              </h2>
+              <p
+                className="text-sm leading-relaxed font-rpg-sm"
+                style={{ color: "rgba(192,167,136,0.6)" }}
+              >
+                10가지 장면에서 선택하면,<br />AI가 당신의 유형을 읽어냅니다
+              </p>
+            </div>
+
             <div className="text-center">
               <h1
                 className="text-xl font-bold mb-2 font-rpg-lg"
@@ -285,7 +315,22 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── 파악 완료 ── */}
+        {/* ── 유형 결과 ── */}
+        {phase === "result" && personalityType && savedProfile && (
+          <div className="w-full max-w-sm animate-in fade-in duration-500">
+            <PersonalityResult
+              type={personalityType}
+              profile={savedProfile}
+              theme={selectedTheme}
+              primaryColor={primaryColor}
+              onContinue={() =>
+                handleStartSession(THEME_TO_NAME[selectedTheme], selectedEntry)
+              }
+            />
+          </div>
+        )}
+
+        {/* ── 파악 완료 (fallback) ── */}
         {phase === "discover-done" && (
           <div className="w-full max-w-sm space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-2">

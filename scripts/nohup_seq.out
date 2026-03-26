@@ -103,3 +103,46 @@ After doing this, you may fix the identity used for this commit with:
 [01:36:43] ======== 그룹 A (성능/인프라) 완료 (성공: 7, 실패: 0) ========
 [01:36:43] 🔨 빌드 테스트...
 [01:36:54]   ✅ 빌드 통과
+[overnight/20260327 3a151e5] batch: 그룹 A (성능/인프라) 완료 (01:36)
+ Committer: sanggyu Lee <sanggyulee@sanggyus-MacBook-Air.local>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 9 files changed, 230 insertions(+), 40 deletions(-)
+ create mode 100644 .state/daily/2026-03-27_evening.md
+ create mode 100644 pullim/src/app/robots.ts
+ create mode 100644 pullim/src/app/sitemap.ts
+[01:36:54] 📌 체크포인트 커밋 완료
+[01:36:54] ======== 그룹 B (기능/콘텐츠) 시작 (��) ========
+[01:36:54] 🚀 34_코드_홈화면_데모유도
+[01:37:53]   ✅ 34_코드_홈화면_데모유도 완료 (190 chars)
+[01:38:03] 🚀 36_코드_구현_유형결과화면
+[01:41:58]   ✅ 36_코드_구현_유형결과화면 완료 (572 chars)
+[01:42:08] 🚀 37_코드_구현_대화톤미리보기
+[01:45:50]   ✅ 37_코드_구현_대화톤미리보기 완료 (372 chars)
+[01:46:00] 🚀 38_코드_구현_익명피드백폼
+[01:47:30]   ✅ 38_코드_구현_익명피드백폼 완료 (238 chars)
+[01:47:40] 🚀 39_코드_구현_결과공유
+[01:48:43]   ✅ 39_코드_구현_결과공유 완료 (194 chars)
+[01:48:53] 🚀 40_코드_구현_discovery_supabase
+[01:50:02]   ✅ 40_코드_구현_discovery_supabase 완료 (174 chars)
+[01:50:12] 🚀 41_코드_내면사고LLM_검증
+[01:51:35]   ✅ 41_코드_내면사고LLM_검증 완료 (367 chars)
+[01:51:45] 🚀 52_스토리장면_텍스트퇴고
+[02:03:37]   ✅ 52_스토리장면_텍스트퇴고 완료 (888 chars)
+[02:03:47] 🚀 53_코드_데모모드_응답개선
+[02:06:42]   ✅ 53_코드_데모모드_응답개선 완료 (452 chars)
+[02:06:52] 🚀 56_코드_구현_아웃트로개선
+[02:08:12]   ✅ 56_코드_구현_아웃트로개선 완료 (245 chars)
+[02:08:22] ======== 그룹 B (기능/콘텐츠) 완료 (성공: 10, 실패: 0) ========
+[02:08:22] 🔨 빌드 테스트...
+[02:08:33]   ✅ 빌드 통과
