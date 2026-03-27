@@ -67,6 +67,15 @@ export interface SensoryCard {
   isCheat?: boolean; // "다 별로야"
 }
 
+// 치트 후 분기 액션
+export type CheatAction = "regenerate" | "theme_suggest" | "fold";
+
+// 테마 전환 제안 정보
+export interface ThemeSuggestion {
+  targetTheme: "모험가" | "전략실" | "달빛정원";
+  reason: string;
+}
+
 // 이면 사고 이벤트
 export interface BehindEvent {
   type: "cheat" | "level_change" | "recommendation_reject" | "recommendation_accept" | "timeout";
@@ -84,6 +93,7 @@ export interface LadderSessionState {
   messages: LadderMessage[];
   turnCount: number;
   behindEvents: BehindEvent[];
+  cheatCount: number; // 누적 치트 횟수
   isEnded: boolean;
   summary: string | null;
 }

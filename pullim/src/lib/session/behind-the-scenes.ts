@@ -2,7 +2,7 @@
 // 사용자에게 보이지 않는 레이어
 
 import type { BehaviorSignals } from "../personalization/behavior-reader";
-import type { LadderLevel, BehindEvent, LadderMessage } from "./ladder-types";
+import type { LadderLevel, BehindEvent, LadderMessage, ThemeSuggestion } from "./ladder-types";
 
 export interface BehindInference {
   // 추론 결과
@@ -149,4 +149,91 @@ export function buildBehindContext(inference: BehindInference): string {
   lines.push("[/BEHIND_THE_SCENES]");
 
   return lines.length > 3 ? lines.join("\n") : "";
+}
+
+/**
+ * 치트 후 분기 판단: "답만 별로" vs "테마가 안 맞는 듯" vs "누적 3회"
+ *
+ * 테마 전환 판단 기준 (이면사고 레이어):
+ * - 감각 선택 계속 거부 + 분석적 텍스트 입력 → 전략실 제안
+ * - 분석 단계에서 감정적 반응 → 달빛정원 제안
+ * - 모험가에서 반복 치트 + 짧은 응답 → 전략실/달빛정원 제안
+ */
+export function inferCheatAction(
+  cheatCount: number,
+  events: BehindEvent[],
+  messages: LadderMessage[],
+  currentLevel: LadderLevel,
+  currentTheme: "모험가" | "전략실" | "달빛정원"
+): { action: "regenerate" | "theme_suggest" | "fold"; themeSuggestion?: ThemeSuggestion } {
+  // c) 누적 3회 → 접어두기 제안
+  if (cheatCount >= 3) {
+    return { action: "fold" };
+  }
+
+  // b) 테마 불일치 패턴 감지
+  const recentUserMessages = messages
+    .filter((m) => m.role === "user")
+    .slice(-5);
+
+  const recentCheats = events.filter(
+    (e) => e.type === "cheat" && Date.now() - e.timestamp < 300_000
+  ).length;
+
+  // 감각 레벨(1-2)에서 치트 반복 + 사용자가 긴 텍스트 입력 → 분석적 성향 → 전략실
+  if (currentTheme !== "전략실") {
+    const sensoryLevelCheats = events.filter(
+      (e) => e.type === "cheat" && e.level <= 2 && Date.now() - e.timestamp < 300_000
+    ).length;
+    const hasAnalyticalInput = recentUserMessages.some(
+      (m) => m.content.length > 30
+    );
+    if (sensoryLevelCheats >= 2 && hasAnalyticalInput) {
+      return {
+        action: "theme_suggest",
+        themeSuggestion: {
+          targetTheme: "전략실",
+          reason: "분석적으로 생각하는 게 더 편할 수도 있어",
+        },
+      };
+    }
+  }
+
+  // 분석 레벨(3+)에서 치트 + 짧은 감정적 응답 → 감성 성향 → 달빛정원
+  if (currentTheme !== "달빛정원") {
+    const analysisLevelCheats = events.filter(
+      (e) => e.type === "cheat" && e.level >= 3 && Date.now() - e.timestamp < 300_000
+    ).length;
+    const hasEmotionalShortInput = recentUserMessages.some(
+      (m) => m.content.length <= 10 && m.level >= 3
+    );
+    if (analysisLevelCheats >= 2 && hasEmotionalShortInput) {
+      return {
+        action: "theme_suggest",
+        themeSuggestion: {
+          targetTheme: "달빛정원",
+          reason: "조금 더 편안한 분위기에서 이야기해볼까",
+        },
+      };
+    }
+  }
+
+  // 같은 테마에서 치트 2회 연속 → 다른 테마 제안
+  if (recentCheats >= 2 && cheatCount >= 2) {
+    const alternativeTheme = currentTheme === "모험가"
+      ? "달빛정원"
+      : currentTheme === "전략실"
+        ? "달빛정원"
+        : "모험가";
+    return {
+      action: "theme_suggest",
+      themeSuggestion: {
+        targetTheme: alternativeTheme,
+        reason: "분위기를 바꿔보면 다르게 느껴질 수도 있어",
+      },
+    };
+  }
+
+  // a) 기본: 답만 별로 → 같은 레벨 재생성
+  return { action: "regenerate" };
 }

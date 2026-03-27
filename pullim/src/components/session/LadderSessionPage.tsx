@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import type { ThemeName } from "@/lib/types-ultimate";
@@ -9,7 +9,7 @@ import { useUserProfile } from "@/hooks/useUserProfile";
 import { buildSensoryLadderContext } from "@/lib/personalization/sensory-ladder";
 import LadderSession from "./LadderSession";
 import CrisisAlert from "@/components/CrisisAlert";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface LadderSessionPageProps {
   theme: ThemeName;
@@ -20,6 +20,7 @@ export default function LadderSessionPage({
   theme,
   bgImage,
 }: LadderSessionPageProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const entryMode = (searchParams.get("entry") as EntryMode) || "concern";
   const { profile } = useUserProfile();
@@ -27,6 +28,20 @@ export default function LadderSessionPage({
 
   // 프로필 기반 개인화 컨텍스트
   const profileContext = profile ? buildSensoryLadderContext(profile) : undefined;
+
+  // 테마 전환 핸들러
+  const handleThemeChange = useCallback(
+    (targetTheme: "모험가" | "전략실" | "달빛정원") => {
+      const themeRoutes: Record<string, string> = {
+        "모험가": "/adventure",
+        "전략실": "/strategy",
+        "달빛정원": "/garden",
+      };
+      const route = themeRoutes[targetTheme] || "/adventure";
+      router.push(`${route}/new?mode=ladder&entry=${entryMode}`);
+    },
+    [router, entryMode]
+  );
 
   return (
     <div className="min-h-[100dvh] flex flex-col relative overflow-x-hidden">
@@ -61,6 +76,7 @@ export default function LadderSessionPage({
           entryMode={entryMode}
           profileContext={profileContext}
           onCrisis={setCrisis}
+          onThemeChange={handleThemeChange}
         />
       </main>
 

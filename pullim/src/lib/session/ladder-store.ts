@@ -31,6 +31,9 @@ interface LadderActions {
   // 턴 증가
   incrementTurn: () => void;
 
+  // 치트 카운트 증가
+  incrementCheatCount: () => void;
+
   // 세션 종료
   endSession: (summary: string) => void;
 
@@ -46,6 +49,7 @@ const initialState: LadderSessionState = {
   messages: [],
   turnCount: 0,
   behindEvents: [],
+  cheatCount: 0,
   isEnded: false,
   summary: null,
 };
@@ -102,6 +106,10 @@ export const useLadderStore = create<LadderSessionState & LadderActions>(
 
     incrementTurn: () => {
       set((s) => ({ turnCount: s.turnCount + 1 }));
+    },
+
+    incrementCheatCount: () => {
+      set((s) => ({ cheatCount: s.cheatCount + 1 }));
     },
 
     endSession: (summary) => {

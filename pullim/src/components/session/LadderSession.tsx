@@ -7,11 +7,13 @@ import type {
   EntryMode,
   LadderMessage,
   LadderOption,
+  CheatAction,
+  ThemeSuggestion,
 } from "@/lib/session/ladder-types";
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
-import { inferState, buildBehindContext } from "@/lib/session/behind-the-scenes";
+import { inferState, buildBehindContext, inferCheatAction } from "@/lib/session/behind-the-scenes";
 import { buildLevelPrompt, buildEndDetectionPrompt } from "@/lib/session/prompt-builder";
 import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/session/level-detector";
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
@@ -30,6 +32,7 @@ interface LadderSessionProps {
   entryMode: EntryMode;
   profileContext?: string; // ProbabilityProfile 기반 프롬프트 (있으면)
   onCrisis?: (crisis: { message: string; hotline: string }) => void;
+  onThemeChange?: (theme: "모험가" | "전략실" | "달빛정원") => void;
 }
 
 type Phase = "entry" | "session" | "summary";
@@ -68,6 +71,7 @@ export default function LadderSession({
   entryMode,
   profileContext,
   onCrisis,
+  onThemeChange,
 }: LadderSessionProps) {
   const router = useRouter();
   const { settings } = useSettings();
@@ -77,6 +81,13 @@ export default function LadderSession({
   const [isLoading, setIsLoading] = useState(false);
   const [streamText, setStreamText] = useState("");
   const [currentResponse, setCurrentResponse] = useState<ReturnType<typeof parseResponse> | null>(null);
+
+  // 치트 후 분기 상태
+  const [cheatPostAction, setCheatPostAction] = useState<{
+    show: boolean;
+    action: CheatAction;
+    themeSuggestion?: ThemeSuggestion;
+  } | null>(null);
 
   // 행동 신호 추적
   const lastResponseTime = useRef<number>(0);
@@ -333,15 +344,6 @@ export default function LadderSession({
     [currentResponse, store, handleUserResponse]
   );
 
-  // ── 치트 선택지 ──
-  const handleCheat = useCallback(() => {
-    handleUserResponse(
-      currentResponse?.cheatText || "다 별로야",
-      false,
-      true
-    );
-  }, [currentResponse, handleUserResponse]);
-
   // ── 세션 요약 생성 ──
   const generateSummary = useCallback(async () => {
     setIsLoading(true);
@@ -412,16 +414,82 @@ export default function LadderSession({
     setIsLoading(false);
   }, [store, theme]);
 
+  // ── 치트 선택지 ──
+  const handleCheat = useCallback(() => {
+    // cheatCount 증가
+    store.incrementCheatCount();
+    const newCheatCount = store.cheatCount + 1;
+
+    // 이면사고 기반 치트 분기 판단
+    const { action, themeSuggestion } = inferCheatAction(
+      newCheatCount,
+      store.behindEvents,
+      store.messages,
+      store.currentLevel,
+      theme
+    );
+
+    // 이벤트 기록
+    store.recordEvent({ type: "cheat", level: store.currentLevel });
+
+    // 분기 UI 표시
+    setCheatPostAction({ show: true, action, themeSuggestion });
+  }, [store, theme]);
+
+  // ── 치트 후 분기 처리 ──
+  const handleCheatAction = useCallback(
+    (selectedAction: CheatAction) => {
+      setCheatPostAction(null);
+
+      switch (selectedAction) {
+        case "regenerate":
+          // 같은 레벨에서 다시 생성
+          sendToAI(store.messages, store.currentLevel, "[재생성 요청] 다른 접근으로 다시 시도해줘.");
+          break;
+        case "theme_suggest":
+          // 테마 전환은 제안만 — 사용자가 수락하면 onThemeChange 호출
+          // 이 경우 CheatPostActionUI에서 직접 처리
+          break;
+        case "fold":
+          // 접어두기 → 세션 요약 생성
+          generateSummary();
+          break;
+      }
+    },
+    [store, sendToAI, generateSummary]
+  );
+
+  // ── 테마 전환 수락 ──
+  const handleThemeSwitch = useCallback(
+    (targetTheme: "모험가" | "전략실" | "달빛정원") => {
+      setCheatPostAction(null);
+      if (onThemeChange) {
+        onThemeChange(targetTheme);
+      } else {
+        // 폴백: 라우터로 이동
+        const themeRoutes: Record<string, string> = {
+          "모험가": "/adventure",
+          "전략실": "/strategy",
+          "달빛정원": "/garden",
+        };
+        const route = themeRoutes[targetTheme] || "/adventure";
+        const sessionId = store.sessionId || "new";
+        router.push(`${route}/${sessionId}?mode=ladder&entry=${store.entryMode}`);
+      }
+    },
+    [onThemeChange, router, store]
+  );
+
   // ── 렌더링 ──
   const level = store.currentLevel;
 
   // 진입 화면
   if (phase === "entry") {
     return (
-      <div className="w-full max-w-sm mx-auto space-y-8 animate-in fade-in duration-500">
+      <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto space-y-8 animate-in fade-in duration-500">
         <div className="text-center">
           <h2
-            className="text-lg font-bold mb-2 font-rpg-lg"
+            className="text-lg md:text-xl font-bold mb-2 font-rpg-lg"
             style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 20px rgba(192,163,116,0.3)" }}
           >
             오늘은 어떻게 시작할까?
@@ -477,7 +545,7 @@ export default function LadderSession({
 
   // 세션 화면
   return (
-    <div className="w-full max-w-sm mx-auto flex flex-col" style={{ height: "calc(100dvh - 120px)" }}>
+    <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto flex flex-col" style={{ height: "calc(100dvh - 120px)" }}>
       {/* 레벨 인디케이터 */}
       <div className="flex items-center justify-between py-3 px-1">
         <div className="flex items-center gap-2">
@@ -553,8 +621,83 @@ export default function LadderSession({
         )}
       </div>
 
+      {/* 치트 후 분기 UI */}
+      {cheatPostAction?.show && (
+        <div className="pb-4 px-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="rpg-panel rounded-2xl p-4 space-y-3">
+            {cheatPostAction.action === "fold" ? (
+              <>
+                <p className="text-sm font-rpg text-center" style={{ color: "var(--fantasy-text)" }}>
+                  계속 안 맞는 것 같아... 접어둘까?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleCheatAction("fold")}
+                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
+                    style={{ color: "var(--fantasy-text)" }}
+                  >
+                    🗂️ 오늘은 여기까지
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCheatPostAction(null);
+                      sendToAI(store.messages, store.currentLevel, "[재생성 요청] 다른 접근으로 다시 시도해줘.");
+                    }}
+                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
+                    style={{ color: "var(--fantasy-text)" }}
+                  >
+                    🔄 좀 더 해볼게
+                  </button>
+                </div>
+              </>
+            ) : cheatPostAction.action === "theme_suggest" && cheatPostAction.themeSuggestion ? (
+              <>
+                <p className="text-sm font-rpg text-center leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
+                  {cheatPostAction.themeSuggestion.reason}
+                </p>
+                <p className="text-xs font-rpg-sm text-center" style={{ color: "rgba(192,167,136,0.55)" }}>
+                  분위기 바꿔볼까?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleThemeSwitch(cheatPostAction.themeSuggestion!.targetTheme)}
+                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
+                    style={{ color: "var(--fantasy-gold-bright)" }}
+                  >
+                    ✨ {cheatPostAction.themeSuggestion.targetTheme}로 가볼게
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCheatPostAction(null);
+                      sendToAI(store.messages, store.currentLevel, "[재생성 요청] 다른 접근으로 다시 시도해줘.");
+                    }}
+                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
+                    style={{ color: "var(--fantasy-text)" }}
+                  >
+                    🔄 여기서 계속할게
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-rpg text-center" style={{ color: "var(--fantasy-text)" }}>
+                  다른 방식으로 다시 해볼게
+                </p>
+                <button
+                  onClick={() => handleCheatAction("regenerate")}
+                  className="rpg-panel-light w-full py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
+                  style={{ color: "var(--fantasy-text)" }}
+                >
+                  🔄 다시 해보자
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 현재 레벨 인터랙션 */}
-      {!isLoading && currentResponse && (
+      {!isLoading && currentResponse && !cheatPostAction?.show && (
         <div className="pb-4">
           {level === 1 && currentResponse.sensoryCards.length > 0 && (
             <SensoryLevel
