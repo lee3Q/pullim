@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd pullim && npm run build",
-  "outputDirectory": "pullim/.next",
-  "installCommand": "cd pullim && npm install",
-  "framework": "nextjs"
-}
