@@ -184,6 +184,10 @@ const PERSONALITY_TYPES: PersonalityType[] = [
   },
 ];
 
+export function getPersonalityTypeById(id: string): PersonalityType | undefined {
+  return PERSONALITY_TYPES.find(t => t.id === id);
+}
+
 export function getPersonalityType(profile: ProbabilityProfile): PersonalityType {
   const approach = profile.approachStyle.value; // analytical(-) ↔ intuitive(+)
   const risk = profile.riskTolerance.value;     // cautious(-) ↔ adventurous(+)

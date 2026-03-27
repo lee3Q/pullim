@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { PersonalityType } from "@/lib/personalization/personality-type";
 import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
 import type { ThemeType } from "@/lib/personalization/story-scenes";
@@ -52,11 +53,20 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   const displayName = type.themedName[theme];
   const displayEmoji = type.themedEmoji[theme];
   const displayAttitude = type.themedAttitude[theme];
+  const characterImage = `/images/personality/${theme}_${type.id}.png`;
+  const [imgError, setImgError] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/result?theme=${theme}&type=${type.id}`
+    : `https://pullim.vercel.app/result?theme=${theme}&type=${type.id}`;
+
+  const shareTitle = `나는 "${displayName}" 유형이래!`;
+  const shareText = `${THEME_LABELS[theme]}에서 발견한 나 — ${displayName}. 너도 해볼래?`;
+
   async function handleCopy() {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -64,11 +74,15 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   const canShare = typeof navigator !== "undefined" && !!navigator.share;
 
   async function handleShare() {
-    await navigator.share({
-      title: `나는 "${displayName}" 유형이래!`,
-      text: `풀림에서 알아낸 나의 유형: ${displayName}. ${type.description}`,
-      url: window.location.href,
-    });
+    try {
+      await navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+      });
+    } catch {
+      // 사용자가 공유 취소 시 무시
+    }
   }
 
   return (
@@ -99,12 +113,10 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
           {THEME_LABELS[theme]}에서 발견한 당신
         </p>
 
-        {/* 이모지 + 이펙트 */}
+        {/* 캐릭터 이미지 또는 이모지 */}
         <div className="relative text-center mb-4">
           {/* 글로우 링 */}
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-          >
+          <div className="absolute inset-0 flex items-center justify-center">
             <div
               className="w-28 h-28 rounded-full animate-pulse opacity-20"
               style={{
@@ -112,14 +124,29 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
               }}
             />
           </div>
-          <div
-            className="relative text-7xl leading-none py-4"
-            style={{
-              filter: `drop-shadow(0 0 30px ${primaryColor}88) drop-shadow(0 0 60px ${primaryColor}44)`,
-            }}
-          >
-            {displayEmoji}
-          </div>
+          {!imgError ? (
+            <div className="relative w-32 h-32 mx-auto my-2">
+              <Image
+                src={characterImage}
+                alt={displayName}
+                fill
+                className="object-contain rounded-2xl"
+                style={{
+                  filter: `drop-shadow(0 0 20px ${primaryColor}66)`,
+                }}
+                onError={() => setImgError(true)}
+              />
+            </div>
+          ) : (
+            <div
+              className="relative text-7xl leading-none py-4"
+              style={{
+                filter: `drop-shadow(0 0 30px ${primaryColor}88) drop-shadow(0 0 60px ${primaryColor}44)`,
+              }}
+            >
+              {displayEmoji}
+            </div>
+          )}
         </div>
 
         {/* 유형명 */}

@@ -21,17 +21,17 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPTS_FILE="$SCRIPT_DIR/prompts.txt"
 SENT_FILE="$SCRIPT_DIR/.queue-sent"
 SAVED_FILE="$SCRIPT_DIR/.queue-saved"
-SAVE_DIR="$SCRIPT_DIR/../pullim/public/assets/discovery"
+SAVE_DIR="$SCRIPT_DIR/../pullim/public/images/personality"
 DOWNLOADS_DIR="$HOME/Downloads"
 PROCESSED_FILE="$SCRIPT_DIR/.queue-processed"
 
 NAMES=(
-  garden_1 garden_2 garden_3 garden_4 garden_5
-  garden_6 garden_7 garden_8 garden_9 garden_10 garden_outro
-  adventure_1 adventure_2 adventure_3 adventure_4 adventure_5
-  adventure_6 adventure_7 adventure_8 adventure_9 adventure_10 adventure_outro
-  strategy_1 strategy_2 strategy_3 strategy_4 strategy_5
-  strategy_6 strategy_7 strategy_8 strategy_9 strategy_10 strategy_outro
+  adventure_quiet-strategist adventure_empathic-deliberator adventure_analytical-explorer adventure_bold-designer
+  adventure_free-healer adventure_warm-guardian adventure_intuitive-breaker adventure_sensory-adventurer
+  garden_quiet-strategist garden_empathic-deliberator garden_analytical-explorer garden_bold-designer
+  garden_free-healer garden_warm-guardian garden_intuitive-breaker garden_sensory-adventurer
+  strategy_quiet-strategist strategy_empathic-deliberator strategy_analytical-explorer strategy_bold-designer
+  strategy_free-healer strategy_warm-guardian strategy_intuitive-breaker strategy_sensory-adventurer
 )
 TOTAL=${#NAMES[@]}
 
