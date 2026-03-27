@@ -56,7 +56,7 @@ export default function LoadingOverlay({ stage, primaryColor, crystalLabel, char
 
   return (
     <div
-      className="rpg-panel rounded-2xl px-6 py-8 max-w-md mx-auto text-center font-rpg"
+      className="rpg-panel rounded-2xl px-6 py-8 max-w-md md:max-w-xl lg:max-w-2xl mx-auto text-center font-rpg"
       style={{ animation: "sage-appear 0.4s ease-out" }}
     >
       {/* 이모지 영역 */}

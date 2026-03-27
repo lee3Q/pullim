@@ -12,7 +12,7 @@ export default function SessionSummary({
   onBackToHome,
 }: SessionSummaryProps) {
   return (
-    <div className="w-full max-w-sm mx-auto space-y-6 animate-in fade-in duration-500">
+    <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 space-y-4">
         <h3 className="text-sm font-medium text-white/60">오늘의 정리</h3>
         <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">

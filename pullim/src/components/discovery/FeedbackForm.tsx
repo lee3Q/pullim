@@ -104,7 +104,8 @@ export default function FeedbackForm({ personalityType }: Props) {
           background: "rgba(255,255,255,0.05)",
           border: "1px solid rgba(139,92,246,0.3)",
           color: "var(--fantasy-text)",
-          fontFamily: "system-ui, -apple-system, sans-serif",
+          fontFamily: "Roboto, 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif",
+          fontSize: "14px",
         }}
       />
 

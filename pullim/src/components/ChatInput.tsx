@@ -50,7 +50,7 @@ export default function ChatInput({
   if (dark) {
     return (
       <div className="px-4 py-3">
-        <div className="flex items-end gap-2 max-w-lg mx-auto">
+        <div className="flex items-end gap-2 max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto">
           <textarea
             ref={textareaRef}
             value={input}

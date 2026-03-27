@@ -31,7 +31,7 @@ function StatBar({ label, value, color }: { label: [string, string]; value: numb
   const percent = Math.round((value + 1) * 50); // -1~1 → 0~100
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-[10px] font-rpg-sm text-white/50">
+      <div className="flex justify-between text-[10px] font-rpg-sm text-white/60">
         <span>{label[0]}</span>
         <span>{label[1]}</span>
       </div>
@@ -86,7 +86,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   }
 
   return (
-    <div className="w-full max-w-sm space-y-5 animate-in fade-in duration-700">
+    <div className="w-full space-y-5 animate-in fade-in duration-700">
 
       {/* ===== 공유용 결과 카드 ===== */}
       <div
@@ -118,18 +118,19 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
           {/* 글로우 링 */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className="w-28 h-28 rounded-full animate-pulse opacity-20"
+              className="w-28 h-28 md:w-40 md:h-40 rounded-full animate-pulse opacity-20"
               style={{
                 background: `radial-gradient(circle, ${primaryColor}44, transparent 70%)`,
               }}
             />
           </div>
           {!imgError ? (
-            <div className="relative w-40 h-40 mx-auto my-2">
+            <div className="relative w-40 h-40 md:w-52 md:h-52 mx-auto my-2">
               <Image
                 src={characterImage}
                 alt={displayName}
                 fill
+                sizes="(max-width: 768px) 160px, 208px"
                 className="object-cover rounded-2xl"
                 style={{
                   filter: `drop-shadow(0 0 20px ${primaryColor}66)`,
@@ -163,7 +164,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
         {/* 한 줄 설명 */}
         <p
           className="relative text-center text-xs font-rpg-sm leading-relaxed px-2 mb-4"
-          style={{ color: "var(--fantasy-text)", opacity: 0.8 }}
+          style={{ color: "var(--fantasy-text)", opacity: 0.9 }}
         >
           {type.description}
         </p>
@@ -358,7 +359,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
                   <li
                     key={i}
                     className="text-sm font-rpg flex items-start gap-2"
-                    style={{ color: "rgba(192,167,136,0.7)" }}
+                    style={{ color: "rgba(192,167,136,0.8)" }}
                   >
                     <span style={{ color: "rgba(192,167,136,0.4)", flexShrink: 0 }}>·</span>
                     {b}
@@ -375,6 +376,12 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
 
       {/* CTA */}
       <div className="space-y-3 pb-6">
+        <p
+          className="text-center text-xs font-rpg-sm leading-relaxed"
+          style={{ color: "rgba(192,167,136,0.45)" }}
+        >
+          파악한 유형을 바탕으로, AI가 당신에게 맞는 대화를 시작합니다
+        </p>
         <button
           onClick={onContinue}
           className="w-full py-4 px-5 rounded-2xl text-sm font-medium font-rpg transition-all active:scale-[0.98]"

@@ -11,7 +11,7 @@ import type { ProbabilityProfile } from "@/lib/personalization/probability-profi
 import type { StorySelectionRecord } from "@/lib/personalization/discovery-engine";
 import { getPersonalityType } from "@/lib/personalization/personality-type";
 import type { PersonalityType } from "@/lib/personalization/personality-type";
-import ThemeSelector from "@/components/ultimate/ThemeSelector";
+// ThemeSelector no longer used on home — theme cards are inline
 import dynamic from "next/dynamic";
 const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscovery"));
 const PersonalityResult = dynamic(() => import("@/components/discovery/PersonalityResult"));
@@ -31,58 +31,42 @@ const THEME_COLORS: Record<ThemeType, string> = {
   strategy: "#60a5fa",
 };
 
-// 기분 → 테마 추천
-const MOOD_OPTIONS: {
+// 테마 카드 데이터
+const THEME_CARDS: {
+  key: ThemeType;
   emoji: string;
-  label: string;
-  sub: string;
-  theme: ThemeType | null;
-  entry: "concern" | "bored" | "curious";
+  name: string;
+  desc: string;
+  when: string;
   color: string;
 }[] = [
   {
-    emoji: "🌙",
-    label: "위로받고 싶어",
-    sub: "마음이 좀 무거워",
-    theme: "garden",
-    entry: "concern",
+    key: "garden",
+    emoji: "🌿",
+    name: "달빛정원",
+    desc: "조용한 정원에서 감정을 천천히 들여다봐요",
+    when: "마음이 무겁거나, 감정을 정리하고 싶을 때",
     color: "#a78bfa",
   },
   {
-    emoji: "🎯",
-    label: "정리하고 싶어",
-    sub: "머리가 복잡해",
-    theme: "strategy",
-    entry: "concern",
+    key: "adventure",
+    emoji: "🧙",
+    name: "모험가의 숲",
+    desc: "이야기 속 갈림길에서 직감을 따라가봐요",
+    when: "뭘 해야 할지 모르겠거나, 방향을 찾고 싶을 때",
+    color: "#ff9f1c",
+  },
+  {
+    key: "strategy",
+    emoji: "🏙️",
+    name: "전략실",
+    desc: "데이터와 논리로 상황을 정리해봐요",
+    when: "머리가 복잡하고, 논리적으로 따져보고 싶을 때",
     color: "#60a5fa",
-  },
-  {
-    emoji: "🌀",
-    label: "모르겠어",
-    sub: "그냥 뭔가...",
-    theme: "adventure",
-    entry: "curious",
-    color: "#ff9f1c",
-  },
-  {
-    emoji: "💬",
-    label: "고민이 있어",
-    sub: "이야기하고 싶은 게 있어",
-    theme: null,
-    entry: "concern",
-    color: "#e0e0e0",
-  },
-  {
-    emoji: "✨",
-    label: "심심해",
-    sub: "재미있는 거 없나",
-    theme: "adventure",
-    entry: "bored",
-    color: "#ff9f1c",
   },
 ];
 
-type Phase = "mood" | "discover" | "result" | "discover-done" | "session-entry";
+type Phase = "mood" | "discover" | "result" | "discover-done";
 
 export default function HomePage() {
   const router = useRouter();
@@ -100,16 +84,12 @@ export default function HomePage() {
 
   const primaryColor = THEME_COLORS[selectedTheme];
 
-  const handleMoodSelect = (mood: (typeof MOOD_OPTIONS)[number]) => {
-    setSelectedEntry(mood.entry);
-    if (mood.theme === null) {
-      // "고민이 있어" → 테마 선택 후 파악
-      setPhase("session-entry");
-    } else {
-      setSelectedTheme(mood.theme);
-      // 모든 경로가 파악을 거친다. 건너뛰기 선택도 데이터.
-      setPhase("discover");
-    }
+  const [showThemeHelp, setShowThemeHelp] = useState(false);
+
+  const handleThemeSelect = (themeKey: ThemeType) => {
+    setSelectedTheme(themeKey);
+    setSelectedEntry("concern");
+    setPhase("discover");
   };
 
   const handleDiscoveryComplete = useCallback(
@@ -235,89 +215,139 @@ export default function HomePage() {
               />
             </button>
           </label>
+          <label className="flex items-center justify-between cursor-pointer mt-3">
+            <span className="text-xs text-white/60">매운맛 모드 🌶️</span>
+            <button
+              onClick={() =>
+                updateSettings({
+                  spicyMode: !settings.spicyMode,
+                })
+              }
+              className="relative w-10 h-5 rounded-full transition-colors"
+              style={{
+                background: settings.spicyMode
+                  ? "#ef4444"
+                  : "rgba(255,255,255,0.15)",
+              }}
+            >
+              <span
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform"
+                style={{
+                  left: settings.spicyMode ? "calc(100% - 18px)" : "2px",
+                }}
+              />
+            </button>
+          </label>
         </div>
       )}
 
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 pb-20 relative z-10">
-        {/* ── 기분 선택 ── */}
+        {/* ── 테마 선택 ── */}
         {phase === "mood" && (
-          <div className="w-full max-w-sm space-y-8 animate-in fade-in duration-500">
-            {/* 데모 유도 카피 */}
+          <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-2 pt-2">
-              <h2
-                className="text-2xl font-bold leading-snug font-rpg-lg"
-                style={{
-                  background: "linear-gradient(135deg, #c0a374 0%, #a78bfa 55%, #93c5fd 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  filter: "drop-shadow(0 0 16px rgba(167,139,250,0.45))",
-                }}
-              >
-                3분이면 나를 알 수 있어요
-              </h2>
-              <p
-                className="text-sm leading-relaxed font-rpg-sm"
-                style={{ color: "rgba(192,167,136,0.6)" }}
-              >
-                10가지 장면에서 선택하면,<br />AI가 당신의 유형을 읽어냅니다
-              </p>
-            </div>
-
-            <div className="text-center">
               <h1
-                className="text-xl font-bold mb-2 font-rpg-lg"
+                className="text-xl md:text-2xl font-bold font-rpg-lg"
                 style={{
                   color: "var(--fantasy-gold-bright)",
                   textShadow: "0 0 20px rgba(192,163,116,0.4), 0 0 40px rgba(192,163,116,0.15)",
                 }}
               >
-                오늘 어떤 마음이야?
+                어떤 분위기에서 이야기할까?
               </h1>
-              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.70)" }}>편하게 골라봐</p>
+              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
+                분위기를 골라봐. 나중에 바꿀 수도 있어.
+              </p>
             </div>
 
             <div className="space-y-3">
-              {MOOD_OPTIONS.map((mood) => (
+              {THEME_CARDS.map((t) => (
                 <button
-                  key={mood.label}
-                  onClick={() => handleMoodSelect(mood)}
+                  key={t.key}
+                  onClick={() => handleThemeSelect(t.key)}
                   className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
                              hover:scale-[1.01] active:scale-[0.98]"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{mood.emoji}</span>
-                    <div>
-                      <p className="text-sm font-medium font-rpg" style={{ color: "var(--fantasy-text)" }}>
-                        {mood.label}
+                  <div className="flex items-start gap-4">
+                    <span className="text-3xl mt-0.5">{t.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
+                        {t.name}
                       </p>
-                      <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.45)" }}>{mood.sub}</p>
+                      <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
+                        {t.desc}
+                      </p>
+                      <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.45)" }}>
+                        {t.when}
+                      </p>
                     </div>
                   </div>
                 </button>
               ))}
             </div>
+
+            {/* 모르겠어 → 더 설명 */}
+            <div className="text-center">
+              <button
+                onClick={() => setShowThemeHelp((v) => !v)}
+                className="text-xs font-rpg-sm transition-colors"
+                style={{ color: "rgba(192,163,116,0.4)" }}
+              >
+                {showThemeHelp ? "접기 ▲" : "잘 모르겠어 — 더 알려줘 ▼"}
+              </button>
+            </div>
+
+            {showThemeHelp && (
+              <div
+                className="rounded-2xl px-5 py-4 space-y-3 animate-in fade-in duration-300"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+              >
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                  <strong style={{ color: "#a78bfa" }}>달빛정원</strong>은 감정에 집중해요. 위로받고 싶거나, 마음이 복잡할 때. 조용하고 따뜻한 톤.
+                </p>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                  <strong style={{ color: "#ff9f1c" }}>모험가의 숲</strong>은 직관에 집중해요. 뭘 원하는지 모르겠거나, 막막할 때. 이야기를 따라가다 보면 실마리가 보여요.
+                </p>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                  <strong style={{ color: "#60a5fa" }}>전략실</strong>은 논리에 집중해요. 선택지를 비교하거나, 체계적으로 정리하고 싶을 때. 데이터 기반.
+                </p>
+                <p className="text-[10px] font-rpg-sm mt-2" style={{ color: "rgba(192,167,136,0.35)" }}>
+                  어떤 걸 골라도 대화 중에 분위기를 바꿀 수 있어요.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
         {/* ── 스토리 파악 ── */}
         {phase === "discover" && (
-          <div className="w-full max-w-sm animate-in fade-in duration-500">
+          <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl animate-in fade-in duration-500">
             <StoryDiscovery
               theme={selectedTheme}
               userName=""
               speechStyle="casual"
               primaryColor={primaryColor}
               showRecommendations={settings.showRecommendations}
+              spicyMode={settings.spicyMode}
               onComplete={handleDiscoveryComplete}
             />
+            <button
+              onClick={() => handleStartSession(THEME_TO_NAME[selectedTheme], selectedEntry)}
+              className="w-full text-center text-xs font-rpg-sm transition-colors pt-4 pb-2"
+              style={{ color: "rgba(192,163,116,0.35)" }}
+            >
+              건너뛰고 바로 대화하기 →
+            </button>
           </div>
         )}
 
         {/* ── 유형 결과 ── */}
         {phase === "result" && personalityType && savedProfile && (
-          <div className="w-full max-w-sm animate-in fade-in duration-500">
+          <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl animate-in fade-in duration-500">
             <PersonalityResult
               type={personalityType}
               profile={savedProfile}
@@ -332,9 +362,9 @@ export default function HomePage() {
 
         {/* ── 파악 완료 (fallback) ── */}
         {phase === "discover-done" && (
-          <div className="w-full max-w-sm space-y-6 animate-in fade-in duration-500">
+          <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
             <div className="text-center space-y-2">
-              <p className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
+              <p className="text-sm md:text-base leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
                 너에 대해 조금 알게 된 것 같아.
               </p>
             </div>
@@ -366,37 +396,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── 세션 진입 (고민이 있어) ── */}
-        {phase === "session-entry" && (
-          <div className="w-full max-w-sm space-y-6 animate-in fade-in duration-500">
-            <div className="text-center">
-              <h2
-                className="text-lg font-bold mb-2 font-rpg-lg"
-                style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 20px rgba(192,163,116,0.3)" }}
-              >
-                어디서 이야기할까?
-              </h2>
-              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.5)" }}>분위기를 골라봐</p>
-            </div>
-
-            <ThemeSelector onSelect={(themeName) => {
-              // 테마 선택 후 파악으로 이동 (모든 경로가 파악을 거친다)
-              const themeKey = Object.entries(THEME_TO_NAME).find(([, v]) => v === themeName)?.[0] as ThemeType | undefined;
-              if (themeKey) {
-                setSelectedTheme(themeKey);
-                setPhase("discover");
-              }
-            }} disabled={false} />
-
-            <button
-              onClick={() => setPhase("mood")}
-              className="w-full text-center text-xs font-rpg-sm transition-colors pt-2"
-              style={{ color: "rgba(192,163,116,0.35)" }}
-            >
-              ← 돌아가기
-            </button>
-          </div>
-        )}
+        {/* session-entry removed — theme selection is now on the home screen */}
       </main>
 
       {/* 로딩 오버레이 */}
@@ -414,12 +414,15 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="text-center text-xs text-white/25 py-4 relative z-10">
-        풀림은 전문 상담을 대체하지 않습니다. 위기 시{" "}
-        <a href="tel:109" className="text-white/60 underline">
-          109
-        </a>
-        로 연락하세요.
+      <footer className="text-center text-xs text-white/25 py-4 relative z-10 space-y-1">
+        <p>데이터는 기기에만 저장되며, 외부로 전송되지 않습니다.</p>
+        <p>
+          풀림은 전문 상담을 대체하지 않습니다. 위기 시{" "}
+          <a href="tel:109" className="text-white/60 underline">
+            109
+          </a>
+          로 연락하세요.
+        </p>
       </footer>
     </div>
   );

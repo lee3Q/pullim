@@ -27,7 +27,7 @@ export default function DataCardList({ cards, primaryColor, onSelect, disabled =
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-3 w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto">
       {/* 검증 상태 배지 (factcheck 결과가 있을 때만) */}
       {factcheckResult && (
         <div className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg ${

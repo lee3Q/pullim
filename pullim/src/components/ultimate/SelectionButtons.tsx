@@ -21,7 +21,7 @@ export default function SelectionButtons({ options, onSelect, primaryColor, disa
 
   return (
     <div
-      className="flex flex-col gap-2 max-w-md mx-auto w-full"
+      className="flex flex-col gap-2 max-w-md md:max-w-xl lg:max-w-2xl mx-auto w-full"
       style={{ animation: "sage-appear 0.4s ease-out" }}
     >
       {options.map((option, i) => {

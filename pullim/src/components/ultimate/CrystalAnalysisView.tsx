@@ -12,7 +12,7 @@ interface Props {
 
 export default function CrystalAnalysisView({ analyses, disagreements, primaryColor, crystalLabel, useExpertLabels = false }: Props) {
   return (
-    <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto">
       {/* 각 구슬 분석 결과 — RPG 패널 */}
       {analyses.map((analysis) => {
         const crystal = CRYSTALS.find((c) => c.name === analysis.crystal);

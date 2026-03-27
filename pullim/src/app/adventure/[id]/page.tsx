@@ -752,7 +752,7 @@ export default function AdventureSessionPage() {
 
       {/* 메인 씬 영역 */}
       <main className="flex-1 flex flex-col justify-end px-3 sm:px-4 pb-4 pt-8 relative z-10 min-h-0">
-        <div className="max-w-lg mx-auto w-full flex flex-col gap-3 sm:gap-4">
+        <div className="max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto w-full flex flex-col gap-3 sm:gap-4">
 
           {/* 온보딩 (첫 방문 사용자) */}
           {needsOnboarding && stage === "ENTER" && (

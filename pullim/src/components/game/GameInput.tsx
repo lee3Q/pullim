@@ -81,7 +81,7 @@ export default function GameInput({
 
   return (
     <div className="px-4 py-3">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto">
         {!expanded ? (
           <button
             onClick={() => setExpanded(true)}

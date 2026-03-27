@@ -19,7 +19,7 @@ export default function DiscoveryChoice({
   primaryColor,
 }: Props) {
   return (
-    <div className="flex flex-col gap-3 max-w-sm mx-auto w-full">
+    <div className="flex flex-col gap-3 max-w-sm md:max-w-lg lg:max-w-xl mx-auto w-full">
       {options.map((option, i) => (
         <button
           key={i}

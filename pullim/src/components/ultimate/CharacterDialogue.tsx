@@ -20,7 +20,7 @@ interface Props {
 
 export default function CharacterDialogue({ character, text, primaryColor, typing = false, avatarSrc }: Props) {
   return (
-    <div className="flex gap-3 items-start max-w-lg" style={{ animation: "sage-appear 0.4s ease-out" }}>
+    <div className="flex gap-3 items-start max-w-lg md:max-w-2xl lg:max-w-3xl" style={{ animation: "sage-appear 0.4s ease-out" }}>
       {/* 캐릭터 아바타 */}
       <div
         className="w-[72px] h-[72px] rounded-full overflow-hidden shrink-0 border-2"

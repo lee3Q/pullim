@@ -50,7 +50,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto">
       {/* 요약 카드 — RPG 패널 */}
       <div className="rpg-panel px-4 py-4">
         <p className="text-xs text-white/55 mb-2 font-rpg-sm">세션 요약</p>

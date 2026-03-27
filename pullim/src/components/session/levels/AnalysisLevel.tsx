@@ -25,8 +25,8 @@ export default function AnalysisLevel({
         className="rpg-panel rounded-2xl p-5 space-y-3"
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-0.5 rounded-full font-rpg-sm" style={{ background: "rgba(192,163,116,0.15)", color: "var(--fantasy-gold)" }}>
-            {card.technique}
+          <span className="text-xs font-rpg-sm" style={{ color: "rgba(192,163,116,0.4)" }}>
+            ✦ 풀림의 생각
           </span>
         </div>
         <p className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>

@@ -14,6 +14,7 @@ interface Props {
   speechStyle: "casual" | "formal";
   primaryColor: string;
   showRecommendations?: boolean;
+  spicyMode?: boolean;
   onComplete: (profile: ProbabilityProfile, selections: StorySelectionRecord[]) => void;
 }
 
@@ -25,6 +26,7 @@ export default function StoryDiscovery({
   speechStyle,
   primaryColor,
   showRecommendations = true,
+  spicyMode = false,
   onComplete,
 }: Props) {
   const story = getThemeStory(theme);
@@ -34,6 +36,7 @@ export default function StoryDiscovery({
   const selections = useRef<StorySelectionRecord[]>([]);
   const sceneStartTime = useRef(Date.now());
   const outroCompleter = useRef<(() => void) | null>(null);
+  const isTransitioning = useRef(false);
 
   const currentScene = story.scenes[sceneIndex];
   const pastMinScenes = sceneIndex >= story.minScenes;
@@ -53,7 +56,8 @@ export default function StoryDiscovery({
 
   const handleChoice = useCallback(
     (choiceIndex: number) => {
-      if (!currentScene) return;
+      if (!currentScene || isTransitioning.current) return;
+      isTransitioning.current = true;
       const choice = currentScene.choices[choiceIndex];
       const timeMs = Date.now() - sceneStartTime.current;
 
@@ -68,6 +72,7 @@ export default function StoryDiscovery({
       setFadeOut(true);
       setTimeout(() => {
         setFadeOut(false);
+        isTransitioning.current = false;
         const nextIndex = sceneIndex + 1;
 
         if (nextIndex >= story.scenes.length) {
@@ -148,14 +153,14 @@ export default function StoryDiscovery({
         <SceneCard primaryColor={primaryColor} bgImage={story.bgImage}>
           {story.outroImagePath && (
             <div
-              className="rounded-xl overflow-hidden relative"
-              style={{ height: 140, border: "1px solid rgba(192,163,116,0.3)" }}
+              className="rounded-xl overflow-hidden relative aspect-[16/9]"
+              style={{ border: "1px solid rgba(192,163,116,0.3)" }}
             >
               <Image
                 src={story.outroImagePath}
                 alt="outro"
                 fill
-                sizes="(max-width: 640px) 100vw, 384px"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 512px, 576px"
                 style={{ objectFit: "cover" }}
               />
             </div>
@@ -241,9 +246,8 @@ export default function StoryDiscovery({
 
           {/* 일러스트 영역 */}
           <div
-            className="rounded-xl overflow-hidden relative"
+            className="rounded-xl overflow-hidden relative aspect-[16/9]"
             style={{
-              height: 140,
               background: `linear-gradient(to bottom, rgba(26,22,18,0.5), rgba(13,11,8,0.8))`,
               border: "1px solid rgba(192,163,116,0.2)",
             }}
@@ -253,7 +257,7 @@ export default function StoryDiscovery({
                 src={currentScene.imagePath}
                 alt={currentScene.illustration}
                 fill
-                sizes="(max-width: 640px) 100vw, 384px"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 512px, 576px"
                 style={{ objectFit: "cover" }}
                 priority={sceneIndex === 0}
               />
@@ -290,13 +294,13 @@ export default function StoryDiscovery({
                 }}
               >
                 <span className="text-lg shrink-0">{choice.emoji}</span>
-                <span className="flex-1">{choice.label}</span>
+                <span className="flex-1">{spicyMode && choice.spicyLabel ? choice.spicyLabel : choice.label}</span>
                 {showRecommendations && choice.recommended && (
                   <span
-                    className="text-[10px] px-2 py-0.5 rounded-full shrink-0"
-                    style={{ background: "rgba(192,163,116,0.25)", color: "var(--fantasy-gold-bright)" }}
+                    className="text-xs shrink-0 opacity-40"
+                    aria-label="추천"
                   >
-                    추천
+                    ✦
                   </span>
                 )}
               </button>

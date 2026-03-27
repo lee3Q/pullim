@@ -6,10 +6,12 @@ const STORAGE_KEY = "pullim_settings";
 
 interface PullimSettings {
   showRecommendations: boolean;
+  spicyMode: boolean;
 }
 
 const DEFAULTS: PullimSettings = {
   showRecommendations: true,
+  spicyMode: false,
 };
 
 export function useSettings() {

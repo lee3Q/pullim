@@ -39,7 +39,7 @@ export default function CrystalSelector({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto">
       {/* 구슬 그리드 */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4 justify-items-center">
         {visibleCrystals.map((crystal) => {

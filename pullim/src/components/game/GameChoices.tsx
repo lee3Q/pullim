@@ -55,7 +55,7 @@ export default function GameChoices({
   const btnClass = isCard ? "game-card-button" : isSignpost ? "game-signpost-button" : "game-petal-button";
 
   return (
-    <div className="flex flex-col gap-2.5 max-w-md mx-auto w-full">
+    <div className="flex flex-col gap-2.5 max-w-md md:max-w-xl lg:max-w-2xl mx-auto w-full">
       {options.map((option, i) => {
         const isSelected = selected === option;
         const isFaded = selected !== null && !isSelected;
