@@ -125,12 +125,12 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
             />
           </div>
           {!imgError ? (
-            <div className="relative w-32 h-32 mx-auto my-2">
+            <div className="relative w-40 h-40 mx-auto my-2">
               <Image
                 src={characterImage}
                 alt={displayName}
                 fill
-                className="object-contain rounded-2xl"
+                className="object-cover rounded-2xl"
                 style={{
                   filter: `drop-shadow(0 0 20px ${primaryColor}66)`,
                 }}
