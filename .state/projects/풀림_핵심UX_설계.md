@@ -45,8 +45,11 @@
    - [x] **디자인 판타지 매칭** — 폰트(Gowun Batang+Noto Serif KR)/카드/버튼/색상 판타지화 완료. CSS 변수 통일. 3-model CC 통과.
    - [x] **위기 안전 시스템** — 클라이언트 Tier A 위기 감지 연결 완료 (SSE crisis 플래그 → CrisisAlert 모달). 빌드 통과.
    - [x] **UI 피드백 수집 준비** — 배치 코드 리뷰 + E2E 플로우 테스트 (3테마 모두 통과) + OG 메타 동적화 (/result?theme=X&type=Y) + 공유 텍스트 테마별 맞춤
-   - [ ] **Claude API 실제 테스트** — 프롬프트 빌더 → 실제 응답 품질 확인 (UI 피드백 수집 후로 연기)
-5. **최종 검증** — 대표 확인 + 교차검토 (배포 목표: 5/23 이후)
+   - [x] **치트 버튼 개선 + 세션 중 테마 전환** — 2탭 확인 + 치트 후 3분기(재생성/테마전환제안/접어두기) + inferCheatAction 테마 판단 로직. 결정: .state/decisions/2026-03-27_치트버튼개선_테마전환.md
+   - [x] **데스크탑 반응형 전면 개선** — html font-size 스케일링(16→18→20px) + 22개 컴포넌트 max-w 반응형 + StoryDiscovery/PersonalityResult 이미지 반응형 수정
+   - [x] **모델 전환 코드 준비** — PIPELINE_MODEL/ANALYSIS_MODEL 환경변수 오버라이드 지원 + .env.local.example 업데이트. 빌드 통과.
+   - [ ] **Claude API 실제 테스트** — 환경변수에 ANTHROPIC_API_KEY 세팅 → Haiku로 흐름 확인 → Sonnet 품질 비교 → Gemini Flash 비교 (🔴 대표 실행 필요)
+5. **최종 검증** — 대표 확인 + 교차검토
 
 ## 대표 피드백 (2026-03-25, 반드시 반영)
 - 온보딩이 모험가 안에 있으면 안 됨 → **홈 화면에서 길잡이가 시작**
@@ -75,6 +78,7 @@
 ## 상태
 - 시작일: 2026-03-25 (분리)
 - 상태: 진행 중
-- 최종 갱신: 2026-03-27
+- 최종 갱신: 2026-03-28
 - 2026-03-27: Vercel 배포 완료 (pullim.vercel.app), Supabase feedback 테이블 생성, PWA 아이콘 추가, 밤 배치 28개 태스크 준비 (유형결과+피드백폼+이미지최적화+UX개선 등)
 - 2026-03-27 (2): UI 피드백 수집 준비 완료. 배치 코드 리뷰 (handleShare try-catch 1건 수정), 3테마 E2E 플로우 테스트 전항 통과, OG 메타 동적화 (/result 페이지 신규), 공유 URL+텍스트 테마별 맞춤 적용.
+- 2026-03-28: 피드백 2라운드 반영. 연타 버그 수정(isTransitioning), 추천 배지 ✦, Android 폰트 수정, 파악 스킵 추가, 데이터/대화 안내 문구, 결과 텍스트 밝기, technique 태그 제거. 매운맛 모드 구현(88개 spicyLabel + 톱니바퀴 토글). 홈 화면 재설계(기분5버튼→테마3카드). 2-model CC로 안전 이슈 6건 수정.
