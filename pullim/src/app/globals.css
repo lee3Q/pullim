@@ -5,6 +5,11 @@
   --color-foreground: #1a1a1a;
 }
 
+html {
+  background: var(--color-background);
+  overscroll-behavior: none;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
