@@ -1,6 +1,6 @@
 // 풀림 Service Worker — PWA 오프라인 지원 + 캐시 전략
-const CACHE_NAME = "pullim-v1";
-const IMAGE_CACHE_NAME = "pullim-images-v1";
+const CACHE_NAME = "pullim-v2";
+const IMAGE_CACHE_NAME = "pullim-images-v2";
 const ALL_CACHES = [CACHE_NAME, IMAGE_CACHE_NAME];
 const STATIC_ASSETS = [
   "/",
@@ -57,24 +57,24 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 정적 에셋: 캐시 우선, 없으면 네트워크
+  // 정적 에셋: 네트워크 우선 → 실패 시 캐시 폴백 (배포 즉시 반영)
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        // 성공 응답만 캐시
-        if (response.ok && request.method === "GET") {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
-      });
-    }).catch(() => {
-      // 오프라인 폴백
-      if (request.destination === "document") {
-        return caches.match("/");
+    fetch(request).then((response) => {
+      // 성공 응답은 캐시에도 저장
+      if (response.ok && request.method === "GET") {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
       }
-      return new Response("오프라인 상태입니다.", { status: 503 });
+      return response;
+    }).catch(() => {
+      // 오프라인 폴백: 캐시에서 제공
+      return caches.match(request).then((cached) => {
+        if (cached) return cached;
+        if (request.destination === "document") {
+          return caches.match("/");
+        }
+        return new Response("오프라인 상태입니다.", { status: 503 });
+      });
     })
   );
 });

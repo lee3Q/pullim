@@ -99,11 +99,12 @@ export default function FeedbackForm({ personalityType }: Props) {
         onChange={(e) => setMessage(e.target.value)}
         placeholder="UI, 결과, 경험 뭐든 자유롭게..."
         rows={3}
-        className="w-full resize-none rounded-xl px-4 py-3 text-sm font-rpg outline-none transition-colors placeholder:opacity-30"
+        className="w-full resize-none rounded-xl px-4 py-3 text-sm outline-none transition-colors placeholder:opacity-30"
         style={{
           background: "rgba(255,255,255,0.05)",
           border: "1px solid rgba(139,92,246,0.3)",
           color: "var(--fantasy-text)",
+          fontFamily: "system-ui, -apple-system, sans-serif",
         }}
       />
 
