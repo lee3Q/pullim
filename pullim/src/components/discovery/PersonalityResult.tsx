@@ -14,7 +14,10 @@ interface Props {
   onContinue: () => void;
 }
 
-export default function PersonalityResult({ type, primaryColor, onContinue }: Props) {
+export default function PersonalityResult({ type, profile, theme, primaryColor, onContinue }: Props) {
+  const displayName = type.themedName[theme];
+  const displayEmoji = type.themedEmoji[theme];
+  const displayAttitude = type.themedAttitude[theme];
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -28,8 +31,8 @@ export default function PersonalityResult({ type, primaryColor, onContinue }: Pr
 
   async function handleShare() {
     await navigator.share({
-      title: `나는 "${type.name}" 유형이래!`,
-      text: `풀림에서 3분만에 알아낸 나의 유형: ${type.name}. ${type.description}`,
+      title: `나는 "${displayName}" 유형이래!`,
+      text: `풀림에서 3분만에 알아낸 나의 유형: ${displayName}. ${type.description}`,
       url: window.location.href,
     });
   }
@@ -42,7 +45,7 @@ export default function PersonalityResult({ type, primaryColor, onContinue }: Pr
           className="text-6xl leading-none"
           style={{ filter: `drop-shadow(0 0 24px ${primaryColor}99)` }}
         >
-          {type.emoji}
+          {displayEmoji}
         </div>
         <p
           className="text-xs font-rpg-sm tracking-widest uppercase"
@@ -57,7 +60,7 @@ export default function PersonalityResult({ type, primaryColor, onContinue }: Pr
             textShadow: `0 0 20px ${primaryColor}55, 0 0 40px ${primaryColor}22`,
           }}
         >
-          {type.name}
+          {displayName}
         </h2>
       </div>
 
@@ -126,6 +129,28 @@ export default function PersonalityResult({ type, primaryColor, onContinue }: Pr
         {type.description}
       </div>
 
+      {/* 풀림의 태도 예고 */}
+      <div
+        className="rounded-2xl px-5 py-5 space-y-3"
+        style={{
+          background: `linear-gradient(135deg, ${primaryColor}0c, ${primaryColor}04)`,
+          border: `1px solid ${primaryColor}20`,
+        }}
+      >
+        <p
+          className="text-xs font-rpg-sm"
+          style={{ color: `${primaryColor}88` }}
+        >
+          풀림이 출시되면, 당신에게는
+        </p>
+        <p
+          className="text-sm font-rpg leading-relaxed"
+          style={{ color: "var(--fantasy-text)" }}
+        >
+          &ldquo;{displayAttitude}&rdquo;
+        </p>
+      </div>
+
       {/* 풀림 대화 미리보기 */}
       <div
         className="rounded-2xl px-5 py-4 space-y-3"
@@ -138,7 +163,7 @@ export default function PersonalityResult({ type, primaryColor, onContinue }: Pr
           className="text-xs font-rpg-sm"
           style={{ color: "rgba(192,167,136,0.45)" }}
         >
-          풀림이라면 이렇게 대화했을 거예요
+          이런 식으로 대화할 거예요
         </p>
         <div className="space-y-2">
           {type.pullimConversation.map((turn, i) => (
