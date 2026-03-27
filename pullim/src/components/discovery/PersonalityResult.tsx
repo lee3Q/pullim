@@ -14,6 +14,40 @@ interface Props {
   onContinue: () => void;
 }
 
+const THEME_GRADIENTS: Record<ThemeType, string> = {
+  adventure: "from-amber-900/40 via-orange-950/30 to-red-950/20",
+  garden: "from-indigo-950/40 via-purple-950/30 to-blue-950/20",
+  strategy: "from-slate-800/40 via-zinc-900/30 to-neutral-950/20",
+};
+
+const THEME_LABELS: Record<ThemeType, string> = {
+  adventure: "모험가의 숲",
+  garden: "달빛정원",
+  strategy: "전략실",
+};
+
+function StatBar({ label, value, color }: { label: [string, string]; value: number; color: string }) {
+  const percent = Math.round((value + 1) * 50); // -1~1 → 0~100
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-[10px] font-rpg-sm text-white/50">
+        <span>{label[0]}</span>
+        <span>{label[1]}</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-1000 ease-out"
+          style={{
+            width: `${percent}%`,
+            background: `linear-gradient(90deg, ${color}66, ${color})`,
+            marginLeft: 0,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function PersonalityResult({ type, profile, theme, primaryColor, onContinue }: Props) {
   const displayName = type.themedName[theme];
   const displayEmoji = type.themedEmoji[theme];
@@ -32,66 +66,117 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   async function handleShare() {
     await navigator.share({
       title: `나는 "${displayName}" 유형이래!`,
-      text: `풀림에서 3분만에 알아낸 나의 유형: ${displayName}. ${type.description}`,
+      text: `풀림에서 알아낸 나의 유형: ${displayName}. ${type.description}`,
       url: window.location.href,
     });
   }
 
   return (
     <div className="w-full max-w-sm space-y-5 animate-in fade-in duration-700">
-      {/* 유형 헤더 */}
-      <div className="text-center space-y-3 pt-4">
-        <div
-          className="text-6xl leading-none"
-          style={{ filter: `drop-shadow(0 0 24px ${primaryColor}99)` }}
-        >
-          {displayEmoji}
+
+      {/* ===== 공유용 결과 카드 ===== */}
+      <div
+        className={`relative rounded-3xl overflow-hidden bg-gradient-to-br ${THEME_GRADIENTS[theme]} p-6 pb-5`}
+        style={{ border: `1px solid ${primaryColor}25` }}
+      >
+        {/* 배경 파티클 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute w-32 h-32 rounded-full blur-3xl opacity-20 animate-pulse"
+            style={{ background: primaryColor, top: "10%", right: "-10%" }}
+          />
+          <div
+            className="absolute w-24 h-24 rounded-full blur-3xl opacity-15 animate-pulse [animation-delay:1s]"
+            style={{ background: primaryColor, bottom: "20%", left: "-5%" }}
+          />
         </div>
+
+        {/* 테마 라벨 */}
         <p
-          className="text-xs font-rpg-sm tracking-widest uppercase"
-          style={{ color: `${primaryColor}99` }}
+          className="relative text-[10px] font-rpg-sm tracking-[0.2em] uppercase text-center mb-5"
+          style={{ color: `${primaryColor}77` }}
         >
-          당신의 유형
+          {THEME_LABELS[theme]}에서 발견한 당신
         </p>
+
+        {/* 이모지 + 이펙트 */}
+        <div className="relative text-center mb-4">
+          {/* 글로우 링 */}
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div
+              className="w-28 h-28 rounded-full animate-pulse opacity-20"
+              style={{
+                background: `radial-gradient(circle, ${primaryColor}44, transparent 70%)`,
+              }}
+            />
+          </div>
+          <div
+            className="relative text-7xl leading-none py-4"
+            style={{
+              filter: `drop-shadow(0 0 30px ${primaryColor}88) drop-shadow(0 0 60px ${primaryColor}44)`,
+            }}
+          >
+            {displayEmoji}
+          </div>
+        </div>
+
+        {/* 유형명 */}
         <h2
-          className="text-2xl font-bold font-rpg-lg"
+          className="relative text-center text-2xl font-bold font-rpg-lg mb-2"
           style={{
             color: primaryColor,
-            textShadow: `0 0 20px ${primaryColor}55, 0 0 40px ${primaryColor}22`,
+            textShadow: `0 0 24px ${primaryColor}66, 0 0 48px ${primaryColor}33`,
           }}
         >
           {displayName}
         </h2>
-      </div>
 
-      {/* 구분선 */}
-      <div
-        className="h-px w-16 mx-auto"
-        style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}55, transparent)` }}
-      />
+        {/* 한 줄 설명 */}
+        <p
+          className="relative text-center text-xs font-rpg-sm leading-relaxed px-2 mb-4"
+          style={{ color: "var(--fantasy-text)", opacity: 0.8 }}
+        >
+          {type.description}
+        </p>
+
+        {/* 4축 미니 스탯 */}
+        <div className="relative grid grid-cols-2 gap-x-4 gap-y-2 px-2">
+          <StatBar label={["분석적", "직관적"]} value={profile.approachStyle.value} color={primaryColor} />
+          <StatBar label={["신중함", "도전적"]} value={profile.riskTolerance.value} color={primaryColor} />
+          <StatBar label={["해결형", "공감형"]} value={profile.copingStyle.value} color={primaryColor} />
+          <StatBar label={["숙고형", "즉흥형"]} value={profile.decisionSpeed.value} color={primaryColor} />
+        </div>
+
+        {/* 풀림 워터마크 */}
+        <p className="relative text-center text-[9px] font-rpg-sm mt-4" style={{ color: `${primaryColor}44` }}>
+          pullim.vercel.app
+        </p>
+      </div>
 
       {/* 공유 버튼 */}
       <div className="flex items-center justify-center gap-2">
         {canShare && (
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-rpg-sm transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-rpg-sm transition-all active:scale-95"
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${primaryColor}30`,
-              color: `${primaryColor}99`,
+              background: `${primaryColor}15`,
+              border: `1px solid ${primaryColor}35`,
+              color: primaryColor,
             }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
             </svg>
-            공유하기
+            친구에게 공유
           </button>
         )}
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-rpg-sm transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-rpg-sm transition-all active:scale-95"
           style={{
             background: copied ? `${primaryColor}18` : "rgba(255,255,255,0.05)",
             border: `1px solid ${copied ? primaryColor + "55" : "rgba(255,255,255,0.1)"}`,
@@ -115,18 +200,6 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
             </>
           )}
         </button>
-      </div>
-
-      {/* 설명 */}
-      <div
-        className="rounded-2xl px-5 py-4 text-sm leading-relaxed font-rpg"
-        style={{
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          color: "var(--fantasy-text)",
-        }}
-      >
-        {type.description}
       </div>
 
       {/* 풀림의 태도 예고 */}
@@ -271,7 +344,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
       </div>
 
       {/* 피드백 폼 */}
-      <FeedbackForm personalityType={type.name} />
+      <FeedbackForm personalityType={displayName} />
 
       {/* CTA */}
       <div className="space-y-3 pb-6">
