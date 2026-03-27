@@ -25,6 +25,7 @@ export const metadata: Metadata = {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-192.png",
   },
+  metadataBase: new URL("https://pullim.vercel.app"),
   openGraph: {
     title: "풀림 — 3분이면 나를 알 수 있어요",
     description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
