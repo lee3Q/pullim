@@ -80,7 +80,8 @@ export default function FeedbackForm({ personalityType }: Props) {
             onMouseLeave={() => setHovered(0)}
             className="text-2xl transition-transform active:scale-90"
             style={{
-              opacity: star <= (hovered || rating) ? 1 : 0.55,
+              opacity: star <= (hovered || rating) ? 1 : 0.8,
+              color: star <= (hovered || rating) ? "#f5c542" : "rgba(192,167,136,0.9)",
               filter:
                 star <= (hovered || rating)
                   ? "drop-shadow(0 0 6px rgba(168,130,88,0.7))"
