@@ -408,7 +408,7 @@ export default function HomePage() {
               <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:200ms]" />
               <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse [animation-delay:400ms]" />
             </div>
-            <p className="text-sm text-white/40">준비하고 있어...</p>
+            <p className="text-sm text-white/60">준비하고 있어...</p>
           </div>
         </div>
       )}
@@ -416,7 +416,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="text-center text-xs text-white/25 py-4 relative z-10">
         풀림은 전문 상담을 대체하지 않습니다. 위기 시{" "}
-        <a href="tel:109" className="text-white/40 underline">
+        <a href="tel:109" className="text-white/60 underline">
           109
         </a>
         로 연락하세요.

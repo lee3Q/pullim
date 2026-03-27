@@ -51,7 +51,7 @@ export default function SelectionButtons({ options, onSelect, primaryColor, disa
         <button
           onClick={onCustomInput}
           disabled={disabled}
-          className="w-full text-left px-4 py-3 text-sm font-rpg transition-all duration-300 rpg-button-ghost text-white/40"
+          className="w-full text-left px-4 py-3 text-sm font-rpg transition-all duration-300 rpg-button-ghost text-white/60"
         >
           직접 입력하기
         </button>

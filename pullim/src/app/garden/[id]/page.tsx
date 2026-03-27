@@ -737,7 +737,7 @@ export default function GardenSessionPage() {
 
           {/* 과거 씬 열람 시: 유저 응답 표시 */}
           {isViewingPast && displayUserInput && (
-            <div className="text-xs font-rpg text-white/30 text-right pr-2">
+            <div className="text-xs font-rpg text-white/60 text-right pr-2">
               💬 {displayUserInput}
             </div>
           )}

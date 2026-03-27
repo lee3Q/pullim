@@ -69,7 +69,7 @@ export default function SatisfactionRating({ onRate, primaryColor }: Props) {
       <div className="flex gap-3">
         <button
           onClick={handleSkip}
-          className="text-xs font-rpg text-white/30 hover:text-white/50 transition-colors"
+          className="text-xs font-rpg text-white/50 hover:text-white/70 transition-colors"
         >
           건너뛰기
         </button>

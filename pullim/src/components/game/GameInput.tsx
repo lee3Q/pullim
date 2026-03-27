@@ -117,7 +117,7 @@ export default function GameInput({
                   setInput("");
                   onCollapse?.();
                 }}
-                className="text-xs font-rpg text-white/40 hover:text-white/60 transition-colors"
+                className="text-xs font-rpg text-white/55 hover:text-white/70 transition-colors"
               >
                 접기
               </button>

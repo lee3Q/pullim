@@ -90,10 +90,10 @@ export default function CrystalSelector({
 
               {/* 라벨 */}
               <div className="text-center">
-                <p className={`text-xs font-rpg-sm ${isSelected ? "text-white/90" : "text-white/50"}`}>
+                <p className={`text-xs font-rpg-sm ${isSelected ? "text-white/90" : "text-white/60"}`}>
                   {useExpertLabels ? crystal.expertLabel : crystal.name}
                 </p>
-                <p className={`text-[10px] sm:text-[11px] mt-0.5 max-w-[80px] sm:max-w-[90px] leading-tight ${isSelected ? "text-white/60" : "text-white/35"}`}>
+                <p className={`text-[10px] sm:text-[11px] mt-0.5 max-w-[80px] sm:max-w-[90px] leading-tight ${isSelected ? "text-white/60" : "text-white/50"}`}>
                   {useExpertLabels ? crystal.expertDescription : crystal.description}
                 </p>
                 {isRecommended && !isSelected && (
@@ -111,7 +111,7 @@ export default function CrystalSelector({
       {!showAll && (
         <button
           onClick={() => setShowAll(true)}
-          className="mt-4 w-full text-xs text-white/45 hover:text-white/50 transition-colors font-rpg-sm"
+          className="mt-4 w-full text-xs text-white/55 hover:text-white/70 transition-colors font-rpg-sm"
         >
           + 더 많은 {crystalLabel} 보기
         </button>

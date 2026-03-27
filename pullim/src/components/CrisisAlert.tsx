@@ -26,7 +26,7 @@ export default function CrisisAlert({ message, hotline, onClose }: Props) {
           </a>
           <button
             onClick={onClose}
-            className="w-full py-3 text-white/40 rounded-xl hover:bg-white/5 transition-colors text-sm"
+            className="w-full py-3 text-white/60 rounded-xl hover:bg-white/5 transition-colors text-sm"
           >
             괜찮습니다
           </button>

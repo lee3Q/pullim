@@ -33,10 +33,10 @@ export default function CrystalAnalysisView({ analyses, disagreements, primaryCo
             <div className="text-sm text-white/75 leading-relaxed space-y-1.5">
               <p>{analysis.observation}</p>
               {analysis.insight && (
-                <p className="text-white/50 text-xs italic">{analysis.insight}</p>
+                <p className="text-white/65 text-xs italic">{analysis.insight}</p>
               )}
               {analysis.risk && <p className="text-[11px] text-amber-400/70 mt-1.5 font-rpg-sm">⚠ {analysis.risk}</p>}
-              {analysis.question && <p className="text-[11px] text-white/40 mt-1 italic">&ldquo;{analysis.question}&rdquo;</p>}
+              {analysis.question && <p className="text-[11px] text-white/55 mt-1 italic">&ldquo;{analysis.question}&rdquo;</p>}
             </div>
           </div>
         );
@@ -63,7 +63,7 @@ export default function CrystalAnalysisView({ analyses, disagreements, primaryCo
               {d.positions.map((p, j) => {
                 const crystal = CRYSTALS.find((c) => c.name === p.crystal);
                 return (
-                  <p key={j} className="text-xs text-white/40 mt-1 pl-2 font-rpg-sm">
+                  <p key={j} className="text-xs text-white/55 mt-1 pl-2 font-rpg-sm">
                     {crystal?.icon} {p.stance}
                   </p>
                 );

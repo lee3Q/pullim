@@ -53,7 +53,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
     <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
       {/* 요약 카드 — RPG 패널 */}
       <div className="rpg-panel px-4 py-4">
-        <p className="text-xs text-white/40 mb-2 font-rpg-sm">세션 요약</p>
+        <p className="text-xs text-white/55 mb-2 font-rpg-sm">세션 요약</p>
         <p className="text-sm text-white/70 leading-relaxed">{conclusion.situationSummary}</p>
         {conclusion.keyCrossroad && (
           <p className="text-xs mt-3 font-rpg" style={{ color: primaryColor }}>
@@ -73,8 +73,8 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
                 className="flex-1 rpg-panel-light px-3 py-3 text-left transition-all hover:border-white/20 cursor-pointer"
               >
                 <p className="text-sm font-rpg text-white/80">{opt.direction}</p>
-                <p className="text-[11px] text-white/40 mt-1 font-rpg-sm">리스크: {opt.risk}</p>
-                <p className="text-[11px] text-white/40 font-rpg-sm">보상: {opt.reward}</p>
+                <p className="text-[11px] text-white/55 mt-1 font-rpg-sm">리스크: {opt.risk}</p>
+                <p className="text-[11px] text-white/55 font-rpg-sm">보상: {opt.reward}</p>
               </button>
             ))}
           </div>
@@ -105,7 +105,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
       {/* 행동 선택 */}
       {phase === "action" && (
         <div className="flex flex-col gap-2">
-          <p className="text-xs text-white/40 mb-1 font-rpg-sm">어떤 걸 해보시겠어요?</p>
+          <p className="text-xs text-white/55 mb-1 font-rpg-sm">어떤 걸 해보시겠어요?</p>
           {conclusion.options.map((opt, i) => (
             <button
               key={i}
@@ -121,7 +121,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
       {/* 기한 선택 */}
       {phase === "deadline" && (
         <div className="flex flex-col gap-2">
-          <p className="text-xs text-white/40 mb-1 font-rpg-sm">언제까지 해보시겠어요?</p>
+          <p className="text-xs text-white/55 mb-1 font-rpg-sm">언제까지 해보시겠어요?</p>
           <div className="flex gap-2">
             {DEADLINE_OPTIONS.map((opt) => (
               <button
@@ -139,7 +139,7 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
       {/* 완료 */}
       {phase === "done" && (
         <>
-          <p className="text-center text-sm text-white/50 italic font-rpg">
+          <p className="text-center text-sm text-white/65 italic font-rpg">
             &ldquo;{farewell}&rdquo;
           </p>
           <div className="flex gap-3 justify-center mt-4">

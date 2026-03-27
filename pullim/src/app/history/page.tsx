@@ -38,7 +38,7 @@ export default function HistoryPage() {
       {/* Main */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <div className="rpg-panel px-8 py-10 max-w-sm w-full text-center">
-          <p className="text-white/50 text-sm font-rpg mb-6">
+          <p className="text-white/65 text-sm font-rpg mb-6">
             아직 기록이 없습니다.
           </p>
           <button

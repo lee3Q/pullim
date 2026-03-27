@@ -22,8 +22,8 @@ function ThemeCard({ theme, onSelect, disabled }: { theme: Theme; onSelect: () =
       <span className="text-4xl">{theme.icon}</span>
       <div className="text-center">
         <p className="text-sm font-semibold text-white/90">{theme.title}</p>
-        <p className="text-xs text-white/40 mt-1 leading-relaxed">{theme.subtitle}</p>
-        <p className="text-[11px] text-white/35 mt-2 font-rpg-sm">{theme.useCases}</p>
+        <p className="text-xs text-white/55 mt-1 leading-relaxed">{theme.subtitle}</p>
+        <p className="text-[11px] text-white/55 mt-2 font-rpg-sm">{theme.useCases}</p>
       </div>
     </button>
   );
