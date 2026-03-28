@@ -23,12 +23,14 @@ const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
   garden: "달빛정원",
   adventure: "모험가",
   strategy: "전략실",
+  stargazer: "천문대",
 };
 
 const THEME_COLORS: Record<ThemeType, string> = {
   garden: "#a78bfa",
   adventure: "#ff9f1c",
   strategy: "#60a5fa",
+  stargazer: "#4338ca",
 };
 
 // 테마 카드 데이터
@@ -39,6 +41,7 @@ const THEME_CARDS: {
   desc: string;
   when: string;
   color: string;
+  imagePath: string;
 }[] = [
   {
     key: "garden",
@@ -47,6 +50,7 @@ const THEME_CARDS: {
     desc: "조용한 정원에서 감정을 천천히 들여다봐요",
     when: "마음이 무겁거나, 감정을 정리하고 싶을 때",
     color: "#a78bfa",
+    imagePath: "/images/home/home_card_garden.png",
   },
   {
     key: "adventure",
@@ -55,6 +59,7 @@ const THEME_CARDS: {
     desc: "이야기 속 갈림길에서 직감을 따라가봐요",
     when: "뭘 해야 할지 모르겠거나, 방향을 찾고 싶을 때",
     color: "#ff9f1c",
+    imagePath: "/images/home/home_card_adventure.png",
   },
   {
     key: "strategy",
@@ -63,6 +68,16 @@ const THEME_CARDS: {
     desc: "데이터와 논리로 상황을 정리해봐요",
     when: "머리가 복잡하고, 논리적으로 따져보고 싶을 때",
     color: "#60a5fa",
+    imagePath: "/images/home/home_card_strategy.png",
+  },
+  {
+    key: "stargazer",
+    emoji: "🔭",
+    name: "천문대",
+    desc: "별을 올려다보며 가능성을 찾아봐요",
+    when: "방향을 모르겠거나, 가능성을 탐색하고 싶을 때",
+    color: "#4338ca",
+    imagePath: "/images/home/home_card_stargazer.png",
   },
 ];
 
@@ -270,7 +285,15 @@ export default function HomePage() {
                              hover:scale-[1.01] active:scale-[0.98]"
                 >
                   <div className="flex items-start gap-4">
-                    <span className="text-3xl mt-0.5">{t.emoji}</span>
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                      <Image
+                        src={t.imagePath}
+                        alt={t.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
                         {t.name}
@@ -314,6 +337,9 @@ export default function HomePage() {
                 </p>
                 <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
                   <strong style={{ color: "#60a5fa" }}>전략실</strong>은 논리에 집중해요. 선택지를 비교하거나, 체계적으로 정리하고 싶을 때. 데이터 기반.
+                </p>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                  <strong style={{ color: "#4338ca" }}>천문대</strong>는 가능성에 집중해요. 방향을 모르겠거나, 새로운 길을 찾고 싶을 때. 별처럼 가능성을 탐색해요.
                 </p>
                 <p className="text-[10px] font-rpg-sm mt-2" style={{ color: "rgba(192,167,136,0.35)" }}>
                   어떤 걸 골라도 대화 중에 분위기를 바꿀 수 있어요.

@@ -3,7 +3,7 @@
 // 선택은 이야기의 일부처럼 느끼게, 성격 측정은 뒤에서.
 // "벤치에 앉을래 지나갈래?" > "너는 분석적이야 직관적이야?"
 
-export type ThemeType = "adventure" | "garden" | "strategy";
+export type ThemeType = "adventure" | "garden" | "strategy" | "stargazer";
 export type Axis = "approach" | "risk" | "coping" | "decision";
 
 export interface Signal {
@@ -156,6 +156,61 @@ const GARDEN_SCENES: StoryScene[] = [
       { emoji: "🔙", label: "왔던 길로 돌아간다", spicyLabel: "귀찮 ㅋ 롤하러 감", signals: [{ axis: "risk", value: -1 }] },
     ],
   },
+  {
+    id: "garden_11",
+    illustration: "달빛 아래 작은 분수, 동전 하나가 바닥에 반짝임",
+    imagePath: "/images/v3/garden_11.png",
+    narrative: "작은 분수 옆에 서 있어.\n물소리가 생각을 가라앉혀.\n\n바닥에 동전 하나가 보여.\n누군가의 소원이었겠지.",
+    choices: [
+      { emoji: "🪙", label: "동전을 들어 다시 던진다", spicyLabel: "남의 소원 재활용 ㅋ", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "💭", label: "그냥 바라보기만 한다", spicyLabel: "관찰자 모드", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "✨", label: "내 소원을 속으로 빈다", spicyLabel: "동전 없어도 소원은 가능", signals: [{ axis: "coping", value: 1 }] },
+    ],
+  },
+  {
+    id: "garden_12",
+    illustration: "정원 담장 너머로 달이 크게 떠오름",
+    imagePath: "/images/v3/garden_12.png",
+    narrative: "담장 위로 달이 크게 올라왔어.\n\n저 너머에\n또 다른 정원이 있을까.",
+    choices: [
+      { emoji: "🌕", label: "담장을 넘어본다", spicyLabel: "남의 정원 무단 침입 ㅋ", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "🌿", label: "이 정원에 머문다", spicyLabel: "여기도 충분함", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "🔭", label: "달을 오래 바라본다", spicyLabel: "달 봐봤자 답 없음 ㅋ", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
+  {
+    id: "garden_13",
+    illustration: "정원 깊숙이, 오래된 우물이 있음",
+    imagePath: "/images/v3/garden_13.png",
+    narrative: "깊은 곳에 우물이 있어.\n들여다보면 바닥이 안 보여.\n\n뭔가 떨어뜨리면\n소리가 날까, 안 날까.",
+    choices: [
+      { emoji: "🪨", label: "돌멩이를 떨어뜨린다", spicyLabel: "결과 없어도 시도하는 게 중요", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "👂", label: "귀를 기울인다", spicyLabel: "소리 없어도 뭔가 있을 수 있음", signals: [{ axis: "decision", value: -1 }], recommended: true },
+      { emoji: "🚶", label: "그냥 지나친다", spicyLabel: "모르는 게 나을 때도 있음", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "garden_14",
+    illustration: "이슬 맺힌 거미줄, 아침 빛에 반짝임",
+    imagePath: "/images/v3/garden_14.png",
+    narrative: "거미줄에 이슬이 맺혀서\n빛에 반짝이고 있어.\n\n작고 연약한데\n어쩐지 단단해 보여.",
+    choices: [
+      { emoji: "🕷️", label: "거미가 어디 있는지 찾아본다", spicyLabel: "거미 찾으면 뭐함 ㅋ", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "💎", label: "이슬 하나를 손으로 건드린다", spicyLabel: "터지면 아쉬운데 건드리게 됨", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "📸", label: "눈에 담아둔다", spicyLabel: "부수면 안 되는 것들이 있음", signals: [{ axis: "coping", value: 1 }], recommended: true },
+    ],
+  },
+  {
+    id: "garden_15",
+    illustration: "정원 끝, 문이 하나 있음 — 열려 있는지 닫혀 있는지 모호함",
+    imagePath: "/images/v3/garden_15.png",
+    narrative: "정원 끝에 문이 있어.\n열려 있는 것 같기도 하고\n닫혀 있는 것 같기도 해.\n\n여기까지 온 게 의미 있었어.",
+    choices: [
+      { emoji: "🚪", label: "문을 열고 나간다", spicyLabel: "들어왔으면 나가야지", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🌿", label: "정원에 좀 더 있는다", spicyLabel: "끝낼 필요 없잖아", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "🤔", label: "문 앞에서 잠깐 멈춘다", spicyLabel: "나가도 되는지 모르겠음", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
 ];
 
 // ═══════════════════════════════════════════
@@ -271,6 +326,61 @@ const ADVENTURE_SCENES: StoryScene[] = [
       { emoji: "🦅", label: "...한번 믿어볼까", spicyLabel: "뛰면 날개 생김? ㅋ 안 생김", signals: [{ axis: "risk", value: 1 }] },
       { emoji: "🔭", label: "경치를 즐긴다", spicyLabel: "ㄹㅇ 이거 쓴 새끼 정신감정 필요", signals: [{ axis: "coping", value: 1 }], recommended: true },
       { emoji: "🪜", label: "계단으로 내려간다", spicyLabel: "현실주의자는 계단으로 ㅋ", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "adventure_11",
+    illustration: "숲 한가운데, 오래된 나침반이 땅에 박혀 있음",
+    imagePath: "/images/v3/adventure_11.png",
+    narrative: "땅에 박힌 나침반.\n바늘이 계속 흔들려.\n\n진북을 가리키지 않아.\n그런데 묘하게 믿음이 가.",
+    choices: [
+      { emoji: "🧭", label: "나침반을 뽑아서 들고 간다", spicyLabel: "쓸모없어도 챙기는 게 사람", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "👣", label: "감각대로 방향을 잡는다", spicyLabel: "나침반 없어도 길은 있음", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "🔍", label: "왜 바늘이 흔들리는지 살핀다", spicyLabel: "원인 먼저 ㅋ", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "adventure_12",
+    illustration: "폭포 앞, 물이 거세게 쏟아지고 뒤에 동굴 입구가 보임",
+    imagePath: "/images/v3/adventure_12.png",
+    narrative: "폭포 너머에 뭔가 있어.\n들어가려면 물을 맞아야 해.\n\n차갑고 거세 보이지만\n저쪽이 궁금해.",
+    choices: [
+      { emoji: "💦", label: "뛰어들어서 통과한다", spicyLabel: "물에 젖는 건 잠깐임", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "🌿", label: "돌아가는 길을 찾는다", spicyLabel: "안 젖는 방법이 있을 수도", signals: [{ axis: "risk", value: -1 }], recommended: true },
+      { emoji: "⏳", label: "폭포가 줄어들길 기다린다", spicyLabel: "폭포는 안 줄어들 거임 ㅋ", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
+  {
+    id: "adventure_13",
+    illustration: "모닥불 앞에 여러 여행자들이 둘러앉아 있음",
+    imagePath: "/images/v3/adventure_13.png",
+    narrative: "밤이 됐어.\n모닥불 주위에 낯선 여행자들.\n서로 이야기를 나누고 있어.\n\n자리가 하나 비어 있어.",
+    choices: [
+      { emoji: "🔥", label: "자리에 앉아 이야기를 듣는다", spicyLabel: "끼어들지 않아도 함께일 수 있음", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "💬", label: "내 이야기를 꺼낸다", spicyLabel: "모닥불엔 사연이 필요함", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "🌙", label: "멀찍이서 불빛만 바라본다", spicyLabel: "참여 안 해도 따뜻함은 느낌", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "adventure_14",
+    illustration: "다음 날 아침, 숲길에 발자국 두 줄이 나란히 있음",
+    imagePath: "/images/v3/adventure_14.png",
+    narrative: "어젯밤 같이 걸었던 누군가의 발자국.\n\n앞으로 가면 같은 방향,\n뒤로 가면 혼자가 돼.",
+    choices: [
+      { emoji: "🚶‍♂️", label: "발자국을 따라간다", spicyLabel: "혼자보단 낫지 않냐", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "🗺️", label: "내 길을 간다", spicyLabel: "동행이 항상 도움은 아님", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "📢", label: "소리쳐서 그 사람을 찾는다", spicyLabel: "먼저 연락하는 게 뭐가 부끄럼", signals: [{ axis: "approach", value: 1 }] },
+    ],
+  },
+  {
+    id: "adventure_15",
+    illustration: "숲 끝, 탁 트인 평원이 펼쳐짐 — 숲과 빛의 경계",
+    imagePath: "/images/v3/adventure_15.png",
+    narrative: "숲이 끝났어.\n탁 트인 평원이 펼쳐져.\n\n뒤에는 지나온 숲,\n앞에는 처음 보는 땅.",
+    choices: [
+      { emoji: "🌄", label: "주저 없이 나아간다", spicyLabel: "멈추면 지는 거", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🌲", label: "숲을 한 번 돌아본다", spicyLabel: "왔던 길을 아는 게 힘이 됨", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "⛺", label: "경계에서 잠시 쉰다", spicyLabel: "전환점에선 쉬어야 함", signals: [{ axis: "risk", value: -1 }] },
     ],
   },
 ];
@@ -390,6 +500,232 @@ const STRATEGY_SCENES: StoryScene[] = [
       { emoji: "📊", label: "데이터를 보여준다", spicyLabel: "감으로 까면 내가 숫자로 팸", signals: [{ axis: "approach", value: -1 }] },
     ],
   },
+  {
+    id: "strategy_11",
+    illustration: "빈 회의실, 화이트보드에 '?'만 적혀 있음",
+    imagePath: "/images/v3/strategy_11.png",
+    narrative: "다음 회의까지 30분 남았어.\n아무도 없는 회의실.\n화이트보드에 물음표만 있어.\n\n뭔가 적고 싶어.",
+    choices: [
+      { emoji: "✍️", label: "지금 생각 나는 걸 적어둔다", spicyLabel: "회의 전 정리는 필수", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "🧘", label: "잠깐 멍하게 있는다", spicyLabel: "비워야 채워짐", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📱", label: "메모앱에 따로 정리한다", spicyLabel: "화이트보드보다 앱이 낫지", signals: [{ axis: "decision", value: 1 }] },
+    ],
+  },
+  {
+    id: "strategy_12",
+    illustration: "두 개의 보고서, 결론이 정반대임",
+    imagePath: "/images/v3/strategy_12.png",
+    narrative: "같은 데이터를 두 팀이 분석했는데\n결론이 정반대야.\n\n둘 다 논리가 맞아.\n어떻게 할래?",
+    choices: [
+      { emoji: "🔍", label: "데이터를 직접 다시 본다", spicyLabel: "중간자가 직접 봐야 함", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "🤝", label: "두 팀을 한 자리에 모은다", spicyLabel: "싸워야 답이 나옴 ㅋ", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "⚖️", label: "더 신뢰할 수 있는 팀 걸 따른다", spicyLabel: "트랙레코드가 답임", signals: [{ axis: "decision", value: 1 }] },
+    ],
+  },
+  {
+    id: "strategy_13",
+    illustration: "퇴근 후 혼자 남은 사무실, 모니터 불빛만 켜져 있음",
+    imagePath: "/images/v3/strategy_13.png",
+    narrative: "모두 퇴근했어.\n혼자 남은 사무실.\n\n아직 할 일이 있는데\n집중이 잘 돼.",
+    choices: [
+      { emoji: "💻", label: "집중해서 마무리한다", spicyLabel: "이 시간이 골든타임", signals: [{ axis: "risk", value: 1 }, { axis: "decision", value: 1 }] },
+      { emoji: "🏠", label: "내일 하기로 하고 퇴근한다", spicyLabel: "번아웃보다 내일이 나음", signals: [{ axis: "risk", value: -1 }], recommended: true },
+      { emoji: "📋", label: "할 일 목록 정리하고 퇴근한다", spicyLabel: "정리하면 내일 바로 시작 가능", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "strategy_14",
+    illustration: "작은 화분에 새싹이 올라옴, 책상 위에 있음",
+    imagePath: "/images/v3/strategy_14.png",
+    narrative: "책상 한쪽에 화분을 뒀는데\n새싹이 올라왔어.\n\n심은 기억이 가물가물해.\n언제였더라.",
+    choices: [
+      { emoji: "💧", label: "물을 준다", spicyLabel: "기억 못 해도 챙기는 게 중요", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "📅", label: "언제 심었는지 찾아본다", spicyLabel: "기록이 있으면 확인해야지", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "😊", label: "그냥 기분 좋게 본다", spicyLabel: "이유 없이 좋은 것도 있음", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
+  {
+    id: "strategy_15",
+    illustration: "프로젝트 마지막 날, 체크리스트가 거의 다 체크됨",
+    imagePath: "/images/v3/strategy_15.png",
+    narrative: "체크리스트에\n항목이 하나 남았어.\n\n작은 항목이야.\n근데 제일 오래 남아 있었어.",
+    choices: [
+      { emoji: "✅", label: "마지막 항목을 체크한다", spicyLabel: "끝내야 끝난 거지", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🔁", label: "전체를 한 번 더 훑는다", spicyLabel: "마무리는 꼼꼼하게", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "🎉", label: "일단 완료 선언한다", spicyLabel: "완벽보다 완성이 중요", signals: [{ axis: "risk", value: 1 }] },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════
+// 천문대 — 밤하늘 + 별 + 방향 + 가능성
+// ═══════════════════════════════════════════
+
+const STARGAZER_SCENES: StoryScene[] = [
+  {
+    id: "stargazer_1",
+    illustration: "천문대 입구, 둥근 돔이 열려 있고 별이 쏟아질 것 같은 밤하늘",
+    imagePath: "/assets/discovery/stargazer_1.png",
+    narrative: "천문대 문이 열려 있어.\n안으로 들어가면\n거대한 망원경이 보여.\n\n두 방향이 있어.\n망원경 앞으로 가거나,\n옥상 계단으로 올라가거나.",
+    choices: [
+      { emoji: "🔭", label: "망원경으로 다가간다", spicyLabel: "도구가 있으면 써야지", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "⭐", label: "옥상으로 올라간다", spicyLabel: "맨눈으로 보는 게 진짜", signals: [{ axis: "approach", value: 1 }], recommended: true },
+    ],
+  },
+  {
+    id: "stargazer_2",
+    illustration: "망원경 렌즈 너머로 보이는 거대한 목성, 줄무늬가 선명함",
+    imagePath: "/assets/discovery/stargazer_2.png",
+    narrative: "망원경을 들여다보니\n목성이 가득 차 있어.\n줄무늬가 선명하고\n작은 위성들도 보여.\n\n누군가 옆에서 속삭여.\n\"저기 가고 싶어요?\"",
+    choices: [
+      { emoji: "🚀", label: "\"갈 수 있다면 가고 싶어\"", spicyLabel: "왕복 불가인데 ㅋ 그래도 가고 싶음", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "🌍", label: "\"여기가 더 좋아\"", spicyLabel: "있는 곳이 최고임", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "🤔", label: "\"...생각해본 적 없는데\"", spicyLabel: "질문이 갑작스러움 ㅋ", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_3",
+    illustration: "은하수가 펼쳐진 하늘, 아래에는 어두운 들판",
+    imagePath: "/assets/discovery/stargazer_3.png",
+    narrative: "옥상에 서니\n은하수가 머리 위를 가로질러.\n\n수억 개의 별.\n근데 어느 별을 봐야 할지\n모르겠어.",
+    choices: [
+      { emoji: "✨", label: "제일 밝은 별을 찾는다", spicyLabel: "밝은 게 눈에 먼저 들어옴", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "🌌", label: "전체를 그냥 바라본다", spicyLabel: "하나 고르면 나머지를 놓치잖아", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📍", label: "방향부터 잡는다 — 북극성 찾기", spicyLabel: "감동보다 위치가 먼저", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_4",
+    illustration: "유성이 하늘을 가로질러 사라지는 순간",
+    imagePath: "/assets/discovery/stargazer_4.png",
+    narrative: "갑자기 유성 하나가\n하늘을 가로질러.\n\n0.5초.",
+    choices: [
+      { emoji: "🌠", label: "소원을 빈다", spicyLabel: "조건반사 ㅋ 원래 그러는 거잖아", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📸", label: "사진 찍으려다 놓친다", spicyLabel: "현실은 눈보다 폰이 먼저임", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "😮", label: "그냥 멍하니 본다", spicyLabel: "아무 생각 없는 게 맞음", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_5",
+    illustration: "천문대 관장이 별자리 지도를 펼쳐 보이고 있음",
+    imagePath: "/assets/discovery/stargazer_5.png",
+    narrative: "천문대 관장이\n낡은 별자리 지도를 펼쳐.\n\n\"이 별자리들은\n각자 이야기가 있어요.\"\n\n어느 별자리가 눈에 들어와?",
+    choices: [
+      { emoji: "🦁", label: "사자자리 — 용기와 위엄", spicyLabel: "레오 = 관종임 ㅋ", signals: [{ axis: "risk", value: 1 }, { axis: "approach", value: 1 }] },
+      { emoji: "🌊", label: "물고기자리 — 흐름과 감수성", spicyLabel: "감성 충만 ㅋ", signals: [{ axis: "coping", value: 1 }, { axis: "approach", value: -1 }] },
+      { emoji: "🏹", label: "오리온자리 — 목표와 추진", spicyLabel: "오리온이 제일 찾기 쉬움 ㅋ", signals: [{ axis: "decision", value: 1 }, { axis: "risk", value: -1 }], recommended: true },
+    ],
+  },
+  {
+    id: "stargazer_6",
+    illustration: "망원경 옆에 열린 노트, 누군가 별 관측 기록을 남겨둔 흔적",
+    imagePath: "/assets/discovery/stargazer_6.png",
+    narrative: "망원경 옆에 노트가 펼쳐져 있어.\n누군가의 관측 기록.\n\n마지막 페이지에\n\"아직 이름 없는 별\"이라고 적혀 있어.",
+    choices: [
+      { emoji: "✍️", label: "내가 이름을 지어준다", spicyLabel: "공식 등록은 못 해도 ㅋ", signals: [{ axis: "approach", value: 1 }, { axis: "risk", value: 1 }] },
+      { emoji: "📖", label: "앞 페이지부터 읽어본다", spicyLabel: "맥락을 알아야 이름도 붙이지", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "🌟", label: "그냥 이름 없는 채로 두는 게 좋다", spicyLabel: "이름이 없어도 존재는 함", signals: [{ axis: "coping", value: 1 }] },
+    ],
+  },
+  {
+    id: "stargazer_7",
+    illustration: "먹구름이 몰려오며 별이 가려지기 시작함",
+    imagePath: "/assets/discovery/stargazer_7.png",
+    narrative: "구름이 몰려오고 있어.\n별이 하나씩 가려져.\n\n잠깐이면 다시 보일 수도 있고\n오늘은 이미 끝일 수도 있어.",
+    choices: [
+      { emoji: "⏳", label: "구름이 걷히길 기다린다", spicyLabel: "기다리면 보임 — 아마도 ㅋ", signals: [{ axis: "decision", value: -1 }] },
+      { emoji: "🚗", label: "구름 없는 곳으로 이동한다", spicyLabel: "안 되면 장소를 바꿔야지", signals: [{ axis: "risk", value: 1 }], recommended: true },
+      { emoji: "🏠", label: "오늘은 그만한다", spicyLabel: "억지로 보면 재미없어짐", signals: [{ axis: "coping", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_8",
+    illustration: "두 사람이 같은 별을 바라보고 있음, 각자 다른 방향을 가리킴",
+    imagePath: "/assets/discovery/stargazer_8.png",
+    narrative: "옆에 있던 사람이\n저 별을 가리키며 말해.\n\"저거 북극성이에요.\"\n\n근데 방향이 달라 보여.",
+    choices: [
+      { emoji: "🤝", label: "\"맞아요\" — 그냥 동의한다", spicyLabel: "내가 틀렸을 수도 있으니까", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "🔍", label: "직접 확인해본다", spicyLabel: "확인하면 되잖아 ㅋ", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "💬", label: "\"제가 봤을 땐 저쪽인 것 같은데요\"", spicyLabel: "틀리면 창피하지만 말해야지", signals: [{ axis: "approach", value: 1 }] },
+    ],
+  },
+  {
+    id: "stargazer_9",
+    illustration: "오래된 천체 사진 여러 장이 벽에 걸려 있음, 수십 년 전 것도 있음",
+    imagePath: "/assets/discovery/stargazer_9.png",
+    narrative: "벽에 오래된 천체 사진들이 걸려 있어.\n수십 년 전 것도 있어.\n\n같은 별인데 사진마다 달라 보여.",
+    choices: [
+      { emoji: "📅", label: "찍힌 연도 순서대로 본다", spicyLabel: "시간 순이 제일 정직함", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "❤️", label: "제일 마음에 드는 걸 먼저 본다", spicyLabel: "끌리는 게 있으면 거기서 시작", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "🕰️", label: "제일 오래된 걸 찾는다", spicyLabel: "처음이 있어야 지금이 있지", signals: [{ axis: "coping", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_10",
+    illustration: "천문대 꼭대기, 360도 탁 트인 밤하늘, 바람이 느껴짐",
+    imagePath: "/assets/discovery/stargazer_10.png",
+    narrative: "천문대 꼭대기에 올랐어.\n360도로 하늘이 펼쳐져.\n\n어느 방향을 먼저 볼지\n결정해야 해.",
+    choices: [
+      { emoji: "🌅", label: "동쪽 — 해가 뜨는 방향", spicyLabel: "시작은 동쪽이지", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "⭐", label: "북쪽 — 북극성이 있는 방향", spicyLabel: "방향은 북극성으로 잡는 거야", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "🌌", label: "은하수가 지나는 쪽", spicyLabel: "제일 화려한 쪽으로", signals: [{ axis: "risk", value: 1 }] },
+    ],
+  },
+  {
+    id: "stargazer_11",
+    illustration: "작은 망원경을 조립하는 안내서, 부품이 여러 개 흩어져 있음",
+    imagePath: "/images/v3/stargazer_11.png",
+    narrative: "작은 망원경 키트가 있어.\n안내서대로 하면 만들 수 있어.\n\n부품이 생각보다 많아.",
+    choices: [
+      { emoji: "📋", label: "안내서를 먼저 다 읽는다", spicyLabel: "ㅋㅋ 모범생 코스", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "🔧", label: "일단 조립하면서 본다", spicyLabel: "해봐야 앎", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "🎥", label: "영상 튜토리얼을 찾는다", spicyLabel: "안내서보다 영상이 나음 ㅋ", signals: [{ axis: "coping", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_12",
+    illustration: "지구에서 가장 가까운 별 알파 센타우리까지의 거리가 적힌 안내판",
+    imagePath: "/images/v3/stargazer_12.png",
+    narrative: "안내판에 적혀 있어.\n\"가장 가까운 별까지 4.2광년.\"\n\n빛의 속도로 4년.\n뭔가 멀고도 가까운 느낌.",
+    choices: [
+      { emoji: "🤯", label: "우주의 크기에 압도된다", spicyLabel: "나 = 먼지 ㅋ 실감남", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "📐", label: "얼마나 먼지 계산해본다", spicyLabel: "숫자로 바꾸면 실감 안 남", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "💭", label: "\"그래도 별은 존재하잖아\"", spicyLabel: "거리가 멀어도 있는 건 있음", signals: [{ axis: "decision", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_13",
+    illustration: "천문대 카페에 관측 일지들이 쌓여 있음, 방문자들이 남긴 것",
+    imagePath: "/images/v3/stargazer_13.png",
+    narrative: "천문대 한쪽에\n방문자 관측 일지들이 쌓여 있어.\n\n아무나 남길 수 있대.\n빈 페이지가 있어.",
+    choices: [
+      { emoji: "✍️", label: "오늘 본 것을 적는다", spicyLabel: "기록은 남는 게 맞음", signals: [{ axis: "approach", value: 1 }], recommended: true },
+      { emoji: "📖", label: "다른 사람 기록을 읽는다", spicyLabel: "내 것보다 남의 게 더 흥미로울 수도", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "🚪", label: "그냥 지나친다", spicyLabel: "남길 게 없으면 안 남기면 됨", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_14",
+    illustration: "새벽빛이 지평선에 올라오기 시작, 별이 하나씩 사라짐",
+    imagePath: "/images/v3/stargazer_14.png",
+    narrative: "어느새 새벽이야.\n별이 하나씩 사라지고 있어.\n\n곧 다 사라질 거야.",
+    choices: [
+      { emoji: "🌅", label: "마지막 별을 찾아 눈에 담는다", spicyLabel: "사라지기 전에 봐야지", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📸", label: "지평선 사진을 찍는다", spicyLabel: "별 사라지면 새벽이 주인공", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "😴", label: "이제 자러 간다", spicyLabel: "충분히 봤으면 됨", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "stargazer_15",
+    illustration: "천문대 출구, 열린 문 너머로 새벽빛이 쏟아짐",
+    imagePath: "/images/v3/stargazer_15.png",
+    narrative: "천문대 문 앞에 서 있어.\n밖은 이미 새벽이야.\n\n밤새 본 것들이\n머릿속에 남아 있어.",
+    choices: [
+      { emoji: "🌄", label: "새벽 공기를 마시며 나간다", spicyLabel: "끝냈으면 나가야지", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🔭", label: "망원경을 한 번 더 들여다본다", spicyLabel: "조금만 더 — 항상 이래", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📓", label: "오늘 밤을 정리하고 나간다", spicyLabel: "마무리가 있어야 다음이 있음", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
 ];
 
 // ═══════════════════════════════════════════
@@ -397,6 +733,19 @@ const STRATEGY_SCENES: StoryScene[] = [
 // ═══════════════════════════════════════════
 
 export const THEME_STORIES: Record<ThemeType, ThemeStory> = {
+  stargazer: {
+    theme: "stargazer",
+    name: "천문대",
+    bgImage: "/assets/stargazer-enter-bg.png",
+    introText: "밤하늘을 같이 보자.\n답은 없어도 괜찮아.",
+    scenes: STARGAZER_SCENES,
+    outroNarrative: "새벽빛이 밀려오고\n별들이 하나씩 잠들고 있어.\n\n오늘 밤 네가 바라본 방향이\n어딘지 조금은 보여.",
+    outroButtonText: "🌟 천문대에서 시작하기",
+    outroImagePath: "/assets/discovery/stargazer_outro.png",
+    minScenes: 10,
+    continuePrompt: "별을 더 볼래?",
+    startPrompt: "여기서 시작하기",
+  },
   garden: {
     theme: "garden",
     name: "달빛정원",

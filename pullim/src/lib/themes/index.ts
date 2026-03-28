@@ -37,7 +37,7 @@ export interface Theme {
   };
 
   crystalLabel: string; // "수정구슬" | "분석 렌즈" | "꽃봉오리"
-  crystalShape: "orb" | "lens" | "bud";
+  crystalShape: "orb" | "lens" | "bud" | "star";
 
   labels: {
     enter: string;       // "모험가여," | "어서 오십시오." | "어서 오세요."
@@ -58,6 +58,7 @@ export const CHARACTER_ICONS: Record<CharacterName, string> = {
   비서: "\uD83D\uDC31",
   코치: "\uD83D\uDD25",
   친구: "\uD83D\uDC30",
+  별지기: "\u2B50",
 };
 
 export const THEMES: Record<ThemeName, Theme> = {
@@ -348,6 +349,103 @@ export const THEMES: Record<ThemeName, Theme> = {
       COMPLETE: {
         gradient: "from-[#1e1540] via-[#2a1f4a] to-[#2a1a3a]",
         particle: "glow",
+      },
+    },
+  },
+
+  천문대: {
+    name: "천문대",
+    character: "별지기",
+    title: "천문대",
+    subtitle: "밤하늘 아래 방향을 찾는 시간",
+    icon: "🔭",
+    colors: {
+      bg: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
+      primary: "#fbbf24",
+      primaryLight: "rgba(251, 191, 36, 0.15)",
+      card: "rgba(251, 191, 36, 0.04)",
+      cardHover: "rgba(251, 191, 36, 0.08)",
+      cardSelected: "rgba(251, 191, 36, 0.12)",
+      text: "#e0e0f0",
+      muted: "#7c7c99",
+    },
+    assets: {
+      bg: "/assets/stargazer-enter-bg.png",
+      avatar: "/assets/stargazer-avatar.png",
+      bgmTracks: [
+        { src: "/assets/stargazer-bgm.mp3", label: "천문대 1" },
+        { src: "/assets/stargazer-bgm-2.mp3", label: "천문대 2" },
+      ],
+    },
+    crystalLabel: "별의 조각",
+    crystalShape: "star",
+    labels: {
+      enter: "어서 오세요. 별이 잘 보이는 밤이에요.",
+      askConcern: "오늘 밤, 어떤 방향을 찾고 싶으세요?",
+      farewell: "밤하늘은 늘 여기 있을게요.",
+      tagline: "어디로 가야 할지 모르겠어도, 별은 항상 있어요.",
+    },
+    route: "/stargazer",
+    useCases: "방향 \u00B7 꿈 \u00B7 가능성 탐색",
+
+    gameUI: {
+      dialogueStyle: "default",
+      choiceStyle: "default",
+      progressStyle: "default",
+      inputLabel: "별에게 말하기",
+    },
+    scenes: {
+      ENTER: {
+        gradient: "from-[#0d0d2e] via-[#1e1b4b] to-[#0d0d2e]",
+        particle: "stars",
+      },
+      LISTEN: {
+        gradient: "from-[#1a1840] via-[#252260] to-[#1a1840]",
+        particle: "stars",
+      },
+      RESEARCH: {
+        gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      VERIFY: {
+        gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      DISCUSS_1: {
+        gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      CRYSTAL_SELECT: {
+        gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
+        particle: "stars",
+      },
+      CRYSTAL_ANALYZE: {
+        gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
+        particle: "stars",
+      },
+      DISCUSS_2: {
+        gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
+        particle: "stars",
+      },
+      DEBATE: {
+        gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      DISCUSS_3: {
+        gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      JUDGE: {
+        gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
+        particle: "glow",
+      },
+      CONCLUDE: {
+        gradient: "from-[#1a1535] via-[#28224a] to-[#1a1a35]",
+        particle: "stars",
+      },
+      COMPLETE: {
+        gradient: "from-[#1a1535] via-[#28224a] to-[#1a1a35]",
+        particle: "stars",
       },
     },
   },

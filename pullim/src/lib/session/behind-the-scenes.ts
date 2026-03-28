@@ -164,7 +164,7 @@ export function inferCheatAction(
   events: BehindEvent[],
   messages: LadderMessage[],
   currentLevel: LadderLevel,
-  currentTheme: "모험가" | "전략실" | "달빛정원"
+  currentTheme: "모험가" | "전략실" | "달빛정원" | "천문대"
 ): { action: "regenerate" | "theme_suggest" | "fold"; themeSuggestion?: ThemeSuggestion } {
   // c) 누적 3회 → 접어두기 제안
   if (cheatCount >= 3) {

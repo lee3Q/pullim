@@ -6,9 +6,9 @@ export type CrystalName =
 
 export type ModelProvider = "claude" | "gpt" | "gemini" | "local";
 
-export type CharacterName = "현자" | "비서" | "코치" | "친구";
+export type CharacterName = "현자" | "비서" | "코치" | "친구" | "별지기";
 
-export type ThemeName = "모험가" | "전략실" | "달빛정원";
+export type ThemeName = "모험가" | "전략실" | "달빛정원" | "천문대";
 
 export type ConcernType =
   | "career" | "relationship" | "identity" | "burnout"

@@ -8,6 +8,7 @@ const CHARACTER_ICONS: Record<CharacterName, string> = {
   비서: "🐱",
   코치: "🔥",
   친구: "🐰",
+  별지기: "⭐",
 };
 
 interface Props {

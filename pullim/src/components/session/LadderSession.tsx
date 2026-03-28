@@ -28,11 +28,11 @@ import TextInputLevel from "./levels/TextInputLevel";
 import SessionSummary from "./SessionSummary";
 
 interface LadderSessionProps {
-  theme: "모험가" | "전략실" | "달빛정원";
+  theme: "모험가" | "전략실" | "달빛정원" | "천문대";
   entryMode: EntryMode;
   profileContext?: string; // ProbabilityProfile 기반 프롬프트 (있으면)
   onCrisis?: (crisis: { message: string; hotline: string }) => void;
-  onThemeChange?: (theme: "모험가" | "전략실" | "달빛정원") => void;
+  onThemeChange?: (theme: "모험가" | "전략실" | "달빛정원" | "천문대") => void;
 }
 
 type Phase = "entry" | "session" | "summary";
@@ -461,7 +461,7 @@ export default function LadderSession({
 
   // ── 테마 전환 수락 ──
   const handleThemeSwitch = useCallback(
-    (targetTheme: "모험가" | "전략실" | "달빛정원") => {
+    (targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대") => {
       setCheatPostAction(null);
       if (onThemeChange) {
         onThemeChange(targetTheme);

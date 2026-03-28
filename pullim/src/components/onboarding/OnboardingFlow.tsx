@@ -16,6 +16,7 @@ const THEME_OPTIONS = [
   { key: "adventure" as const, emoji: "🗡️", label: "모험가", desc: "희망도 패배도 있는 길" },
   { key: "garden" as const, emoji: "🌿", label: "정원", desc: "조용히 정리하는 곳" },
   { key: "strategy" as const, emoji: "🎯", label: "전략실", desc: "딱 부러지게 가는 곳" },
+  { key: "stargazer" as const, emoji: "🔭", label: "천문대", desc: "방향을 모르겠을 때" },
 ];
 
 export default function OnboardingFlow({ onComplete, primaryColor }: OnboardingFlowProps) {

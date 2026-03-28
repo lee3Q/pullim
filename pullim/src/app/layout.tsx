@@ -30,14 +30,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "풀림 — 3분이면 나를 알 수 있어요",
     description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
-    images: [{ url: "/icons/icon-512.png" }],
+    images: [{ url: "/images/og/og_main.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "풀림 — 3분이면 나를 알 수 있어요",
     description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
-    images: ["/icons/icon-512.png"],
+    images: ["/images/og/og_main.png"],
   },
 };
 

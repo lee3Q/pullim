@@ -31,11 +31,12 @@ export default function LadderSessionPage({
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(
-    (targetTheme: "모험가" | "전략실" | "달빛정원") => {
+    (targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대") => {
       const themeRoutes: Record<string, string> = {
         "모험가": "/adventure",
         "전략실": "/strategy",
         "달빛정원": "/garden",
+        "천문대": "/stargazer",
       };
       const route = themeRoutes[targetTheme] || "/adventure";
       router.push(`${route}/new?mode=ladder&entry=${entryMode}`);

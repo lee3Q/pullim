@@ -7,6 +7,7 @@ const THEME_LABELS: Record<ThemeType, string> = {
   adventure: "모험가의 숲",
   garden: "달빛정원",
   strategy: "전략실",
+  stargazer: "천문대",
 };
 
 const BASE_URL = "https://pullim.vercel.app";
@@ -33,6 +34,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const title = `나는 "${displayName}" 유형이래! — 풀림`;
   const description = `${themeLabel}에서 발견한 나: ${displayName}. ${pt.description}`;
 
+  const ogImage = `/images/og/og_${theme}_${typeId}.png`;
+
   return {
     title,
     description,
@@ -40,14 +43,14 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     openGraph: {
       title,
       description,
-      images: [{ url: "/icons/icon-512.png" }],
+      images: [{ url: ogImage, width: 1200, height: 630 }],
       type: "website",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: ["/icons/icon-512.png"],
+      images: [ogImage],
     },
   };
 }

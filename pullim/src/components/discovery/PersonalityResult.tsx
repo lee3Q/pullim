@@ -20,12 +20,14 @@ const THEME_GRADIENTS: Record<ThemeType, string> = {
   adventure: "from-amber-900/40 via-orange-950/30 to-red-950/20",
   garden: "from-indigo-950/40 via-purple-950/30 to-blue-950/20",
   strategy: "from-slate-800/40 via-zinc-900/30 to-neutral-950/20",
+  stargazer: "from-indigo-900/40 via-indigo-950/30 to-violet-950/20",
 };
 
 const THEME_LABELS: Record<ThemeType, string> = {
   adventure: "모험가의 숲",
   garden: "달빛정원",
   strategy: "전략실",
+  stargazer: "천문대",
 };
 
 function StatBar({ label, value, color }: { label: [string, string]; value: number; color: string }) {

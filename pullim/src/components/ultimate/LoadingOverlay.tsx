@@ -1,10 +1,12 @@
 "use client";
 
+import { CharacterName } from "@/lib/types-ultimate";
+
 interface Props {
   stage: "research" | "analyze" | "debate" | "conclude";
   primaryColor: string;
   crystalLabel: string;
-  character?: "현자" | "비서" | "친구" | "코치";
+  character?: CharacterName;
 }
 
 const STAGE_CONFIG = {
@@ -16,7 +18,8 @@ const STAGE_CONFIG = {
       비서: "데이터를 조회하는 중...",
       친구: "이야기를 찾아보는 중...",
       코치: "자료를 조사하는 중...",
-    },
+      별지기: "별자리를 읽는 중...",
+    } as Record<CharacterName, string>,
   },
   analyze: {
     variant: "glow" as const,
@@ -26,7 +29,8 @@ const STAGE_CONFIG = {
       비서: "전문가 관점에서 분석하는 중...",
       친구: "꽃봉오리가 피어나는 중...",
       코치: "분석을 진행하는 중...",
-    },
+      별지기: "별빛이 비추는 중...",
+    } as Record<CharacterName, string>,
   },
   debate: {
     variant: "cross" as const,
@@ -36,7 +40,8 @@ const STAGE_CONFIG = {
       비서: "관점을 교차 검증 중...",
       친구: "꽃들이 속삭이는 중...",
       코치: "의견을 나누는 중...",
-    },
+      별지기: "별들이 대화하는 중...",
+    } as Record<CharacterName, string>,
   },
   conclude: {
     variant: "fade" as const,
@@ -46,7 +51,8 @@ const STAGE_CONFIG = {
       비서: "보고서를 작성하는 중...",
       친구: "마음을 정리하는 중...",
       코치: "결론을 정리하는 중...",
-    },
+      별지기: "밤하늘에 기록하는 중...",
+    } as Record<CharacterName, string>,
   },
 };
 

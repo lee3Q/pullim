@@ -6,7 +6,7 @@ import { CrystalName, CRYSTALS } from "@/lib/types-ultimate";
 interface Props {
   max: number;
   crystalLabel: string;
-  crystalShape: "orb" | "lens" | "bud";
+  crystalShape: "orb" | "lens" | "bud" | "star";
   primaryColor: string;
   onConfirm: (selected: CrystalName[]) => void;
   recommended?: CrystalName[];
