@@ -389,9 +389,9 @@ export const THEMES: Record<ThemeName, Theme> = {
     useCases: "방향 \u00B7 꿈 \u00B7 가능성 탐색",
 
     gameUI: {
-      dialogueStyle: "default",
-      choiceStyle: "default",
-      progressStyle: "default",
+      dialogueStyle: "letter",
+      choiceStyle: "petal",
+      progressStyle: "journey",
       inputLabel: "별에게 말하기",
     },
     scenes: {

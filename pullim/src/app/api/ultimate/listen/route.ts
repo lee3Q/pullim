@@ -3,11 +3,9 @@ import { getClient, PIPELINE_MODEL } from "@/lib/llm/claude";
 import { isLocalMode, localStream } from "@/lib/llm/local";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { readBehavior, type BehaviorSignals } from "@/lib/personalization/behavior-reader";
-import { CRYSTALS, CrystalName } from "@/lib/types-ultimate";
+import { CRYSTALS, CrystalName, type ThemeName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
 import { getDemoLadderResponse } from "@/lib/session/demo-ladder";
-
-type ThemeName = "모험가" | "전략실" | "달빛정원" | "천문대";
 
 // 한국 정서 맥락 — 프롬프트 레벨에서만 처리, 글로벌 확장 시 이 블록만 교체
 const CULTURAL_CONTEXT = `
