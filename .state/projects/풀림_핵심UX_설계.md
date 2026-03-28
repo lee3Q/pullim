@@ -48,7 +48,7 @@
    - [x] **치트 버튼 개선 + 세션 중 테마 전환** — 2탭 확인 + 치트 후 3분기(재생성/테마전환제안/접어두기) + inferCheatAction 테마 판단 로직. 결정: .state/decisions/2026-03-27_치트버튼개선_테마전환.md
    - [x] **데스크탑 반응형 전면 개선** — html font-size 스케일링(16→18→20px) + 22개 컴포넌트 max-w 반응형 + StoryDiscovery/PersonalityResult 이미지 반응형 수정
    - [x] **모델 전환 코드 준비** — PIPELINE_MODEL/ANALYSIS_MODEL 환경변수 오버라이드 지원 + .env.local.example 업데이트. 빌드 통과.
-   - [ ] **Claude API 실제 테스트** — 환경변수에 ANTHROPIC_API_KEY 세팅 → Haiku로 흐름 확인 → Sonnet 품질 비교 → Gemini Flash 비교 (🔴 대표 실행 필요)
+   - [ ] **Claude API 실제 테스트** — 테스트 가이드 완성 (테스트/API_테스트_가이드.md), 토큰 로깅 코드 구현 완료. 🔴 대표가 ANTHROPIC_API_KEY 세팅 → 가이드 따라 Haiku/Sonnet 비교 실행
 5. **최종 검증** — 대표 확인 + 교차검토
 
 ## 대표 피드백 (2026-03-25, 반드시 반영)
@@ -82,3 +82,4 @@
 - 2026-03-27: Vercel 배포 완료 (pullim.vercel.app), Supabase feedback 테이블 생성, PWA 아이콘 추가, 밤 배치 28개 태스크 준비 (유형결과+피드백폼+이미지최적화+UX개선 등)
 - 2026-03-27 (2): UI 피드백 수집 준비 완료. 배치 코드 리뷰 (handleShare try-catch 1건 수정), 3테마 E2E 플로우 테스트 전항 통과, OG 메타 동적화 (/result 페이지 신규), 공유 URL+텍스트 테마별 맞춤 적용.
 - 2026-03-28: 피드백 2라운드 반영. 연타 버그 수정(isTransitioning), 추천 배지 ✦, Android 폰트 수정, 파악 스킵 추가, 데이터/대화 안내 문구, 결과 텍스트 밝기, technique 태그 제거. 매운맛 모드 구현(88개 spicyLabel + 톱니바퀴 토글). 홈 화면 재설계(기분5버튼→테마3카드). 2-model CC로 안전 이슈 6건 수정.
+- 2026-03-28 (2): API 테스트 설계 3-model CC 3라운드 완료. 토큰 로깅 코드(모델별 단가 맵 + dev-only SSE) + 테스트 가이드(시나리오3+안전테스트+2회전Go/No-Go) 작성. 빌드 통과.
