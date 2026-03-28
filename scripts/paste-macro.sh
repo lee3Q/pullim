@@ -118,8 +118,20 @@ load_batch_config() {
       BATCH_LABEL="Batch 8: 앱 아이콘"
       PROMPT_OFFSET=77
       ;;
+    9) # v3 나머지 (12장)
+      SAVE_DIR="$SCRIPT_DIR/../pullim/public/images/v3"
+      NAMES=(
+        stargazer_level2 stargazer_level5
+        crystal_magnify crystal_puzzle crystal_compass
+        summary_adventure summary_strategy summary_stargazer
+        bg_onboarding bg_achievement bg_settings
+        marketing_summary_v2
+      )
+      BATCH_LABEL="Batch 9: v3 나머지"
+      PROMPT_OFFSET=0
+      ;;
     *)
-      echo "❌ 배치 $batch 없음 (1~8)"; exit 1 ;;
+      echo "❌ 배치 $batch 없음 (1~9)"; exit 1 ;;
   esac
   TOTAL=${#NAMES[@]}
 }
@@ -151,13 +163,18 @@ tell application "Google Chrome"
 set imgUrl to execute front window's active tab javascript "
 (function() {
 var imgs = document.querySelectorAll('img');
-var found = '';
-for (var i = imgs.length - 1; i >= 0; i--) {
-  if (imgs[i].src && imgs[i].naturalWidth > 200 && imgs[i].src.indexOf('data:') !== 0) {
-    found = imgs[i].src; break;
+var best = '';
+var bestArea = 0;
+for (var i = 0; i < imgs.length; i++) {
+  var img = imgs[i];
+  if (!img.src || img.src.indexOf('data:') === 0) continue;
+  var area = img.naturalWidth * img.naturalHeight;
+  if (area > bestArea && img.naturalWidth >= 400 && img.naturalHeight >= 400) {
+    bestArea = area;
+    best = img.src;
   }
 }
-return found;
+return best;
 })();
 "
 return imgUrl
@@ -222,22 +239,14 @@ log_manifest() {
   echo "| $saved | $timestamp | $name | ${prompt_preview:0:60} | $file_path |" >> "$MANIFEST_FILE"
 }
 
-# ── Lockstep 체크 ──
+# ── Lockstep 경고 (차단 아님) ──
 check_lockstep() {
   local sent saved
   sent=$(get_sent)
   saved=$(get_saved)
-  if [ "$sent" -gt "$saved" ]; then
-    local unsaved_name="${NAMES[$saved]}"
-    echo ""
-    echo "⚠️  이전 이미지 아직 저장 안 됨!"
-    echo "   대기 중: $(theme_label "$unsaved_name")  $unsaved_name"
-    echo ""
-    echo "   ps  → 다운로드에서 저장"
-    echo "   p dl → Chrome에서 직접 저장"
-    echo "   p force → 무시하고 다음 전송"
-    echo ""
-    return 1
+  local gap=$((sent - saved))
+  if [ "$gap" -ge 3 ]; then
+    echo "   ⚠️  미저장 ${gap}개 — 순서 밀릴 수 있음! (ps/p dl/p watch로 저장)"
   fi
   return 0
 }
@@ -316,7 +325,7 @@ show_status() {
   if [ "$saved" -ge "$TOTAL" ]; then
     echo ""
     local next_batch=$((batch + 1))
-    if [ "$next_batch" -le 8 ]; then
+    if [ "$next_batch" -le 9 ]; then
       echo "🎉 배치 $batch 완료! 다음: p batch $next_batch"
     else
       echo "🎉 전체 완료!"
@@ -343,7 +352,7 @@ case "$CMD" in
     ;;
   batch)
     NEW_BATCH="${2:-}"
-    if [ -z "$NEW_BATCH" ] || [ "$NEW_BATCH" -lt 1 ] || [ "$NEW_BATCH" -gt 8 ]; then
+    if [ -z "$NEW_BATCH" ] || [ "$NEW_BATCH" -lt 1 ] || [ "$NEW_BATCH" -gt 9 ]; then
       echo ""
       echo "배치 목록:"
       echo "  1: OG 공유 카드 (25장)"
@@ -354,6 +363,7 @@ case "$CMD" in
       echo "  6: 레벨 일러스트 (15장)"
       echo "  7: 마케팅 (5장)"
       echo "  8: 앱 아이콘 (5장)"
+      echo "  9: v3 전체 (39장)"
       echo ""
       echo "현재: Batch $(get_batch)"
       echo "사용법: p batch N"
@@ -365,8 +375,188 @@ case "$CMD" in
     > "$PROCESSED_FILE" 2>/dev/null || true
     load_batch_config
     mkdir -p "$SAVE_DIR"
-    echo "🔄 $BATCH_LABEL ($TOTAL장) — 시작!"
+    echo "🔄 $BATCH_LABEL (${TOTAL}장) — 시작!"
     echo "   저장 경로: $SAVE_DIR"
+    exit 0
+    ;;
+  p1|send5)
+    # 5개 프롬프트를 Chrome 탭 1~5에 순서대로 전송
+    TABS="${2:-5}"
+    IDX=$(get_sent)
+    REMAINING=$((TOTAL - IDX))
+    COUNT=$TABS
+    [ "$COUNT" -gt "$REMAINING" ] && COUNT=$REMAINING
+    if [ "$COUNT" -le 0 ]; then
+      echo "🎉 전부 전송 완료!"; exit 0
+    fi
+    echo ""
+    echo "📋 ${COUNT}개 전송 시작 (탭 1~${COUNT}) [$BATCH_LABEL]"
+    echo ""
+    for i in $(seq 0 $((COUNT - 1))); do
+      CUR=$((IDX + i))
+      NAME="${NAMES[$CUR]}"
+      PROMPT=$(get_prompt "$CUR")
+      TAGGED_PROMPT="[${NAME}] ${PROMPT}"
+      TAB_NUM=$((i + 1))
+      # 클립보드에 복사
+      echo -n "$TAGGED_PROMPT" | pbcopy
+      # Chrome 탭 전환 + 붙여넣기 + 전송
+      osascript <<ASCRIPT
+tell application "Google Chrome"
+  activate
+  tell front window
+    set active tab index to $TAB_NUM
+  end tell
+end tell
+delay 0.5
+tell application "System Events"
+  keystroke "v" using command down
+  delay 0.3
+  keystroke return
+end tell
+ASCRIPT
+      THEME=$(theme_label "$NAME")
+      echo "   탭${TAB_NUM}: $THEME  $NAME ✓"
+      sleep 0.5
+    done
+    set_sent $((IDX + COUNT))
+    echo ""
+    echo "✅ ${COUNT}개 전송 완료! ($((IDX + COUNT))/$TOTAL)"
+    echo "   → 이미지 생성 기다린 후: p grab${TABS}"
+    echo ""
+    exit 0
+    ;;
+  p2|grab5)
+    # Chrome 탭 1~5에서 이미지를 순서대로 다운로드+저장
+    TABS="${2:-5}"
+    SAVED=$(get_saved)
+    SENT=$(get_sent)
+    UNSAVED=$((SENT - SAVED))
+    COUNT=$TABS
+    [ "$COUNT" -gt "$UNSAVED" ] && COUNT=$UNSAVED
+    if [ "$COUNT" -le 0 ]; then
+      echo "⚠️  저장할 게 없음. p send5로 먼저 전송!"; exit 1
+    fi
+    mkdir -p "$SAVE_DIR"
+    echo ""
+    echo "📥 ${COUNT}개 저장 시작 (탭 1~${COUNT}) [$BATCH_LABEL]"
+    echo ""
+    for i in $(seq 0 $((COUNT - 1))); do
+      CUR=$((SAVED + i))
+      NAME="${NAMES[$CUR]}"
+      TAB_NUM=$((i + 1))
+      # Chrome 탭 전환
+      osascript <<ASCRIPT
+tell application "Google Chrome"
+  tell front window
+    set active tab index to $TAB_NUM
+  end tell
+end tell
+ASCRIPT
+      sleep 0.3
+      # 이미지 URL 추출
+      IMG_URL=$(get_chrome_image_url)
+      if [ -z "$IMG_URL" ] || [ "$IMG_URL" = "missing value" ]; then
+        echo "   탭${TAB_NUM}: ❌ $NAME — 이미지 못 찾음 (아직 생성 중?)"
+        continue
+      fi
+      curl -sL "$IMG_URL" -o "$SAVE_DIR/${NAME}.png"
+      if [ -s "$SAVE_DIR/${NAME}.png" ]; then
+        PROMPT_PREVIEW=$(get_prompt_preview "$CUR")
+        THEME=$(theme_label "$NAME")
+        echo "   탭${TAB_NUM}: ✅ $THEME  ${NAME}.png"
+        echo "          📋 $PROMPT_PREVIEW"
+        log_manifest "$NAME" "$PROMPT_PREVIEW" "$SAVE_DIR/${NAME}.png"
+      else
+        rm -f "$SAVE_DIR/${NAME}.png"
+        echo "   탭${TAB_NUM}: ❌ $NAME — 다운로드 실패"
+      fi
+    done
+    # 성공한 만큼 saved 업데이트
+    ACTUAL_SAVED=0
+    for i in $(seq 0 $((COUNT - 1))); do
+      CUR=$((SAVED + i))
+      NAME="${NAMES[$CUR]}"
+      if [ -f "$SAVE_DIR/${NAME}.png" ]; then
+        ACTUAL_SAVED=$((ACTUAL_SAVED + 1))
+      else
+        break  # 중간에 실패하면 거기서 멈춤 (순서 보장)
+      fi
+    done
+    set_saved $((SAVED + ACTUAL_SAVED))
+    echo ""
+    echo "✅ ${ACTUAL_SAVED}/${COUNT}개 저장 완료! (전체: $((SAVED + ACTUAL_SAVED))/$TOTAL)"
+    if [ $((SAVED + ACTUAL_SAVED)) -lt "$TOTAL" ]; then
+      echo "   → 다음: p send5"
+    else
+      echo "   🎉 이 배치 완료! 다음: p batch $(($(get_batch) + 1))"
+    fi
+    echo ""
+    exit 0
+    ;;
+  auto)
+    # 전자동 v2: 전송 전부 먼저 → 완료 확인 → 한 번에 복구
+    # Phase 1: 모든 프롬프트를 5탭에 빠르게 전송 (이미지 생성 안 기다림)
+    # Phase 2: 사용자가 생성 완료 확인 후 Enter
+    # Phase 3: recover-images.sh로 한 번에 저장
+    WAIT="${2:-60}"  # p1 간 대기 (기본 60초, 이미지 생성 시간)
+    echo ""
+    echo "🤖 전자동 모드 v2 — 전송 먼저, 저장은 마지막에"
+    echo "   Ctrl+C로 중지"
+    echo ""
+
+    # Phase 1: 전송
+    echo "═══ Phase 1: 프롬프트 전송 ═══"
+    echo ""
+    TOTAL_SENT=0
+    while true; do
+      load_batch_config
+      SENT=$(get_sent)
+      if [ "$SENT" -ge "$TOTAL" ]; then
+        CUR_BATCH=$(get_batch)
+        NEXT_BATCH=$((CUR_BATCH + 1))
+        if [ "$NEXT_BATCH" -gt 9 ]; then
+          echo ""
+          echo "✅ 전체 전송 완료! (총 ${TOTAL_SENT}장)"
+          break
+        fi
+        echo ""
+        echo "🎉 $BATCH_LABEL 전송 완료 → 다음 배치"
+        echo "$NEXT_BATCH" > "$BATCH_FILE"
+        set_sent 0
+        set_saved 0
+        > "$PROCESSED_FILE" 2>/dev/null || true
+        load_batch_config
+        mkdir -p "$SAVE_DIR"
+        echo "🔄 $BATCH_LABEL (${TOTAL}장)"
+        continue
+      fi
+      bash "$0" p1
+      SENT_THIS=$(( $(get_sent) - SENT ))
+      TOTAL_SENT=$((TOTAL_SENT + SENT_THIS))
+      echo "   (${TOTAL_SENT}장 전송됨)"
+      echo ""
+      sleep "$WAIT"
+    done
+
+    # Phase 2: 대기
+    echo ""
+    echo "═══ Phase 2: 이미지 생성 대기 ═══"
+    echo ""
+    echo "   모든 탭에서 이미지 생성이 완료될 때까지 기다려주세요."
+    echo "   각 탭 맨 아래까지 스크롤해서 이미지가 다 나왔는지 확인."
+    echo ""
+    echo "   준비되면 Enter 누르세요..."
+    read -r
+
+    # Phase 3: 복구
+    echo ""
+    echo "═══ Phase 3: 이미지 복구 ═══"
+    echo ""
+    bash "$SCRIPT_DIR/recover-images.sh"
+
+    echo ""
+    echo "🎉 전자동 완료!"
     exit 0
     ;;
   skip)
@@ -604,7 +794,8 @@ case "$CMD" in
     if [ -z "$PROMPT" ]; then
       echo "❌ 프롬프트 읽기 실패 (인덱스: $IDX)"; exit 1
     fi
-    echo -n "$PROMPT" | pbcopy
+    TAGGED_PROMPT="[${NAME}] ${PROMPT}"
+    echo -n "$TAGGED_PROMPT" | pbcopy
     paste_to_browser "$BROWSER"
     set_sent $((IDX + 1))
     echo ""
@@ -628,7 +819,7 @@ if [ "$IDX" -ge "$TOTAL" ]; then
   echo "🎉 $BATCH_LABEL 전부 전송 완료! ($TOTAL/$TOTAL)"
   echo "   남은 저장: $((TOTAL - $(get_saved)))개"
   next_batch=$(($(get_batch) + 1))
-  if [ "$next_batch" -le 8 ]; then
+  if [ "$next_batch" -le 9 ]; then
     echo "   다음 배치: p batch $next_batch"
   fi
   echo ""
@@ -648,7 +839,9 @@ if [ -z "$PROMPT" ]; then
   echo "❌ 프롬프트 읽기 실패 (인덱스: $IDX)"; exit 1
 fi
 
-echo -n "$PROMPT" | pbcopy
+# 프롬프트 앞에 파일명 태그 삽입 — 이미지 생성기 히스토리에서 추적 가능
+TAGGED_PROMPT="[${NAME}] ${PROMPT}"
+echo -n "$TAGGED_PROMPT" | pbcopy
 paste_to_browser "$BROWSER"
 set_sent $((IDX + 1))
 

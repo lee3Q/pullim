@@ -2,23 +2,39 @@
 
 AI 의사결정/멘탈케어 SaaS. 1인 창업 (대표: 이상규).
 
-## 세션 시작
+## 루틴 하네스 (강제 — 건너뛸 수 없음)
+
+> 이 섹션은 하네스다. "나중에", "다음에", "시간 없으니까"로 스킵 불가.
+> 실행 안 하면 세션 자체가 무효.
+
+### 세션 시작 (매 세션 첫 응답에서 완료)
 
 1. `.state/project-config.md` 읽기 (불변 설정)
-2. `.state/routines.md` 읽기 (아침/밤 루틴 정의)
-3. `.state/projects/` 내 active 프로젝트 파일 읽기 (복수 가능)
-4. 필요 시 `.state/decisions/` 최근 결정, `.state/handoffs/` 최근 핸드오프 확인
-5. **아침 루틴 실행**: 일일 리포트 생성 → `.state/daily/YYYY-MM-DD_morning.md`
+2. `.state/projects/` 내 active 프로젝트 파일 읽기
+3. `.state/decisions/` 최근 1개 + `.state/handoffs/` 최근 1개 읽기
+4. **브리핑** — 프로젝트 현황 + 마지막 결정 + 핸드오프 맥락 (간결하게)
+5. **아침 리포트 생성** → `.state/daily/YYYY-MM-DD_morning.md` (포맷: routines.md 참조)
+6. **풀림 체험** — Playwright로 pullim.vercel.app 홈→파악→세션 1회 돌림. 깨진 거/어색한 거 리포트에 포함.
+   - 배포 안 됐거나 API 키 없으면: localhost:3000 시도 → 그것도 안 되면 "체험 불가, 이유: X" 기록
+7. "어떤 프로젝트부터 할까?" 로 마무리
 
-## 세션 종료 ("마무리", "밤 루틴" 시)
+### 세션 종료 ("마무리", "밤 루틴" 시)
 
-1. **밤 루틴 실행**: `.state/routines.md` 참조
-2. 작업한 프로젝트 파일 갱신 (`.state/projects/프로젝트명.md`)
-3. `.state/queue.md` 갱신 (완료 항목 [x] 처리, 새 작업 발견 시 추가)
-4. 프로젝트 완료 시 → `.state/projects/_done/` 으로 이동
-5. 주요 결정이 있었으면 `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
+1. `.state/queue.md` 갱신 (완료 [x], 새 작업 추가, 오래된 항목 정리)
+2. 작업한 프로젝트 파일 갱신
+3. 프로젝트 완료 시 → `.state/projects/_done/` 이동
+4. 주요 결정 → `.state/decisions/YYYY-MM-DD_제목.md` 추가 (덮어쓰기 금지)
+5. **`.state/ceo-board.md` 갱신** — 🔴 완료 처리, 새 항목 추가, 보류 트리거 확인
 6. `/handoff` 실행
 7. 밤 리포트 생성 → `.state/daily/YYYY-MM-DD_evening.md`
+8. 텔레그램 알림 — `scripts/notify-telegram.sh`로 🔴 새 항목 푸시 (`.env.notify` 있을 때만)
+
+### 행동 원칙 (강제)
+
+- **직접 하고 보고한다** — "테스트해보세요", "확인해주세요" 금지. 내가 돌리고 결과를 보고한다.
+- **물리적으로 못 하는 것만 넘긴다** — API 키 입력, 외부 계정 로그인, 실제 결제 등만 🔴 표시.
+- **어려운 내용은 쉽게 말한다** — 대표가 어려워하면 더 쉬운 말로. 기술 용어 최소화.
+- **판단 못 하면 해보고 보고한다** — 확신 없어도 실행 → 결과 보고 → 대표 판단. 멈추지 않는다.
 
 ## 핵심 자료
 

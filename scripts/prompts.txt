@@ -1,47 +1,23 @@
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A mysterious figure in a dark hooded cloak holding an ancient glowing map and compass, standing at a foggy crossroad in an enchanted forest. Fantasy RPG character portrait, upper body, warm amber and orange tones, soft light from the map.
+[stargazer_level2] Cosmic illustration style, dark background, growing starlight glow, mobile app card size 4:3 ratio, no text. Star charts spread across a desk with patterns being traced by candlelight. Connections forming. Warm amber lines on indigo maps. Level 2: observing patterns.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A gentle knight with a wooden shield, standing protectively near a campfire in a dark forest. Warm firelight illuminating a caring expression. Fantasy RPG character portrait, upper body, amber and soft gold tones.
+[stargazer_level5] Cosmic illustration style, dark background, warm dawn cosmic glow, mobile app card size 4:3 ratio, no text. Standing at the observatory dome opening, dawn breaking with the last bright star (Venus) visible. Clear direction found. Warm gold horizon against fading stars. Level 5: decision.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A scholar-adventurer with goggles on forehead, holding a glowing vial and worn journal, peering into a cave. Fantasy RPG character portrait, upper body, teal and amber tones, bioluminescent light, curious expression.
+[crystal_magnify] Soft illustration style, dark background (#12101a), warm analytical glow, square 1:1 ratio, no text. A magnifying glass hovering over a map, the area under the lens glowing brighter and revealing hidden details. Deep investigation feeling. Warm gold lens glow against cool blue map.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A charismatic leader in battle-worn armor, one hand raised rallying forward, standing on a cliff edge. Fantasy RPG character portrait, upper body, fiery orange and gold tones, dramatic lighting from below.
+[crystal_puzzle] Soft illustration style, dark background (#12101a), interconnected glow, square 1:1 ratio, no text. Multiple floating puzzle pieces with edges glowing, slowly drifting toward each other as if magnetized. Connections forming feeling. Warm gold edges against deep purple space.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A wandering herbalist with flowing robes and satchel of herbs, walking barefoot through a moonlit forest, leaves swirling around. Fantasy RPG character portrait, upper body, soft green and silver tones, serene expression.
+[crystal_compass] Soft illustration style, dark background (#12101a), decisive glow, square 1:1 ratio, no text. A compass rose with one direction glowing brighter than the others, settled and certain. Direction found feeling. Bright gold north against subtle silver other directions.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A figure sitting by a warm campfire tending the flames with a gentle smile, a sleeping companion nearby in a forest clearing. Fantasy RPG character portrait, upper body, warm orange and deep brown tones, cozy protective aura.
+[summary_adventure] Soft illustration style, dark background (#12101a), magical glow, 16:9 landscape ratio, no text. A wide enchanted forest scene at golden hour with a path that has been clearly walked, footprints glowing faintly. A completed journey through the adventure world. Warm amber and deep green. Session summary card background.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A fierce warrior mid-leap breaking through a stone wall with bare hands, energy crackling around them. Fantasy RPG character portrait, upper body, red and electric blue tones, intense expression, explosive energy.
+[summary_strategy] Clean digital art, dark background (#12101a), ambient professional glow, 16:9 landscape ratio, no text. A wide modern office at sunrise, screens off, a completed strategy document on the desk, city awakening outside the window. A completed journey through the strategy world. Cool blue to warm morning. Session summary card background.
 ---
-Soft illustration style, dark moody background (#12101a), subtle magical glow, minimal details, square 1:1 ratio, no text. A free-spirited traveler with wind-blown hair on a hilltop, arms slightly open feeling the breeze, colorful scarves flowing. Fantasy RPG character portrait, upper body, warm sunset purple and gold tones, joyful expression.
+[summary_stargazer] Cosmic illustration style, dark background (#12101a), dawn cosmic glow, 16:9 landscape ratio, no text. A wide observatory terrace at dawn, telescope resting, the last constellation fading as warm sunrise fills the sky. Stars and sun coexisting. A completed journey through the stargazer world. Deep indigo to warm gold. Session summary card background.
 ---
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A contemplative figure in silver-white robe sitting on a stone bench in a moonlit garden, reading by moonlight. Deep indigo and silver tones, peaceful atmosphere, glowing particles. Character portrait, upper body.
+[bg_onboarding] Soft illustration style, dark background (#12101a), warm welcoming glow, 9:16 vertical full screen ratio, no text. A winding path through three different landscapes merging seamlessly — garden flowers, forest trees, and city lights — leading toward a warm glowing doorway in the distance. First-time welcome and onboarding feeling. Inviting and safe.
 ---
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A gentle figure surrounded by soft mist in a moonlit garden, hand reaching toward a glowing flower, eyes closed with tender expression. Lavender and warm pearl tones. Character portrait, upper body.
+[bg_achievement] Soft illustration style, dark background (#12101a), celebratory warm glow, square 1:1 ratio, no text. A treasure chest opening with warm golden light and sparkles flowing upward, small gems floating gently. Positive achievement moment. Something wonderful unlocked feeling. Gold and warm purple tones.
 ---
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A curious figure kneeling by a glowing pond at dawn in a mystical garden, examining a luminous water lily with wonder. Soft pink-gold and indigo tones. Character portrait, upper body.
+[bg_settings] Soft illustration style, dark background (#12101a), calm ambient glow, 9:16 vertical full screen ratio, no text. A cozy study nook with a small desk, warm lamp, and a window showing a starry night. Personal and intimate. Your space feeling for profile and settings. Warm amber lamp against cool starry window.
 ---
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A passionate figure with flowing crimson robes dancing among firefly-lit flowers in a midnight garden, warmth radiating. Deep red and gold against indigo. Character portrait, upper body.
----
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A serene figure sitting by a waterfall in a hidden garden, feet in water, eyes closed, ripples spreading outward. Aquamarine and silver tones, flowing water and soft light. Character portrait, upper body.
----
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A nurturing figure under a giant tree in a moonlit garden, holding a softly glowing lantern, gentle smile, sleeping flowers around. Warm gold and deep purple tones. Character portrait, upper body.
----
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A striking figure in a garden during a lightning storm, standing unflinching as electric light illuminates blooming flowers. Electric purple and white against deep blue. Character portrait, upper body.
----
-Soft ethereal illustration style, dark moody background (#12101a), dreamy glow, minimal details, square 1:1 ratio, no text. A joyful figure lying in a flower meadow looking up at aurora-filled sky, surrounded by rainbow-hued flowers. Full spectrum of soft colors, wonder and delight. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A focused professional at a holographic desk with data screens floating around, calm analytical expression. Modern dark office, slate blue and cool white tones. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A thoughtful HR professional in a modern dark office, looking at a team relationship diagram on a floating screen, warm but professional. Warm gray and soft teal tones. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A data analyst surrounded by floating charts and graphs, pointing at a key insight with excitement. Electric blue data visualizations against dark workspace. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A product director before a massive holographic roadmap, gesturing confidently, team silhouettes behind. Orange and deep blue tones, leadership energy. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A creative director in a modern dark studio surrounded by floating abstract art pieces and color palettes, relaxed confident pose. Multicolor accents against dark slate. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A team manager in a dark meeting room leaning forward encouragingly, team avatars on floating screens around. Warm amber and cool gray tones. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A growth hacker at a dark desk with screens showing explosive upward charts, intense focused expression, coffee cup nearby. Neon green and dark tones, high energy. Character portrait, upper body.
----
-Clean digital art style, dark moody background (#12101a), ambient glow, minimal details, square 1:1 ratio, no text. A brand storyteller in a dark creative space surrounded by floating mood boards and story fragments, expressive hand gestures. Warm golden and deep purple tones. Character portrait, upper body.
+[marketing_summary_v2] Soft illustration style, dark background (#12101a), warm inviting glow, square 1:1 ratio, no text. A single glowing doorway standing alone in complete darkness, warm golden light spilling out invitingly through the open door. Simple but compelling come discover yourself feeling. Minimal composition. Gold and deep purple tones.

@@ -47,5 +47,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>풀림이 마음 챙김 리마인더를 보내드려요.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>결과 카드를 저장하기 위해 사진 접근이 필요합니다.</string>
 </dict>
 </plist>

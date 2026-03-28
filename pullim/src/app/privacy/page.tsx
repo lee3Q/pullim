@@ -30,7 +30,12 @@ export default function PrivacyPage() {
 
         <div>
           <h2 className="text-lg font-semibold mb-2">4. 제3자 제공</h2>
-          <p>풀림은 수집된 개인정보를 제3자에게 제공하지 않습니다. 단, AI 응답 생성을 위해 Anthropic(Claude API)에 대화 내용이 전송되며, Anthropic의 API 이용약관에 따라 처리됩니다.</p>
+          <p>풀림은 수집된 개인정보를 제3자에게 제공하지 않습니다. 단, 서비스 운영을 위해 다음 제3자에게 데이터가 전송됩니다.</p>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li>Anthropic (Claude API) — AI 응답 생성을 위한 대화 내용 전송</li>
+            <li>Supabase — 피드백, 세션 통계 등 서비스 데이터 저장 및 관리</li>
+            <li>Google (Gemini API) — 이면사고 분석을 위한 보조 AI 처리</li>
+          </ul>
         </div>
 
         <div>
