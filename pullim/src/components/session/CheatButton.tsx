@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { hapticMedium, hapticHeavy } from "@/lib/native/capacitor";
 
 interface CheatButtonProps {
   text?: string;
@@ -19,9 +20,11 @@ export default function CheatButton({
       // 2탭: 실제 발동
       if (timerRef.current) clearTimeout(timerRef.current);
       setConfirming(false);
+      hapticHeavy();
       onClick();
     } else {
       // 1탭: 확인 표시
+      hapticMedium();
       setConfirming(true);
       timerRef.current = setTimeout(() => {
         setConfirming(false);

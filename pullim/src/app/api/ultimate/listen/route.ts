@@ -479,7 +479,32 @@ export async function POST(req: NextRequest) {
             );
           });
 
-          await stream.finalMessage();
+          const finalMsg = await stream.finalMessage();
+
+          // 토큰 사용량 로깅 (테스트용)
+          const usage = finalMsg.usage;
+          const model = finalMsg.model;
+          const PRICES: Record<string, { input: number; output: number }> = {
+            "claude-haiku-4-5-20251001": { input: 1, output: 5 },
+            "claude-sonnet-4-6": { input: 3, output: 15 },
+          };
+          const price = PRICES[model] ?? { input: 3, output: 15 };
+          const inputCost = usage.input_tokens * price.input / 1_000_000;
+          const outputCost = usage.output_tokens * price.output / 1_000_000;
+          const costKRW = Math.round((inputCost + outputCost) * 1380);
+          console.log(
+            `[TOKEN] model=${model} theme=${resolvedTheme} turn=${turnCount}` +
+            ` in=${usage.input_tokens} out=${usage.output_tokens}` +
+            ` cost=~${costKRW}원` +
+            (sensoryLadderContext ? ` mode=ladder` : ` mode=pipeline`)
+          );
+
+          // SSE로 클라이언트에도 usage 전달 (개발 모드에서만)
+          if (process.env.NODE_ENV === "development") {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ usage: { input_tokens: usage.input_tokens, output_tokens: usage.output_tokens, model, cost_krw: costKRW } })}\n\n`)
+            );
+          }
         }
 
         // Extract options

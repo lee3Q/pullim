@@ -6,6 +6,7 @@ import type { PersonalityType } from "@/lib/personalization/personality-type";
 import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
 import type { ThemeType } from "@/lib/personalization/story-scenes";
 import FeedbackForm from "./FeedbackForm";
+import { nativeShare, hapticLight } from "@/lib/native/capacitor";
 
 interface Props {
   type: PersonalityType;
@@ -75,11 +76,11 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
 
   async function handleShare() {
     try {
-      await navigator.share({
-        title: shareTitle,
-        text: shareText,
-        url: shareUrl,
-      });
+      await hapticLight();
+      const shared = await nativeShare({ title: shareTitle, text: shareText, url: shareUrl });
+      if (!shared) {
+        await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+      }
     } catch {
       // 사용자가 공유 취소 시 무시
     }

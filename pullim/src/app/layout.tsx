@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Gowun_Batang, Noto_Serif_KR } from "next/font/google";
 import StoreProvider from "@/components/StoreProvider";
+import NativeInit from "@/components/NativeInit";
 import "./globals.css";
 
 const gowunBatang = Gowun_Batang({
@@ -74,6 +75,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden w-full max-w-screen">
+        <NativeInit />
         <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
