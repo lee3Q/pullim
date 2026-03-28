@@ -130,7 +130,7 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "warm-guardian",
     name: "따뜻한 수호자",
     emoji: "🌙",
-    themedName: { adventure: "모닥불을 지키는 모험가", garden: "포근한 달빛을 가진 사람", strategy: "팀 매니저", stargazer: "누군가의 별을 오래 바라보는 별을 가진 사람" },
+    themedName: { adventure: "모닥불을 지키는 모험가", garden: "포근한 달빛을 가진 사람", strategy: "팀 매니저", stargazer: "누군가를 오래 바라보는 별을 가진 사람" },
     themedEmoji: { adventure: "🏕️", garden: "🌙", strategy: "👥", stargazer: "🌟" },
     themedAttitude: { adventure: "당신이 지쳤을 때 먼저 알아채고, 쉬어가자고 말할게요.", garden: "마음이 무거울 때 옆에 있어줄게요. 해결보다 함께 있는 게 먼저예요.", strategy: "혼자 다 짊어지지 않도록, 나눌 수 있는 것을 같이 찾아줄게요.", stargazer: "밤하늘 아래 당신 옆에 있을게요. 어떤 별을 보고 싶은지 먼저 들을게요." },
     description:
