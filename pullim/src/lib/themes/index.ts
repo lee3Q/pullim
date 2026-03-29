@@ -400,54 +400,67 @@ export const THEMES: Record<ThemeName, Theme> = {
       ENTER: {
         gradient: "from-[#0d0d2e] via-[#1e1b4b] to-[#0d0d2e]",
         particle: "stars",
+        bgImage: "/assets/stargazer-enter-bg.png",
       },
       LISTEN: {
         gradient: "from-[#1a1840] via-[#252260] to-[#1a1840]",
         particle: "stars",
+        bgImage: "/assets/stargazer-listen-bg.png",
       },
       RESEARCH: {
         gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       VERIFY: {
         gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       DISCUSS_1: {
         gradient: "from-[#1e1b4b] via-[#2d2a6e] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       CRYSTAL_SELECT: {
         gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
         particle: "stars",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       CRYSTAL_ANALYZE: {
         gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
         particle: "stars",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       DISCUSS_2: {
         gradient: "from-[#1a1840] via-[#2e2b70] to-[#1a1840]",
         particle: "stars",
+        bgImage: "/assets/stargazer-research-bg.png",
       },
       DEBATE: {
         gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-conclude-bg.png",
       },
       DISCUSS_3: {
         gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-conclude-bg.png",
       },
       JUDGE: {
         gradient: "from-[#1e1b4b] via-[#312e81] to-[#1e1b4b]",
         particle: "glow",
+        bgImage: "/assets/stargazer-conclude-bg.png",
       },
       CONCLUDE: {
         gradient: "from-[#1a1535] via-[#28224a] to-[#1a1a35]",
         particle: "stars",
+        bgImage: "/assets/stargazer-conclude-bg.png",
       },
       COMPLETE: {
         gradient: "from-[#1a1535] via-[#28224a] to-[#1a1a35]",
         particle: "stars",
+        bgImage: "/assets/stargazer-conclude-bg.png",
       },
     },
   },

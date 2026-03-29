@@ -1,27 +1,3 @@
-# home_card_apocalypse.png
-Post-apocalyptic illustration style, dark atmospheric background, warm ember amber glow, 4:3 landscape ratio, no text. A dark ruined city skyline silhouette at dusk, broken buildings and structures outlined against a deep amber and orange glowing sky. Moody and evocative. Dark near-black city silhouette, rich warm amber and orange sky gradient.
----
-# apocalypse-session-enter-bg.png
-Post-apocalyptic illustration style, dark ruined interior background, warm amber and ember glow, 16:9 landscape ratio, no text. A survivor standing at the entrance to the ruined city, seen from behind, the vast devastated cityscape stretching ahead under an amber haze sky. A beginning. Dark figure at threshold, warm amber light ahead, dark rubble framing the sides.
----
-# apocalypse-listen-bg.png
-Post-apocalyptic illustration style, dim abandoned room interior background, soft amber listening glow, 16:9 landscape ratio, no text. Two figures seated facing each other in a dim abandoned room, a small candle or ember between them, leaning slightly forward in quiet conversation. Intimate listening in the ruins. Warm amber candle glow, dark crumbled walls, close quiet figures.
----
-# apocalypse-research-bg.png
-Post-apocalyptic illustration style, ruined wall interior background, focused amber investigation glow, 16:9 landscape ratio, no text. A wide ruined interior wall covered in collected notes, maps, and observations, a figure standing before it illuminated by a lantern. Gathering information from the wreckage. Amber lantern light on detailed wall arrangement, dark ruin interior.
----
-# apocalypse-conclude-bg.png
-Post-apocalyptic illustration style, wide open ruined vista background, warm amber dusk glow, 16:9 landscape ratio, no text. Two figures sitting together at the edge of a ruined rooftop, looking out over the city below in quiet thought. Conclusion and reflection in the ruins. Warm amber dusk, dark ruined city below, contemplative stillness.
----
-# apocalypse-complete-bg.png
-Post-apocalyptic illustration style, hilltop panoramic background, warm amber dawn and green, 16:9 landscape ratio, no text. A wide hilltop scene at dawn, two figures standing looking at the horizon where ruins give way to returning green land. Journey complete, something new ahead. Wide warm amber dawn sky, ruin behind, green ahead, open horizon.
----
-# apocalypse-avatar.png
-Post-apocalyptic illustration style, dark neutral background, warm soft amber glow, square 1:1 ratio, no text. A companion character in a worn hooded jacket, hood slightly down, looking gently toward the viewer with a warm and steady expression. A survivor who feels safe. Warm amber tones on face and jacket, soft dark background, approachable and intimate.
----
-# apocalypse-enter-bg.png
-Post-apocalyptic illustration style, wide panoramic ruined cityscape background, rich amber and orange sunset glow, 16:9 landscape ratio, no text. A breathtaking wide panorama of a devastated city at golden sunset — collapsed skyscrapers, empty highways, and overgrown streets stretching to the horizon under a blazing amber and orange sky. Epic and melancholy. Rich warm amber and orange sky, deep grey-green ruined cityscape silhouette.
----
 # landing_1.png
 Soft mixed illustration style, dark atmospheric background, warm inviting glow, 16:9 landscape ratio, no text. A hero panoramic scene showing all four theme worlds side by side blending into each other — enchanted forest, moonlit garden, dark office at night, and starry observatory — lit from within. Pullim's universe at a glance. Warm amber and purple and indigo tones, cohesive dark background.
 ---
@@ -36,3 +12,24 @@ Soft illustration style, dark flowing abstract background, warm calm glow, 16:9 
 ---
 # landing_5.png
 Soft illustration style, dark open sky background, warm hopeful glow, 16:9 landscape ratio, no text. A wide open night landscape with a single warm light on a distant hill and a figure walking toward it on a path that is barely visible. The journey toward clarity. Deep dark foreground, warm amber destination light on horizon, quiet hope and forward motion.
+---
+# stargazer-session-enter-bg.png
+Cosmic illustration style, dark background (#0d0d2e), ethereal starlight glow, 16:9 landscape ratio, no text. An observatory entrance at night — heavy wooden doors just opening, revealing a grand telescope silhouetted against a brilliant star-filled sky. The threshold between the ordinary world and a cosmos of possibility. Deep indigo and violet exterior, warm amber candlelight spilling from within, stars blazing through the open dome above. A sense of quiet welcome and infinite potential.
+---
+# stargazer-complete-bg.png
+Cosmic illustration style, dark background (#12101a), dawn cosmic glow, 16:9 landscape ratio, no text. A wide observatory terrace at the moment just after clarity arrives — a figure stands at the open dome, one hand resting on the telescope, looking outward at a sky where a single bright star guides the way home. Stars and early dawn light coexisting in deep indigo fading to warm gold at the horizon. A completed journey, direction found. Peaceful and accomplished.
+---
+# stargazer_11.png
+Cosmic illustration style, dark background (#12101a), soft starlight glow, mobile app card size 4:3 ratio, no text. An old leather star atlas open on a reading stand, pages glowing faintly as if the constellations are alive. Candlelight from the side. The beginning of a search for meaning in the patterns above. Warm amber and deep navy tones.
+---
+# stargazer_12.png
+Cosmic illustration style, dark background (#12101a), gentle ethereal glow, mobile app card size 4:3 ratio, no text. A spiral staircase inside the observatory tower winding upward toward a circular window showing the night sky. Each step glowing faintly with starlight. The journey inward and upward at the same time. Deep indigo and soft violet, with cool silver starlight from above.
+---
+# stargazer_13.png
+Cosmic illustration style, dark background (#12101a), luminous cosmic glow, mobile app card size 4:3 ratio, no text. A wooden chair beside a large telescope, a cup of tea still steaming on the armrest, star charts scattered on the floor. Someone deeply absorbed in observation paused just a moment. Intimate and focused. Warm amber candlelight against deep indigo darkness.
+---
+# stargazer_14.png
+Cosmic illustration style, dark background (#12101a), brilliant nebula glow, mobile app card size 4:3 ratio, no text. A large telescope pointed at a vibrant nebula visible through the open dome — swirling clouds of purple, teal, and gold light filling the eyepiece and spilling soft color into the dark room. Wonder and discovery at the moment of contact. Rich cosmic colors against deep indigo.
+---
+# stargazer_15.png
+Cosmic illustration style, dark background (#12101a), warm golden glow, mobile app card size 4:3 ratio, no text. The observatory dome closing gently at the end of the night, the last visible star framed perfectly in the narrowing gap. A sense of completion and quiet satisfaction. One bright golden star against deep indigo sky, the dome's silhouette curving around it like protective hands.
