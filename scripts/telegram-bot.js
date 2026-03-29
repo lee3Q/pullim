@@ -334,6 +334,28 @@ bot.on('callback_query', async (query) => {
   }
 });
 
+// ========== 일반 메시지 저장 (명령어 아닌 것) ==========
+
+const INBOX_FILE = path.join(STATE_DIR, 'telegram-inbox.md');
+
+bot.on('message', (msg) => {
+  if (!isAuthorized(msg)) return;
+  // 명령어(/)는 무시 — 이미 위에서 처리됨
+  if (msg.text && msg.text.startsWith('/')) return;
+  if (!msg.text) return;
+
+  const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+  const entry = `\n- [${timestamp}] ${msg.text}`;
+
+  // 파일이 없으면 헤더 생성
+  if (!fs.existsSync(INBOX_FILE)) {
+    fs.writeFileSync(INBOX_FILE, '# 텔레그램 인박스\n\n> 대표가 텔레그램으로 보낸 메시지. 22시 자동 확인.\n');
+  }
+
+  fs.appendFileSync(INBOX_FILE, entry + '\n');
+  bot.sendMessage(CHAT_ID, '메모 저장됨 ✓');
+});
+
 // ========== 에러 처리 ==========
 
 bot.on('polling_error', (error) => {
