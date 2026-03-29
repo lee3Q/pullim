@@ -604,10 +604,10 @@ export default function LadderSession({
           );
         })}
 
-        {/* 스트리밍 중 */}
+        {/* 스트리밍 중 — 구조화 태그 제거 후 표시 */}
         {isLoading && streamText && (
           <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-            {streamText}
+            {streamText.split(/\[(?:COMPARISON|SENSORY|ANALYSIS|OPTIONS|CHEAT|WRAP_SUGGEST|LISTEN_COMPLETE|SUMMARY|SESSION_SUMMARY_MODE|BEHIND_THE_SCENES)/)[0].trim() || "..."}
           </div>
         )}
         {isLoading && !streamText && (
