@@ -295,44 +295,71 @@ export default function HomePage() {
 
             <div className="space-y-3">
               {THEME_CARDS.map((t) => (
-                <div key={t.key} className="space-y-1">
-                  <button
-                    onClick={() => handleThemeSelect(t.key)}
-                    className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
-                               hover:scale-[1.01] active:scale-[0.98]"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                          src={t.imagePath}
-                          alt={t.name}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
-                          {t.name}
-                        </p>
-                        <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
-                          {t.desc}
-                        </p>
-                        <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.60)" }}>
-                          {t.when}
-                        </p>
-                      </div>
+                <button
+                  key={t.key}
+                  onClick={() => handleThemeSelect(t.key)}
+                  className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
+                             hover:scale-[1.01] active:scale-[0.98]"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                      <Image
+                        src={t.imagePath}
+                        alt={t.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
                     </div>
-                  </button>
-                  <button
-                    onClick={() => handleThemeSelect(t.key, true)}
-                    className="w-full text-center text-[10px] font-rpg-sm py-1 transition-colors"
-                    style={{ color: "rgba(232,213,181,0.40)" }}
-                  >
-                    나를 먼저 파악해줘 →
-                  </button>
-                </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
+                        {t.name}
+                      </p>
+                      <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
+                        {t.desc}
+                      </p>
+                      <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.60)" }}>
+                        {t.when}
+                      </p>
+                    </div>
+                  </div>
+                </button>
               ))}
+            </div>
+
+            {/* 테마 선택 없이 진입하는 옵션들 */}
+            <div className="flex gap-3 pt-1">
+              <button
+                onClick={() => {
+                  const keys: ThemeType[] = ["garden", "adventure", "strategy", "stargazer", "apocalypse"];
+                  const randomTheme = keys[Math.floor(Math.random() * keys.length)];
+                  setSelectedTheme(randomTheme);
+                  handleThemeSelect(randomTheme, true);
+                }}
+                className="flex-1 py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "rgba(232,213,181,0.65)",
+                }}
+              >
+                알아서 골라줘
+              </button>
+              <button
+                onClick={() => {
+                  const keys: ThemeType[] = ["garden", "adventure", "strategy", "stargazer", "apocalypse"];
+                  const randomTheme = keys[Math.floor(Math.random() * keys.length)];
+                  handleStartSession(THEME_TO_NAME[randomTheme], "concern");
+                }}
+                className="flex-1 py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "rgba(232,213,181,0.65)",
+                }}
+              >
+                그냥 대화할래
+              </button>
             </div>
 
             {/* 모르겠어 → 더 설명 / 파악 먼저 */}
