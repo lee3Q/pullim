@@ -585,17 +585,15 @@ export default function LadderSession({
             msg.comparisonCards
           );
           return (
-            <div key={msg.id} className={msg.role === "user" ? "text-right" : ""}>
+            <div key={msg.id}>
               {msg.role === "user" ? (
-                <div
-                  className="inline-block max-w-[80%] py-2 px-4 rounded-2xl text-sm font-rpg"
-                  style={{
-                    background: "rgba(75,43,26,0.4)",
-                    border: "1px solid rgba(192,163,116,0.2)",
-                    color: "var(--fantasy-gold-bright)",
-                  }}
-                >
-                  {msg.content}
+                <div className="flex justify-end">
+                  <span
+                    className="text-[11px] font-rpg-sm italic"
+                    style={{ color: "rgba(192,163,116,0.40)" }}
+                  >
+                    {msg.content}
+                  </span>
                 </div>
               ) : hasStructured ? null : (
                 <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
@@ -756,7 +754,7 @@ export default function LadderSession({
 
           {level === 5 && (
             <TextInputLevel
-              text={currentResponse.text}
+              text=""
               onSend={(msg) => handleUserResponse(msg)}
               onSwitchToChoices={() => {
                 store.setLevel(4);
@@ -773,7 +771,7 @@ export default function LadderSession({
             !currentResponse.comparisonCards &&
             currentResponse.sensoryCards.length === 0 && (
               <TextInputLevel
-                text={currentResponse.text}
+                text=""
                 onSend={(msg) => handleUserResponse(msg)}
                 onSwitchToChoices={() => sendToAI(store.messages, 4)}
                 isLoading={isLoading}
