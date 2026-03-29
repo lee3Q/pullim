@@ -190,14 +190,14 @@ export default function HomePage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowSettings((v) => !v)}
-            className="text-sm text-white/60 hover:text-white/80 transition-colors p-2"
+            className="text-sm text-white/60 hover:text-white/80 transition-colors p-3"
             aria-label="설정"
           >
             &#9881;
           </button>
           <button
             onClick={() => router.push("/history")}
-            className="text-sm text-white/60 hover:text-white/80 transition-colors font-rpg-sm p-2"
+            className="text-sm text-white/60 hover:text-white/80 transition-colors font-rpg-sm p-3"
           >
             내 기록
           </button>
@@ -206,7 +206,7 @@ export default function HomePage() {
 
       {/* Settings dropdown */}
       {showSettings && (
-        <div className="mx-6 mt-1 rounded-xl border border-white/10 bg-black/60 backdrop-blur-md px-4 py-3 relative z-20 animate-in fade-in duration-200">
+        <div className="mx-6 mt-1 rounded-xl border border-white/25 bg-black/80 backdrop-blur-md px-4 py-3 relative z-20 animate-in fade-in duration-200">
           <label className="flex items-center justify-between cursor-pointer">
             <span className="text-xs text-white/60">선택지 추천 표시</span>
             <button
@@ -314,7 +314,7 @@ export default function HomePage() {
             <div className="text-center">
               <button
                 onClick={() => setShowThemeHelp((v) => !v)}
-                className="text-xs font-rpg-sm transition-colors"
+                className="text-xs font-rpg-sm transition-colors py-3 px-2"
                 style={{ color: "rgba(192,163,116,0.4)" }}
               >
                 {showThemeHelp ? "접기 ▲" : "잘 모르겠어 — 더 알려줘 ▼"}
