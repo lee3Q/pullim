@@ -51,7 +51,15 @@ $STATE_DIR/harnesses/${TODAY}_자동초안.md 에 하네스 초안을 별도로 
 ## 작업 항목
 - 구체적인 실행 단계 (3~5개)
 ## 완료 기준 (AC)
-- [ ] 검증 가능한 조건"
+- [ ] 검증 가능한 조건
+
+리포트 생성 후, 추가로 상태 정합성을 검증하라:
+1. .state/handoffs/ 에서 오늘 날짜 핸드오프를 읽어라
+2. .state/queue.md를 읽어라
+3. 핸드오프에서 완료된 항목이 queue에 [x] 안 되어있으면 자동 수정하라
+4. 핸드오프에서 신규 발견된 항목이 queue에 없으면 추가하라
+5. .state/ceo-board.md도 동일하게 검증하고 수정하라
+6. 불일치가 있었으면 리포트에 '⚠ 상태 정합성 N건 수정' 섹션을 추가하라"
 
 claude -p --model sonnet --dangerously-skip-permissions "$PROMPT" > /tmp/pullim-evening.log 2>&1
 RESULT=$?
