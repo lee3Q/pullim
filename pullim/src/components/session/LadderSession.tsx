@@ -9,7 +9,9 @@ import type {
   LadderOption,
   CheatAction,
   ThemeSuggestion,
+  PullimPromise,
 } from "@/lib/session/ladder-types";
+import { getActivePromises, checkPromise } from "@/lib/session/promise-store";
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
@@ -143,6 +145,11 @@ export default function LadderSession({
   // 이면사고 추론 상태 (표시용)
   const [currentInference, setCurrentInference] = useState<BehindInference | null>(null);
 
+  // 약속 확인 상태 (진입 화면)
+  const [activePromise, setActivePromise] = useState<PullimPromise | null>(null);
+  const [promiseChecked, setPromiseChecked] = useState(false);
+  const [promiseFeedback, setPromiseFeedback] = useState<string | null>(null);
+
   // 치트 후 분기 상태
   const [cheatPostAction, setCheatPostAction] = useState<{
     show: boolean;
@@ -179,6 +186,14 @@ export default function LadderSession({
     }, 200);
     return () => clearTimeout(timer);
   }, [store.currentLevel, theme, phase]);
+
+  // active 약속 로드 (진입 시 한 번)
+  useEffect(() => {
+    const promises = getActivePromises();
+    if (promises.length > 0) {
+      setActivePromise(promises[promises.length - 1]);
+    }
+  }, []);
 
   // ── 세션 시작 ──
   const handleStartLevel = useCallback(
@@ -562,6 +577,89 @@ export default function LadderSession({
   // ── 렌더링 ──
   const level = store.currentLevel;
 
+  // 진입 화면 — 약속 확인 (active 약속 있을 때)
+  if (phase === "entry" && activePromise && !promiseChecked) {
+    return (
+      <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="text-center space-y-2">
+          <h2
+            className="text-lg md:text-xl font-bold font-rpg-lg"
+            style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 20px rgba(192,163,116,0.3)" }}
+          >
+            지난번 약속 기억해?
+          </h2>
+          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>
+            💫 해봤어?
+          </p>
+        </div>
+
+        {!promiseFeedback ? (
+          <>
+            <div
+              className="rpg-panel rounded-2xl p-5 space-y-3"
+            >
+              <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.55)" }}>
+                <span style={{ color: "var(--fantasy-gold)" }}>만약</span>{" "}
+                {activePromise.trigger}
+              </p>
+              <p className="text-sm font-rpg" style={{ color: "var(--fantasy-text)" }}>
+                → {activePromise.action}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  checkPromise(activePromise.id, "completed");
+                  setPromiseFeedback("대단한데. 기억하고 지켜봤어.");
+                }}
+                className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
+                style={{ color: "var(--fantasy-gold-bright)" }}
+              >
+                ✓ 했어
+              </button>
+              <button
+                onClick={() => {
+                  checkPromise(activePromise.id, "failed");
+                  setPromiseFeedback("괜찮아, 이것도 하나의 발견이야.");
+                }}
+                className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
+                style={{ color: "var(--fantasy-text)" }}
+              >
+                못했어
+              </button>
+              <button
+                onClick={() => {
+                  checkPromise(activePromise.id, "skipped");
+                  setPromiseChecked(true);
+                }}
+                className="w-full py-2 text-center text-xs font-rpg-sm transition-colors"
+                style={{ color: "rgba(192,167,136,0.40)" }}
+              >
+                나중에 얘기할게
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-6">
+            <div className="rpg-panel rounded-2xl p-6 text-center space-y-2">
+              <p className="text-sm font-rpg" style={{ color: "var(--fantasy-text)" }}>
+                {promiseFeedback}
+              </p>
+            </div>
+            <button
+              onClick={() => setPromiseChecked(true)}
+              className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
+              style={{ color: "var(--fantasy-text)" }}
+            >
+              오늘도 시작할게
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // 진입 화면
   if (phase === "entry") {
     return (
@@ -628,6 +726,7 @@ export default function LadderSession({
     return (
       <SessionSummary
         summary={store.summary}
+        theme={theme}
         onClose={() => {
           store.endSession(store.summary!); // keep summary
           setPhase("session");

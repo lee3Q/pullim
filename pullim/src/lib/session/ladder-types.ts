@@ -97,3 +97,15 @@ export interface LadderSessionState {
   isEnded: boolean;
   summary: string | null;
 }
+
+// 약속 (Promise) — if/then 자기변화 실험
+export interface PullimPromise {
+  id: string;
+  createdAt: number;
+  sessionTheme: string;
+  trigger: string;     // "~할 때" (if)
+  action: string;      // "~해볼래" (then)
+  status: "active" | "completed" | "failed" | "skipped";
+  checkedAt?: number;
+  reflection?: string; // 사용자 후기
+}
