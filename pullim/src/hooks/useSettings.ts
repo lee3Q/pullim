@@ -7,11 +7,13 @@ const STORAGE_KEY = "pullim_settings";
 interface PullimSettings {
   showRecommendations: boolean;
   spicyMode: boolean;
+  showBehindThoughts: boolean;
 }
 
 const DEFAULTS: PullimSettings = {
   showRecommendations: true,
   spicyMode: false,
+  showBehindThoughts: false,
 };
 
 export function useSettings() {

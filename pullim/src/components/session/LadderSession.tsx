@@ -14,7 +14,8 @@ import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
 import { getDemoSummary } from "@/lib/session/demo-ladder";
-import { inferState, buildBehindContext, inferCheatAction } from "@/lib/session/behind-the-scenes";
+import { inferState, buildBehindContext, inferCheatAction, describeBehindInference } from "@/lib/session/behind-the-scenes";
+import type { BehindInference } from "@/lib/session/behind-the-scenes";
 import { buildLevelPrompt, buildEndDetectionPrompt } from "@/lib/session/prompt-builder";
 import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/session/level-detector";
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
@@ -82,6 +83,9 @@ export default function LadderSession({
   const [isLoading, setIsLoading] = useState(false);
   const [streamText, setStreamText] = useState("");
   const [currentResponse, setCurrentResponse] = useState<ReturnType<typeof parseResponse> | null>(null);
+
+  // 이면사고 추론 상태 (표시용)
+  const [currentInference, setCurrentInference] = useState<BehindInference | null>(null);
 
   // 치트 후 분기 상태
   const [cheatPostAction, setCheatPostAction] = useState<{
@@ -154,6 +158,7 @@ export default function LadderSession({
 
       // 이면 사고 추론 (LLM 기반, 실패 시 규칙 기반 폴백)
       const inference = await inferState(signals, store.behindEvents, level, history);
+      setCurrentInference(inference);
       const behindContext = buildBehindContext(inference);
 
       // 레벨 프롬프트
@@ -294,6 +299,7 @@ export default function LadderSession({
         turnCount: store.turnCount,
       };
       const inference = await inferState(signals, store.behindEvents, level, store.messages);
+      setCurrentInference(inference);
 
       let nextLevel = level;
       if (isUnknown && shouldLevelDown(level, inference, true)) {
@@ -574,6 +580,16 @@ export default function LadderSession({
           오늘은 여기까지
         </button>
       </div>
+
+      {/* 이면사고 표시 (showBehindThoughts 설정 on 시) */}
+      {settings.showBehindThoughts && currentInference && describeBehindInference(currentInference) && (
+        <div
+          className="px-1 pb-1 text-[10px] font-rpg-sm animate-in fade-in duration-300"
+          style={{ color: "rgba(192,163,116,0.45)" }}
+        >
+          {describeBehindInference(currentInference)}
+        </div>
+      )}
 
       {/* 대화 히스토리 */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4 px-1">

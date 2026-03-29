@@ -73,9 +73,35 @@ export function inferStateSync(
     currentLevel < 5 &&
     signals.turnCount >= 2;
 
-  // 톤 조정
+  // 톤 조정 — 12종 (복합 조건 우선, 레벨별 특화, 단일 신호 순)
   let toneAdjustment: string | null = null;
-  if (fatigue) {
+
+  // ── 첫 턴 ──
+  if (signals.turnCount === 0) {
+    toneAdjustment = "아직 모르는 상태. 가볍게 시작하라. 판단하지 마라.";
+
+  // ── 복합 조건 (3개) ──
+  } else if (fatigue && opening) {
+    toneAdjustment = "쉬고 싶지만 말하고 싶어하는 상태. 부담 없이 따라가라. 끝내지 마라.";
+  } else if (confident && dissatisfied) {
+    toneAdjustment = "방향은 알지만 제시된 것이 맞지 않는다. 다른 각도를.";
+  } else if (fatigue && struggling) {
+    toneAdjustment = "완전히 지쳐있다. 한 가지만. 오늘은 여기까지 제안해도 된다.";
+
+  // ── 복합 조건 추가 ──
+  } else if (confident && opening) {
+    toneAdjustment = "확신과 개방이 동시에 나타난다. 더 깊은 질문으로 자연스럽게 이끌어라.";
+
+  // ── 레벨별 특화 (3개) ──
+  } else if ((currentLevel === 1 || currentLevel === 2) && struggling) {
+    toneAdjustment = "감각 단계에서 막히고 있다. 선택지를 두 개로 줄여라. 단순하게.";
+  } else if (currentLevel === 3 && dissatisfied) {
+    toneAdjustment = "분석 단계에서 맞지 않다. 분석 각도를 완전히 바꿔라. 다른 프레임.";
+  } else if (currentLevel === 5 && fatigue) {
+    toneAdjustment = "직접 말하는 단계에서 지쳐있다. 질문 줄이고 공감으로.";
+
+  // ── 단일 신호 (5개) ──
+  } else if (fatigue) {
     toneAdjustment = "피로 감지. 가볍게 전환하거나 마무리 제안. 길게 말하지 마라.";
   } else if (struggling) {
     toneAdjustment = "결정이 어렵다. 선택지를 줄이고 더 쉽게. 부담 주지 마라.";
@@ -83,6 +109,8 @@ export function inferStateSync(
     toneAdjustment = "마음이 열리는 중. 끊지 말고 따라가라. 질문을 너무 많이 하지 마라.";
   } else if (dissatisfied && recentRejects >= 2) {
     toneAdjustment = "접근 방식이 맞지 않다. 완전히 다른 각도로 시도하라.";
+  } else if (dissatisfied) {
+    toneAdjustment = "한 번 불만족. 같은 방식 반복하지 말고 조금 다른 방향으로.";
   }
 
   return {
@@ -149,6 +177,24 @@ export function buildBehindContext(inference: BehindInference): string {
   lines.push("[/BEHIND_THE_SCENES]");
 
   return lines.length > 3 ? lines.join("\n") : "";
+}
+
+/**
+ * 추론 결과 → 짧은 표시 텍스트 (이면사고 토글 UI용)
+ * 데모에서 "이 AI가 나를 어떻게 파악하는지" 시각화
+ */
+export function describeBehindInference(inference: BehindInference): string | null {
+  if (inference.topicExhausted) return "💭 [주제 소진] 전환 고려 중...";
+  if (inference.fatigue && inference.opening) return "💭 [피로+열림] 가볍게 따라가는 중...";
+  if (inference.fatigue && inference.struggling) return "💭 [피로+어려움] 최소화 중...";
+  if (inference.confident && inference.dissatisfied) return "💭 [확신+불만] 각도 전환 중...";
+  if (inference.confident && inference.opening) return "💭 [확신+열림] 깊이 들어가는 중...";
+  if (inference.fatigue) return "💭 [피로 감지] 가볍게 전환 중...";
+  if (inference.struggling) return "💭 [결정 어려움] 쉽게 조정 중...";
+  if (inference.opening) return "💭 [마음 열림] 따라가는 중...";
+  if (inference.dissatisfied) return "💭 [불만족] 각도 바꾸는 중...";
+  if (inference.confident) return "💭 [확신] 깊이 들어가는 중...";
+  return null;
 }
 
 /**
