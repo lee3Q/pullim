@@ -10,26 +10,23 @@
    - 예상 비용: 세션 1회 ~$0.05-0.10
    - 프로젝트: 풀림_PMF로드맵 Phase 0
 
-2. **Vercel Root Directory 설정** — `pullim`으로 설정하면 git push 자동 배포 됨.
-   - 방법: vercel.com → 프로젝트 → Settings → General → Root Directory → `pullim` 입력
-   - **반복 등장** — 이거 안 하면 git push해도 배포 안 됨
+2. ~~**Vercel Root Directory 설정**~~ — ✅ 완료 (2026-03-29 대표 설정)
 
 3. **4/2 아산 두어스 온라인 설명회 참석** (D-4)
    - 3학년 수업과 일정 충돌 확인 필요
    - 프로젝트: 아산두어스_신청
 
-## 🔧 오늘 밤 자동 작업 (대표 확인 불필요)
+## 🔧 밤배치 결과 (2026-03-30 00:48)
 
-> 밤배치 5개 태스크 예약됨. 실행 명령어:
-> `caffeinate -s bash ~/study/main/pullim/scripts/night-batch.sh ~/study/main/pullim/scripts/batch-tasks/2026-03-29-night.sh`
+> **1/6 성공, 5/6 rate limit 실패** — rate limit 재시도 로직 night-batch.sh에 추가 완료
 
-| # | 작업 | 예상 시간 | 하네스 |
-|---|------|-----------|--------|
-| 1 | 이미지 매핑 + 배포 | 30분 | H4 |
-| 2 | 데모 세션 응답 확충 + 완주 | 45분 | H1 |
-| 3 | 내면사고 규칙 강화 | 20분 | H5 |
-| 4 | 텍스트 게임 UX | 60분 | H2 |
-| 5 | 약속 기능 기반 | 30분 | H3 |
+| # | 작업 | 결과 | 비고 |
+|---|------|------|------|
+| 1 | 이미지 매핑 + 배포 (H4) | ✅ SUCCESS | 134초, 커밋+푸시 완료 |
+| 2 | 데모 세션 (H1) | ❌ RATE_LIMIT | 509초 작업 후 한도 초과 |
+| 3~5 | 내면사고/텍스트게임/약속 | ❌ RATE_LIMIT | 시작 즉시 거절 |
+
+> 재실행: `caffeinate -s bash ~/study/main/pullim/scripts/night-batch.sh ~/study/main/pullim/scripts/batch-tasks/2026-03-30-retry.sh`
 
 ## 📊 오늘 발견된 문제 요약 (2026-03-29 전면 점검)
 
@@ -96,5 +93,5 @@
 | 05-12 | 두어스 면접 (MARU360, BEI) | 대기 |
 
 ---
-*최종 갱신: 2026-03-29 21:30*
-*갱신 주체: Claude (전면 점검 세션)*
+*최종 갱신: 2026-03-30 01:10*
+*갱신 주체: Claude (밤배치 실패 진단 + rate limit 재시도 로직 추가)*

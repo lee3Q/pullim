@@ -107,11 +107,31 @@ run_with_timeout() {
 
 declare -a TASK_RESULTS=()
 
+MAX_RATE_LIMIT_RETRIES="${MAX_RATE_LIMIT_RETRIES:-3}"
+
+# rate limit 감지: 로그에서 resetsAt 타임스탬프 추출
+check_rate_limit() {
+  local logfile=$1
+  if grep -q "rate_limit\|hit your limit" "$logfile" 2>/dev/null; then
+    # resetsAt 유닉스 타임스탬프 추출
+    local resets_at
+    resets_at=$(grep -o '"resetsAt":[0-9]*' "$logfile" 2>/dev/null | tail -1 | grep -o '[0-9]*')
+    if [ -n "$resets_at" ]; then
+      echo "$resets_at"
+    else
+      echo "unknown"
+    fi
+  else
+    echo ""
+  fi
+}
+
 run_task() {
   local task_num=$1
   local task_name=$2
   local prompt=$3
   local logfile="$LOG_DIR/task${task_num}.log"
+  local retry_count=0
 
   log ""
   log "========================================="
@@ -120,39 +140,79 @@ run_task() {
   log "  로그: ${logfile}"
   log "========================================="
 
-  > "$logfile"
+  while true; do
+    > "$logfile"
 
-  local start_time
-  start_time=$(date +%s)
+    local start_time
+    start_time=$(date +%s)
 
-  run_with_timeout "$TASK_TIMEOUT" "$logfile" \
-    claude -p --model sonnet --output-format stream-json --dangerously-skip-permissions "$prompt"
-  local result=$?
+    run_with_timeout "$TASK_TIMEOUT" "$logfile" \
+      claude -p --model sonnet --output-format stream-json --dangerously-skip-permissions "$prompt"
+    local result=$?
 
-  local end_time
-  end_time=$(date +%s)
-  local duration=$(( end_time - start_time ))
-  local log_size
-  log_size=$(wc -c < "$logfile" 2>/dev/null || echo 0)
+    local end_time
+    end_time=$(date +%s)
+    local duration=$(( end_time - start_time ))
+    local log_size
+    log_size=$(wc -c < "$logfile" 2>/dev/null || echo 0)
 
-  case $result in
-    0)
-      log "Task ${task_num} SUCCESS (${duration}s, ${log_size}B)"
-      TASK_RESULTS+=("${task_num}|${task_name}|SUCCESS|${duration}s|${log_size}B")
-      ;;
-    124)
-      log "Task ${task_num} TIMEOUT (${TASK_TIMEOUT}s limit)"
-      TASK_RESULTS+=("${task_num}|${task_name}|TIMEOUT|${duration}s|${log_size}B")
-      ;;
-    125)
-      log "Task ${task_num} WATCHDOG (log stalled)"
-      TASK_RESULTS+=("${task_num}|${task_name}|WATCHDOG|${duration}s|${log_size}B")
-      ;;
-    *)
-      log "Task ${task_num} FAIL exit=${result} (${duration}s)"
-      TASK_RESULTS+=("${task_num}|${task_name}|FAIL(${result})|${duration}s|${log_size}B")
-      ;;
-  esac
+    # rate limit 감지
+    local rate_limit_reset
+    rate_limit_reset=$(check_rate_limit "$logfile")
+
+    if [ -n "$rate_limit_reset" ] && [ $retry_count -lt $MAX_RATE_LIMIT_RETRIES ]; then
+      retry_count=$((retry_count + 1))
+
+      if [ "$rate_limit_reset" != "unknown" ]; then
+        local now
+        now=$(date +%s)
+        local wait_sec=$(( rate_limit_reset - now ))
+        if [ $wait_sec -gt 0 ]; then
+          log "Task ${task_num} RATE_LIMIT — ${wait_sec}초 대기 후 재시도 (${retry_count}/${MAX_RATE_LIMIT_RETRIES})"
+          # 60초 여유를 두고 대기
+          sleep $(( wait_sec + 60 ))
+        else
+          log "Task ${task_num} RATE_LIMIT — 이미 리셋됨, 즉시 재시도 (${retry_count}/${MAX_RATE_LIMIT_RETRIES})"
+          sleep 10
+        fi
+      else
+        # resetsAt를 못 찾으면 5분 대기
+        log "Task ${task_num} RATE_LIMIT — 리셋 시간 불명, 5분 대기 후 재시도 (${retry_count}/${MAX_RATE_LIMIT_RETRIES})"
+        sleep 300
+      fi
+      continue
+    fi
+
+    # 일반 결과 처리
+    local retry_note=""
+    [ $retry_count -gt 0 ] && retry_note=" [재시도${retry_count}회]"
+
+    case $result in
+      0)
+        log "Task ${task_num} SUCCESS (${duration}s, ${log_size}B)${retry_note}"
+        TASK_RESULTS+=("${task_num}|${task_name}|SUCCESS|${duration}s|${log_size}B")
+        ;;
+      124)
+        log "Task ${task_num} TIMEOUT (${TASK_TIMEOUT}s limit)${retry_note}"
+        TASK_RESULTS+=("${task_num}|${task_name}|TIMEOUT|${duration}s|${log_size}B")
+        ;;
+      125)
+        log "Task ${task_num} WATCHDOG (log stalled)${retry_note}"
+        TASK_RESULTS+=("${task_num}|${task_name}|WATCHDOG|${duration}s|${log_size}B")
+        ;;
+      *)
+        if [ -n "$rate_limit_reset" ]; then
+          log "Task ${task_num} RATE_LIMIT 재시도 한도 초과 (${MAX_RATE_LIMIT_RETRIES}회)${retry_note}"
+          TASK_RESULTS+=("${task_num}|${task_name}|RATE_LIMIT|${duration}s|${log_size}B")
+        else
+          log "Task ${task_num} FAIL exit=${result} (${duration}s)${retry_note}"
+          TASK_RESULTS+=("${task_num}|${task_name}|FAIL(${result})|${duration}s|${log_size}B")
+        fi
+        ;;
+    esac
+
+    break
+  done
 
   return 0  # 실패해도 다음 Task 계속
 }
