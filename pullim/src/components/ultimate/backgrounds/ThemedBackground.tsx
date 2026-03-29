@@ -266,6 +266,36 @@ export default function ThemedBackground({ theme, currentStage }: Props) {
     );
   }
 
+  // 종말 — scene-based bg image
+  if (theme.name === "종말") {
+    const apocSceneConfig = currentStage && theme.scenes?.[currentStage];
+    const apocGradient = apocSceneConfig
+      ? `bg-gradient-to-b ${apocSceneConfig.gradient}`
+      : "bg-gradient-to-b from-[#1a0a0a] via-[#2d1515] to-[#1a0a0a]";
+    const apocParticle = apocSceneConfig?.particle ?? "firefly";
+    const apocBg = apocSceneConfig?.bgImage ?? theme.assets.bg;
+
+    return (
+      <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden">
+        <div className={`absolute inset-0 transition-colors duration-1000 ${apocGradient}`} />
+        <div className="absolute inset-0 opacity-40">
+          <Image
+            src={apocBg}
+            alt=""
+            fill
+            className="object-cover transition-opacity duration-700"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
+        {apocParticle === "stars" && <StarParticles containerRef={containerRef} />}
+        {apocParticle === "firefly" && <FireflyParticles containerRef={containerRef} />}
+        {apocParticle === "glow" && <GlowParticles containerRef={containerRef} />}
+      </div>
+    );
+  }
+
   // 달빛정원 — scene-based if scenes config exists
   const sceneConfig = currentStage && theme.scenes?.[currentStage];
   const gardenGradient = sceneConfig

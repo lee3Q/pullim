@@ -10,6 +10,7 @@ export interface GameUIStyle {
 export interface SceneConfig {
   gradient: string;
   particle: "stars" | "firefly" | "petal" | "glow" | "none";
+  bgImage?: string;
 }
 
 export interface Theme {
@@ -59,6 +60,7 @@ export const CHARACTER_ICONS: Record<CharacterName, string> = {
   코치: "\uD83D\uDD25",
   친구: "\uD83D\uDC30",
   별지기: "\u2B50",
+  동행자: "\u2604\uFE0F",
 };
 
 export const THEMES: Record<ThemeName, Theme> = {
@@ -446,6 +448,114 @@ export const THEMES: Record<ThemeName, Theme> = {
       COMPLETE: {
         gradient: "from-[#1a1535] via-[#28224a] to-[#1a1a35]",
         particle: "stars",
+      },
+    },
+  },
+  종말: {
+    name: "종말",
+    character: "동행자",
+    title: "종말",
+    subtitle: "세상이 끝난 뒤, 남은 것들을 마주하다",
+    icon: "☄️",
+    colors: {
+      bg: "from-[#1a0a0a] via-[#2d1515] to-[#1a0a0a]",
+      primary: "#f97316",
+      primaryLight: "rgba(249, 115, 22, 0.15)",
+      card: "rgba(249, 115, 22, 0.04)",
+      cardHover: "rgba(249, 115, 22, 0.08)",
+      cardSelected: "rgba(249, 115, 22, 0.12)",
+      text: "#e8d8d0",
+      muted: "#8a7068",
+    },
+    assets: {
+      bg: "/images/v4/mapped/apocalypse-enter-bg.png",
+      avatar: "/images/v4/mapped/apocalypse-avatar.png",
+      bgmTracks: [
+        { src: "/assets/apocalypse-bgm.mp3", label: "종말 1" },
+      ],
+    },
+    crystalLabel: "잿빛 조각",
+    crystalShape: "orb",
+    labels: {
+      enter: "여기까지 왔구나. 같이 걷자.",
+      askConcern: "이 세상에서 뭘 찾고 싶어?",
+      farewell: "내일 해가 뜨면 다시 만나자.",
+      tagline: "끝이라고 생각했는데, 옆에 사람이 있었어.",
+    },
+    route: "/apocalypse",
+    useCases: "극한 속 감성 · 관계 · 의미",
+
+    gameUI: {
+      dialogueStyle: "parchment",
+      choiceStyle: "signpost",
+      progressStyle: "journey",
+      inputLabel: "마음 남기기",
+    },
+    scenes: {
+      ENTER: {
+        gradient: "from-[#1a0a05] via-[#2d1510] to-[#1a0a05]",
+        particle: "firefly",
+        bgImage: "/images/v4/mapped/apocalypse-session-enter-bg.png",
+      },
+      LISTEN: {
+        gradient: "from-[#1e1008] via-[#2e1a10] to-[#1e1008]",
+        particle: "firefly",
+        bgImage: "/images/v4/mapped/apocalypse-listen-bg.png",
+      },
+      RESEARCH: {
+        gradient: "from-[#1a0f0a] via-[#2a1a12] to-[#1a0f0a]",
+        particle: "glow",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      VERIFY: {
+        gradient: "from-[#1a0f0a] via-[#2a1a12] to-[#1a0f0a]",
+        particle: "glow",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      DISCUSS_1: {
+        gradient: "from-[#1a0f0a] via-[#2a1a12] to-[#1a0f0a]",
+        particle: "glow",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      CRYSTAL_SELECT: {
+        gradient: "from-[#1e0d08] via-[#301810] to-[#1e0d08]",
+        particle: "stars",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      CRYSTAL_ANALYZE: {
+        gradient: "from-[#1e0d08] via-[#301810] to-[#1e0d08]",
+        particle: "stars",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      DISCUSS_2: {
+        gradient: "from-[#1e0d08] via-[#301810] to-[#1e0d08]",
+        particle: "stars",
+        bgImage: "/images/v4/mapped/apocalypse-research-bg.png",
+      },
+      DEBATE: {
+        gradient: "from-[#1a0a0a] via-[#2d1515] to-[#1a0a0a]",
+        particle: "firefly",
+        bgImage: "/images/v4/mapped/apocalypse-conclude-bg.png",
+      },
+      DISCUSS_3: {
+        gradient: "from-[#1a0a0a] via-[#2d1515] to-[#1a0a0a]",
+        particle: "firefly",
+        bgImage: "/images/v4/mapped/apocalypse-conclude-bg.png",
+      },
+      JUDGE: {
+        gradient: "from-[#1a0a0a] via-[#2d1515] to-[#1a0a0a]",
+        particle: "firefly",
+        bgImage: "/images/v4/mapped/apocalypse-conclude-bg.png",
+      },
+      CONCLUDE: {
+        gradient: "from-[#1e1008] via-[#2a1812] to-[#1a1008]",
+        particle: "glow",
+        bgImage: "/images/v4/mapped/apocalypse-conclude-bg.png",
+      },
+      COMPLETE: {
+        gradient: "from-[#1e1008] via-[#2a1812] to-[#1a1008]",
+        particle: "glow",
+        bgImage: "/images/v4/mapped/apocalypse-complete-bg.png",
       },
     },
   },

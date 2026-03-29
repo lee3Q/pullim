@@ -24,6 +24,7 @@ const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
   adventure: "모험가",
   strategy: "전략실",
   stargazer: "천문대",
+  apocalypse: "종말",
 };
 
 const THEME_COLORS: Record<ThemeType, string> = {
@@ -31,6 +32,7 @@ const THEME_COLORS: Record<ThemeType, string> = {
   adventure: "#ff9f1c",
   strategy: "#60a5fa",
   stargazer: "#4338ca",
+  apocalypse: "#f97316",
 };
 
 // 테마 카드 데이터
@@ -78,6 +80,15 @@ const THEME_CARDS: {
     when: "방향을 모르겠거나, 가능성을 탐색하고 싶을 때",
     color: "#4338ca",
     imagePath: "/images/home/home_card_stargazer.png",
+  },
+  {
+    key: "apocalypse",
+    emoji: "☄️",
+    name: "종말",
+    desc: "세상이 끝난 뒤, 남은 것들을 마주해봐요",
+    when: "극한 속에서 진짜 감정을 느끼고 싶을 때",
+    color: "#f97316",
+    imagePath: "/images/home/home_card_apocalypse.png",
   },
 ];
 
