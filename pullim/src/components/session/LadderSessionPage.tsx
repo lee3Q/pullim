@@ -31,7 +31,7 @@ export default function LadderSessionPage({
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(
-    (targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대") => {
+    (targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말") => {
       const themeRoutes: Record<string, string> = {
         "모험가": "/adventure",
         "전략실": "/strategy",

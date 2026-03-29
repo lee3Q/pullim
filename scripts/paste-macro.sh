@@ -130,8 +130,19 @@ load_batch_config() {
       BATCH_LABEL="Batch 9: v3 나머지"
       PROMPT_OFFSET=0
       ;;
+    10) # 아포칼립스 누락 + 랜딩 (13장)
+      SAVE_DIR="$SCRIPT_DIR/../pullim/public/images/v4"
+      NAMES=(
+        home_card_apocalypse
+        apocalypse-session-enter-bg apocalypse-listen-bg apocalypse-research-bg
+        apocalypse-conclude-bg apocalypse-complete-bg apocalypse-avatar apocalypse-enter-bg
+        landing_1 landing_2 landing_3 landing_4 landing_5
+      )
+      BATCH_LABEL="Batch 10: 아포칼립스 누락 + 랜딩"
+      PROMPT_OFFSET=0
+      ;;
     *)
-      echo "❌ 배치 $batch 없음 (1~9)"; exit 1 ;;
+      echo "❌ 배치 $batch 없음 (1~10)"; exit 1 ;;
   esac
   TOTAL=${#NAMES[@]}
 }

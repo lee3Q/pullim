@@ -11,6 +11,7 @@ const CHARACTER_NAMES: Record<CharacterName, string> = {
   코치: "코치",
   친구: "정원 친구",
   별지기: "별지기",
+  동행자: "동행자",
 };
 
 interface Props {

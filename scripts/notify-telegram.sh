@@ -19,7 +19,6 @@ MSG="${1:-알림}"
 
 curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
   -d chat_id="$TELEGRAM_CHAT_ID" \
-  -d text="$MSG" \
-  -d parse_mode="Markdown" > /dev/null 2>&1
+  --data-urlencode "text=$MSG" > /dev/null 2>&1
 
 echo "[notify] Telegram 전송 완료"

@@ -11,6 +11,7 @@ const THEME_COLORS: Record<ThemeType, string> = {
   adventure: "#ff9f1c",
   strategy: "#60a5fa",
   stargazer: "#4338ca",
+  apocalypse: "#f97316",
 };
 
 // 유형 ID → 대표 프로필 생성 (공유 페이지용)

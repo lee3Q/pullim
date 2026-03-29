@@ -72,7 +72,7 @@ export type CheatAction = "regenerate" | "theme_suggest" | "fold";
 
 // 테마 전환 제안 정보
 export interface ThemeSuggestion {
-  targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대";
+  targetTheme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말";
   reason: string;
 }
 
@@ -87,7 +87,7 @@ export interface BehindEvent {
 // 세션 상태
 export interface LadderSessionState {
   sessionId: string;
-  theme: "모험가" | "전략실" | "달빛정원" | "천문대";
+  theme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말";
   entryMode: EntryMode;
   currentLevel: LadderLevel;
   messages: LadderMessage[];

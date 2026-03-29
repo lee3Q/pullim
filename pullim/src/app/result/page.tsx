@@ -8,6 +8,7 @@ const THEME_LABELS: Record<ThemeType, string> = {
   garden: "달빛정원",
   strategy: "전략실",
   stargazer: "천문대",
+  apocalypse: "종말",
 };
 
 const BASE_URL = "https://pullim.vercel.app";

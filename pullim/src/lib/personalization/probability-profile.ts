@@ -30,7 +30,7 @@ export interface ProbabilityProfile {
   // 온보딩 설정
   userName: string;
   speechStyle: "casual" | "formal";
-  selectedTheme: "adventure" | "garden" | "strategy" | "stargazer";
+  selectedTheme: "adventure" | "garden" | "strategy" | "stargazer" | "apocalypse";
 
   // [확장 포인트] 다음 Seed에서 추가될 필드
   // philosophyReactions?: Record<string, UserDimension>;

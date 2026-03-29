@@ -1,7 +1,9 @@
 // 풀림 Service Worker — PWA 오프라인 지원 + 캐시 전략
-const CACHE_NAME = "pullim-v2";
-const IMAGE_CACHE_NAME = "pullim-images-v2";
+const CACHE_NAME = "pullim-v3";
+const IMAGE_CACHE_NAME = "pullim-images-v3";
 const ALL_CACHES = [CACHE_NAME, IMAGE_CACHE_NAME];
+const MAX_IMAGE_CACHE_ENTRIES = 100;
+const MAX_STATIC_CACHE_ENTRIES = 50;
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
@@ -25,6 +27,17 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// LRU 캐시 제한 — 오래된 항목부터 삭제
+function trimCache(cache, maxEntries) {
+  cache.keys().then((keys) => {
+    if (keys.length > maxEntries) {
+      cache.delete(keys[0]).then(() => {
+        if (keys.length - 1 > maxEntries) trimCache(cache, maxEntries);
+      });
+    }
+  });
+}
+
 // Fetch: Network-first (API), Cache-first (정적 에셋)
 self.addEventListener("fetch", (event) => {
   const { request } = event;
@@ -42,14 +55,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // /assets/ 이미지: pullim-images-v1 캐시로 분리 (cache-first)
-  if (url.pathname.startsWith("/assets/")) {
+  // 이미지: 별도 캐시로 분리 (cache-first, LRU 제한)
+  if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/images/")) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached;
         return fetch(event.request).then((response) => {
           const clone = response.clone();
-          caches.open(IMAGE_CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          caches.open(IMAGE_CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone);
+            trimCache(cache, MAX_IMAGE_CACHE_ENTRIES);
+          });
           return response;
         });
       })
@@ -63,7 +79,10 @@ self.addEventListener("fetch", (event) => {
       // 성공 응답은 캐시에도 저장
       if (response.ok && request.method === "GET") {
         const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, clone);
+          trimCache(cache, MAX_STATIC_CACHE_ENTRIES);
+        });
       }
       return response;
     }).catch(() => {

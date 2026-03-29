@@ -1,0 +1,299 @@
+# og_stargazer_quiet-strategist.png
+Cosmic illustration style, deep indigo space background with faint nebula mist, deep purple and gold tones, square 1:1 ratio, no text. A solitary figure at a brass telescope, meticulously mapping star coordinates on a glowing celestial chart. Grid lines and compass marks radiate from the chart. Methodical, precise, contained. Warm candlelight meets cold starfield.
+---
+# og_stargazer_empathic-deliberator.png
+Cosmic illustration style, deep velvety purple cosmos background, soft moonsilver glow, square 1:1 ratio, no text. A gentle crescent moon floating in deep space, surrounded by several smaller companion stars drifting quietly nearby. Tender, unhurried presence among the stars. Moonsilver and muted gold tones against deep purple.
+---
+# og_stargazer_analytical-explorer.png
+Cosmic illustration style, vast milky way background, intellectual starlight glow, square 1:1 ratio, no text. Wide telescope lens framing a spiral galaxy, luminous constellation lines connecting clusters in precise patterns as if being analyzed. Scientific wonder meets cosmic beauty. Cool teal and gold on deep indigo.
+---
+# og_stargazer_bold-designer.png
+Cosmic illustration style, dark dramatic space background, blazing golden energy, square 1:1 ratio, no text. A brilliant meteor streaking boldly across the night sky, leaving a long blazing trail of gold and orange fire. Fast, decisive, burning bright. Deep purple sky with vivid gold and amber meteor trail.
+---
+# og_stargazer_free-healer.png
+Cosmic illustration style, flowing deep space background, soft drifting cosmic glow, square 1:1 ratio, no text. A loose swirl of scattered stars drifting like cosmic pollen, carried gently by invisible celestial winds in free-form patterns. Boundless and unrestrained. Soft lavender, silver, and warm gold against deep purple.
+---
+# og_stargazer_warm-guardian.png
+Cosmic illustration style, still night sky background, warm patient glow, square 1:1 ratio, no text. One large steadily glowing amber star at the center, surrounded by several smaller dimmer stars it seems to watch over. Enduring, reliable light in the dark. Warm amber central star, cool deep purple sky, soft silver satellite stars.
+---
+# og_stargazer_intuitive-breaker.png
+Cosmic illustration style, charged deep space background, fierce directional energy, square 1:1 ratio, no text. A single blazing comet charging in one unwavering direction through the cosmos, leaving an explosive white-gold wake behind it. Focused, unstoppable momentum. Vivid gold and white comet trail against deep indigo and purple.
+---
+# og_stargazer_sensory-adventurer.png
+Cosmic illustration style, luminous midnight blue cosmos background, aurora radiance, square 1:1 ratio, no text. Rippling curtains of aurora spreading across the cosmos in shimmering waves, like light dancing to unheard music. Sensory and alive, color in motion. Vibrant purple, teal, and gold aurora ribbons against deep midnight blue.
+---
+# appstore_9.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Adventure-themed app home screen: dark enchanted forest path with two glowing choice cards at a crossroads shown inside the screen. Fantasy illustration style. Deep forest green, warm amber lantern glow. Clean app interface visible.
+---
+# appstore_10.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Adventure-themed app discovery session screen: a figure at a mystical forest clearing, with dialogue bubble and two illustrated choice cards at the bottom of the in-screen UI. Rich dark forest with magical amber light.
+---
+# appstore_11.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Adventure-themed app personality result screen: an adventurer character portrait card with badge and strengths list displayed inside the screen. Fantasy character art style. Warm amber and deep forest green tones.
+---
+# appstore_12.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Garden-themed app home screen: a moonlit garden with glowing flower path and soft night sky shown inside the screen. Soft ethereal illustration style. Deep lavender, soft gold tones. Clean app interface visible.
+---
+# appstore_13.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Garden-themed app discovery session screen: a figure among softly glowing moonlit flowers, with illustrated choice cards at the bottom of the in-screen UI. Deep purple and warm gold tones.
+---
+# appstore_14.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Garden-themed app personality result screen: a garden-themed character card with moonlit floral motifs and trait list shown inside the screen. Ethereal illustration style. Soft lavender, moonsilver and warm gold.
+---
+# appstore_15.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Strategy-themed app home screen: a dark modern strategy room interface with glowing screens and clean decision cards shown inside the device. Sleek digital illustration style. Deep blue and warm amber.
+---
+# appstore_16.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Strategy-themed app discovery session screen: an office desk scenario with a glowing document and two decision cards at the bottom of the in-screen UI. Clean digital illustration style. Cool blue and dark gray with warm accent.
+---
+# appstore_17.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Strategy-themed app personality result screen: a professional character badge with subtle data chart motifs and trait list shown inside the screen. Clean digital art style. Deep navy and gold tones.
+---
+# appstore_18.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Stargazer-themed app home screen: observatory interior with starfield visible through dome opening and glowing telescope icon shown inside the device screen. Cosmic illustration style. Deep indigo and warm gold.
+---
+# appstore_19.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Stargazer-themed app discovery session screen: a figure at an open observatory dome with stars above, with glowing choice cards at the bottom of the in-screen UI. Cosmic illustration style. Deep purple and golden starlight.
+---
+# appstore_20.png
+Smartphone app UI mockup illustration, realistic 6.5 inch device frame, dark background, no text. Stargazer-themed app personality result screen: a cosmic star-type character card with constellation motif and personality traits shown inside the screen. Cosmic illustration style. Deep indigo, purple and bright gold.
+---
+# marketing_adventure_1.png
+Soft illustration style, dark atmospheric forest background, dramatic warm golden glow, 9:16 vertical ratio, no text. A lone adventurer standing at a glowing crossroads deep in an enchanted forest, multiple luminous paths stretching forward into the unknown. Bold and hopeful composition. Space for text at top and bottom. Warm amber and deep forest green.
+---
+# marketing_adventure_2.png
+Soft illustration style, dark dramatic mountain background, golden sunset glow, 9:16 vertical ratio, no text. Two adventurers standing on a hilltop overlooking a vast glowing landscape of forests and mountains at dusk. Sense of possibility and shared discovery. Wide open sky with warm amber and violet gradient. Space for text at top.
+---
+# marketing_adventure_3.png
+Soft illustration style, deep enchanted forest night background, magical warm lantern glow, 9:16 vertical ratio, no text. A single glowing lantern hanging from an ancient tree guiding a path forward, small silhouetted figures following its light through ancient trees. Intimate adventure magic. Warm amber lantern against deep emerald darkness. Space for text at bottom.
+---
+# marketing_garden_1.png
+Soft ethereal illustration, deep purple night background, gentle moonlit glow, 9:16 vertical ratio, no text. A moonlit garden path lined with oversized softly glowing flowers, silver mist floating low over the ground. Peaceful, healing, and quietly beautiful. Space for text at top and bottom. Lavender and pale gold tones.
+---
+# marketing_garden_2.png
+Soft illustration style, deep night sky background, warm silver celestial glow, 9:16 vertical ratio, no text. A lone figure sitting under a huge blossoming tree in a moonlit garden, stars perfectly reflected in a still pond nearby. Contemplative solitude and quiet beauty. Deep purple sky, silver moonlight, warm gold shimmer. Space for text at top.
+---
+# marketing_garden_3.png
+Soft illustration style, dark lush floral background, gentle nurturing glow, 9:16 vertical ratio, no text. Oversized luminous flowers blooming around a small figure as if cradling them in a magical garden sanctuary. Safe, nurturing, and magical. Soft pinks, lavender and warm gold against deep purple. Space for text at bottom.
+---
+# marketing_strategy_1.png
+Clean digital art illustration, dark midnight office background, focused blue glow, 9:16 vertical ratio, no text. A figure standing before a floor-to-ceiling glowing strategy board with luminous decision nodes and connecting paths. Power of clarity and purposeful thinking. Cool blue board glow with warm amber accent, dark background. Space for text at top.
+---
+# marketing_strategy_2.png
+Clean digital art illustration, dark urban night background, cool professional glow, 9:16 vertical ratio, no text. A rooftop vantage point over a sprawling glowing city at night, one figure surveying the landscape below with quiet purpose. Strategic perspective from elevation. Cool blue city lights and warm amber lamp. Space for text at bottom.
+---
+# marketing_strategy_3.png
+Clean digital art illustration, dark minimal abstract background, decisive warm glow, 9:16 vertical ratio, no text. A single luminous golden path emerging from a complex dim maze of other routes. The right direction found among complexity. Singular warm gold beam against deep dark, minimal and impactful. Space for text at top and bottom.
+---
+# marketing_stargazer_1.png
+Cosmic illustration style, breathtaking deep space background, stunning cosmic glow, 9:16 vertical ratio, no text. A lone figure lying on a dark hilltop looking up at a vast galaxy filling the entire sky overhead. The connection between one small person and the infinite cosmos. Deep indigo and brilliant gold. Space for text at bottom.
+---
+# marketing_stargazer_2.png
+Cosmic illustration style, open observatory night background, intimate cosmic glow, 9:16 vertical ratio, no text. An open observatory dome revealing a glowing nebula above, two silhouettes inside gazing upward together. Shared wonder and quiet connection. Deep purple and rich gold cosmic light. Space for text at top.
+---
+# marketing_stargazer_3.png
+Cosmic illustration style, dark cosmic background, warm discovery glow, 9:16 vertical ratio, no text. A constellation gradually connecting in the night sky, the final star illuminating to complete a recognizable figure. A picture emerging from scattered points of light. Gold constellation lines on deep indigo. Space for text at bottom.
+---
+# marketing_apocalypse_1.png
+Post-apocalyptic illustration style, dark ruined city background, warm ember and amber glow, 9:16 vertical ratio, no text. Two silhouettes walking side by side through a devastated city street, warm amber light filtering through ash and dust around them. Tender companionship amid vast ruin. Warm orange and amber glow against ash grey and dark. Space for text at top.
+---
+# marketing_apocalypse_2.png
+Post-apocalyptic illustration style, dark ruined cityscape background, warm hopeful ember glow, 9:16 vertical ratio, no text. A single vivid green plant pushing through cracked concrete in a ruined street, bathed in soft amber dawn light. Small, stubborn life in vast ruin. Vivid green against grey rubble and warm orange glow. Space for text at bottom.
+---
+# marketing_apocalypse_3.png
+Post-apocalyptic illustration style, dark wasteland horizon background, intimate campfire glow, 9:16 vertical ratio, no text. A warm campfire burning in the center of the frame with a dark post-apocalyptic landscape stretching beyond, one lone figure sitting beside it. Survival warmth and quiet intimacy. Warm amber fire against dark ash and smoke tones. Space for text at top.
+---
+# ui_session-summary_1.png
+Soft illustration style, dark moody forest background, warm golden hour glow, 4:3 landscape ratio, no text. A wide mystical forest path at golden hour, footsteps glowing faintly along the trail behind a figure who has just passed. Journey completed. Warm amber and deep forest green tones. Adventure session summary card background.
+---
+# ui_session-summary_2.png
+Soft ethereal illustration, dark garden background, moonlit dawn glow, 4:3 landscape ratio, no text. A wide moonlit garden at early dawn, flowers gently closing after a night of blooming, dewdrops catching the first warm light. Completed garden journey feeling. Lavender fading to warm gold. Garden session summary card background.
+---
+# ui_session-summary_3.png
+Clean digital art, dark office background, ambient morning glow, 4:3 landscape ratio, no text. A wide modern strategy office at sunrise with screens off, a completed document on the desk, the city beginning to wake outside the window. Completed strategy session. Cool blue to warm morning gold. Strategy session summary card background.
+---
+# ui_session-summary_4.png
+Cosmic illustration style, dark cosmic background, warm dawn glow, 4:3 landscape ratio, no text. A wide observatory terrace at dawn, telescope at rest, the last constellation fading as soft sunrise fills the sky. Stars and sun coexisting at the edge of night. Completed stargazer journey. Deep indigo to warm gold. Stargazer session summary card background.
+---
+# ui_session-summary_5.png
+Post-apocalyptic illustration style, ruined landscape background, warm amber dawn glow, 4:3 landscape ratio, no text. A wide panoramic view of a ruined city at dawn with hints of green growth returning in the foreground. New beginning in the aftermath. Warm orange sunrise against ash grey ruins. Apocalypse session summary card background.
+---
+# ui_level-transition_1.png
+Soft illustration style, dark background (#12101a), warm anticipatory glow, 4:3 landscape ratio, no text. A small weathered wooden door slightly ajar with warm golden light seeping through the keyhole and gap, as if a new space is about to open. Threshold and quiet anticipation. Warm amber glow against dark wood and deep shadow.
+---
+# ui_level-transition_2.png
+Soft illustration style, dark background (#12101a), ascending warm glow, 4:3 landscape ratio, no text. A spiral stone staircase rising upward with warm light emanating from above, each step faintly illuminated on the way up. Rising through levels, upward progress. Warm gold ascending light against dark stone.
+---
+# ui_level-transition_3.png
+Soft illustration style, dark background (#12101a), expanding ethereal glow, 4:3 landscape ratio, no text. Soft ripples expanding outward on a still dark water surface, catching silver light from an unseen source above. Progress radiating outward in calm waves. Silver and teal ripples on deep dark reflective water.
+---
+# ui_level-transition_4.png
+Soft illustration style, dark background (#12101a), warm breakthrough glow, 4:3 landscape ratio, no text. A chrysalis cracking open with warm golden light bursting through the seams, transformation actively unfolding. Change emerging from within. Warm gold breakthrough light against dark organic cocoon form.
+---
+# ui_level-transition_5.png
+Cosmic illustration style, dark background (#12101a), brilliant cosmic glow, 4:3 landscape ratio, no text. A star suddenly igniting in the dark, expanding rings of light radiating outward like a silent nova. Moment of sudden illumination. Brilliant white and gold nova burst against deep indigo background.
+---
+# ui_loading_1.png
+Soft illustration style, dark background (#12101a), warm magical glow, 4:3 landscape ratio, no text. A softly glowing golden knot slowly untying itself, delicate threads drifting upward like wisps of smoke. AI processing and unraveling feeling. Warm purple and gold thread on dark background. Centered minimal composition.
+---
+# ui_loading_2.png
+Soft illustration style, dark background (#12101a), cool ethereal glow, 4:3 landscape ratio, no text. A gently glowing hourglass suspended in darkness with tiny stars flowing slowly between its two chambers like star-sand. Waiting with quiet beauty. Soft silver and deep purple, star particles drifting gently downward.
+---
+# ui_loading_3.png
+Soft illustration style, dark background (#12101a), soft searching glow, 4:3 landscape ratio, no text. A compass rose floating in darkness, one needle slowly sweeping as if searching for true north, one direction softly illuminated. Seeking direction feeling. Warm gold needle against cool silver compass face, deep dark background.
+---
+# ui_loading_4.png
+Soft illustration style, dark background (#12101a), mysterious amber glow, 4:3 landscape ratio, no text. A closed ancient book floating in darkness with warm amber light seeping through the pages, as if something is being prepared within. Something being assembled inside feeling. Warm amber light from book edges against deep dark leather cover.
+---
+# ui_loading_5.png
+Cosmic illustration style, dark background (#12101a), gathering cosmic glow, 4:3 landscape ratio, no text. Scattered small star fragments slowly drifting together from the edges of the frame, assembling into a constellation pattern at the center. Building and connecting feeling. Soft gold and silver star pieces drifting on deep indigo background.
+---
+# apocalypse_1.png
+Post-apocalyptic illustration style, dark background with warm orange/amber glow, ember and ash tones, 4:3 landscape ratio, no text. An empty city street where tall weeds and grass have broken through the cracked asphalt, a dusty amber-tinted sky above. Eerie silence and reclaimed nature. Warm amber haze on grey ruins, green pushing through dark concrete.
+---
+# apocalypse_2.png
+Post-apocalyptic illustration style, dark ruined urban background, warm ember glow, 4:3 landscape ratio, no text. A shadowy figure visible through a gap in a crumbled concrete wall, cautious eyes peering from the darkness between ruins. Tense first encounter. Dark ash tones with amber backlight silhouetting the shadow, watchful and still.
+---
+# apocalypse_3.png
+Post-apocalyptic illustration style, ruined city street background, warm sunset amber glow, 4:3 landscape ratio, no text. Two small figures walking side by side down a wide devastated street, long sunset shadows stretching ahead of them, rubble lining both sides. First steps of companionship in the ruins. Warm amber and orange sunset against grey ash tones.
+---
+# apocalypse_4.png
+Post-apocalyptic illustration style, dark ruined storefront background, warm interior amber glow, 4:3 landscape ratio, no text. A broken shop window with shattered glass, looking into an old café inside where a ceramic cup still sits abandoned on the counter, exactly as it was left. Haunting normalcy preserved. Warm amber interior glow through dark broken frame.
+---
+# apocalypse_5.png
+Post-apocalyptic illustration style, dark rainy ruins background, cool rain with warm ember glow, 4:3 landscape ratio, no text. Heavy rain falling on a ruined street, two figures sheltering close together under a partially collapsed concrete overhang. Shoulders nearly touching. Grey rain curtain against dark ruins, small warm ember glow from within the shelter.
+---
+# apocalypse_6.png
+Post-apocalyptic illustration style, dark abandoned interior background, dusty amber light shafts, 4:3 landscape ratio, no text. Inside a looted supermarket, empty shelves stretching back into shadow, but in one corner two forgotten cans sit on a lower shelf, catching a shaft of amber light. Last remaining provisions. Dusty amber beams through dark hollow interior.
+---
+# apocalypse_7.png
+Post-apocalyptic illustration style, dark abandoned home interior background, soft amber glow, 4:3 landscape ratio, no text. Inside a deserted house, an open diary lies on a dusty floor with a child's crayon drawing of a smiling family of four tucked between the pages. Preserved memory amid ruin. Soft warm light on the drawing against dusty dark interior.
+---
+# apocalypse_8.png
+Post-apocalyptic illustration style, dark open-air night background, warm campfire and brilliant starfield, 4:3 landscape ratio, no text. Two figures sitting side by side before a glowing campfire, the dark city ruins silhouetted behind them, an extraordinarily star-filled sky above. Stars visible only because the city lights are gone. Warm amber fire glow below, brilliant cold stars above.
+---
+# apocalypse_9.png
+Post-apocalyptic illustration style, dark wasteland background, warm distant ember glow, 4:3 landscape ratio, no text. A distant light blinking slowly across a dark landscape, a thin column of smoke rising above it against the hazy sky. Signal of unseen survivors. Warm amber pinpoint glow in deep dark distance, grey smoke threading upward.
+---
+# apocalypse_10.png
+Post-apocalyptic illustration style, dark ruined road background, warm amber light, 4:3 landscape ratio, no text. A cracked road splitting into two directions, one path wide and together, one narrower and solitary, both disappearing into amber-lit ruins. The weight of diverging choices. Warm amber glow ahead on both paths, dark rubble flanking the fork.
+---
+# apocalypse_11.png
+Post-apocalyptic illustration style, dark grey rubble background, vivid small warm glow, 4:3 landscape ratio, no text. A single small vivid flower blooming through a crack in dark crumbled concrete, its petals extraordinarily bright against the grey ash surroundings. Life insisting on itself. Vivid soft pink flower, warm amber glow against cold grey rubble and ash.
+---
+# apocalypse_12.png
+Post-apocalyptic illustration style, serene ruined riverside background, clear water and warm light, 4:3 landscape ratio, no text. Two figures sitting at the edge of an unexpectedly clear, calm river in the ruins, bare feet dangling in the water. One of them is smiling. Warm amber light on the water, green growth along the riverbank, dark ruin backdrop.
+---
+# apocalypse_13.png
+Post-apocalyptic illustration style, dark ruined street background, quiet amber light, 4:3 landscape ratio, no text. A weathered old red mailbox standing intact on a ruined street corner, a figure holding a blank piece of paper, looking at the mailbox. Unsendable words. Soft amber light on the figure, dark ruined street behind, the mailbox faded but upright.
+---
+# apocalypse_14.png
+Post-apocalyptic illustration style, wide ruined cityscape background, blazing amber dawn, 4:3 landscape ratio, no text. A wide view over broken rooftops and ruins as the sun rises on the horizon, the sky stained deep amber and crimson red. Two small figures silhouetted against the blazing dawn. Ruins made briefly beautiful. Rich warm orange-red sunrise flooding grey devastation.
+---
+# apocalypse_15.png
+Post-apocalyptic illustration style, wide hilltop panoramic view, warm amber and green tones, 4:3 landscape ratio, no text. Two figures standing side by side on a hilltop, the ruined city behind them and a landscape of returning green land ahead. End and beginning coexisting in one view. Warm amber on ruins behind, vivid green ahead, wide open sky.
+---
+# apocalypse_outro.png
+Post-apocalyptic illustration style, wide hilltop dusk background, warm ember and growing green, 4:3 landscape ratio, no text. Two figures standing together at the very top of a hill, the devastated ruins visible behind, and a wide green-returning landscape spread before them, the sky glowing amber and rose. The world ended, but something new begins. Warm amber sky, ash grey behind, vivid green ahead.
+---
+# apocalypse_quiet-strategist.png
+Post-apocalyptic illustration style, dark ruined cityscape background, warm amber ember glow, square 1:1 ratio, no text. A lone survivor crouched over a hand-drawn map on the ground in the ruins, carefully marking routes with chalk or charcoal by the light of an amber lantern. Methodical calm in chaos. Warm amber lantern light on detailed map, dark rubble surroundings.
+---
+# apocalypse_empathic-deliberator.png
+Post-apocalyptic illustration style, dark ruined street background, warm protective amber glow, square 1:1 ratio, no text. A survivor standing slightly behind a companion on a ruined street, one hand gently on their shoulder, watchful and protective. The world shattered but loyalty intact. Warm amber backlight silhouetting the protective figure, dark ruin surroundings.
+---
+# apocalypse_analytical-explorer.png
+Post-apocalyptic illustration style, dark ruined interior background, cool observation glow, square 1:1 ratio, no text. A survivor studying patterns scratched onto a wall — a diagram of some kind — holding a dim torch, observing intently. Finding logic in the wreckage. Cool amber torch glow on detailed wall markings, dark debris surroundings.
+---
+# apocalypse_bold-designer.png
+Post-apocalyptic illustration style, dark dramatic ruined skyline background, fierce amber glow, square 1:1 ratio, no text. A survivor standing at the top of a broken concrete structure, a dark makeshift flag planted beside them, surveying the ruins below. Claiming space in the chaos. Dramatic amber backlight, silhouette against dark broken cityscape.
+---
+# apocalypse_free-healer.png
+Post-apocalyptic illustration style, ruined urban background with surprising green, warm amber glow, square 1:1 ratio, no text. A survivor tending a small patch of growing plants among the ruins, kneeling gently with soil-covered hands, green life spreading where concrete once was. Transforming ruin into garden. Vivid greens and warm amber soil, dark ruin backdrop.
+---
+# apocalypse_warm-guardian.png
+Post-apocalyptic illustration style, dark night ruins background, intimate campfire glow, square 1:1 ratio, no text. A survivor sitting close beside a fire in the ruins, keeping it carefully fed, waiting with patient warmth. Steady presence through the dark. Warm amber campfire glow, dark ruined silhouettes behind, ember sparks rising.
+---
+# apocalypse_intuitive-breaker.png
+Post-apocalyptic illustration style, dark concrete wall background, intense amber burst glow, square 1:1 ratio, no text. A survivor mid-motion, having just broken through a crumbling concrete barrier, light and dust bursting through the newly made gap. Breaking through rather than waiting. Bright amber burst through dark wall, flying debris, fierce forward energy.
+---
+# apocalypse_sensory-adventurer.png
+Post-apocalyptic illustration style, dark grey ash ruin background, vivid warm discovery glow, square 1:1 ratio, no text. A survivor kneeling and gently touching a brilliantly colored wildflower growing through the rubble, eyes wide with quiet wonder. Finding beauty where others see only ruin. Vivid flower color, warm amber touch-light, dark grey surroundings.
+---
+# og_apocalypse_quiet-strategist.png
+Post-apocalyptic illustration style, dark ruined cityscape background, amber ember glow, square 1:1 ratio, no text. A cracked city street map spread across rubble, hand-drawn routes marked in glowing amber lines, a lone figure's shadow at the edge. Calm strategy in devastation. Warm amber route lines on dark worn paper, grey rubble surroundings.
+---
+# og_apocalypse_empathic-deliberator.png
+Post-apocalyptic illustration style, dark ruined street background, soft warm amber glow, square 1:1 ratio, no text. Two figures silhouetted in warm amber backlight walking side by side down a ruined street, close together. Companionship as survival. Rich warm amber backlight, dark rubble on both sides, intimate figure closeness.
+---
+# og_apocalypse_analytical-explorer.png
+Post-apocalyptic illustration style, dark ruined interior background, cool amber glow, square 1:1 ratio, no text. A ruined wall covered in hand-drawn diagrams and observations, lit by a dim torch, patterns emerging from the chaos. Finding law in the lawless. Cool amber torch glow, intricate wall markings, deep dark interior.
+---
+# og_apocalypse_bold-designer.png
+Post-apocalyptic illustration style, dark dramatic ruined skyline, fierce amber sunset, square 1:1 ratio, no text. A dark makeshift flag planted atop a crumbling concrete structure against an amber-blazing sky. Claiming the future in the ruins. Bold silhouette flag against vivid amber and orange sunset sky, dark broken city below.
+---
+# og_apocalypse_free-healer.png
+Post-apocalyptic illustration style, dark grey ruin background, vivid warm green and amber glow, square 1:1 ratio, no text. A small garden growing improbably from cracked pavement, vivid green leaves and flowers spreading outward from a central point in the grey ruins. Life reclaiming the concrete. Vivid greens and warm amber glow, dark grey rubble surrounding.
+---
+# og_apocalypse_warm-guardian.png
+Post-apocalyptic illustration style, dark night ruins background, warm intimate campfire glow, square 1:1 ratio, no text. A campfire burning steadily in the ruins, warm amber and orange light pooling outward, ember sparks drifting upward into the dark sky. Steady warmth held against the dark. Warm amber fire at center, dark ruin silhouettes, glowing ember sparks rising.
+---
+# og_apocalypse_intuitive-breaker.png
+Post-apocalyptic illustration style, dark crumbled concrete background, dramatic burst glow, square 1:1 ratio, no text. A gaping break through a thick concrete wall, warm amber light and dust pouring through the new opening, debris still falling. The path made by force. Bright amber burst through dark wall gap, dynamic falling dust and rubble.
+---
+# og_apocalypse_sensory-adventurer.png
+Post-apocalyptic illustration style, dark grey devastated background, vivid discovery glow, square 1:1 ratio, no text. A single vivid wildflower in bloom, petals intensely colored against grey ash and crumbled concrete, a warm amber shaft of light falling exactly on it. The one beautiful thing. Vivid flower color, warm amber spotlight, stark grey ruin background.
+---
+# apocalypse_level1.png
+Post-apocalyptic illustration style, dark devastated urban background, cold ash tones, 4:3 landscape ratio, no text. A heavily ruined cityscape with collapsed buildings and cracked streets, almost entirely grey and ash-colored. Only the faintest hint of amber in the distant sky. Maximum devastation, minimum life. Cold ash grey and dark, minimal warmth.
+---
+# apocalypse_level2.png
+Post-apocalyptic illustration style, ruined urban background, mostly ash with emerging warmth, 4:3 landscape ratio, no text. A ruined city street with a few small patches of grass and weeds pushing through the cracked pavement. Amber light returning slightly on the horizon. Small signs of life beginning. Mostly cold grey ruins, small vivid green patches, faint warm amber.
+---
+# apocalypse_level3.png
+Post-apocalyptic illustration style, half-ruined half-green urban background, balanced warm amber glow, 4:3 landscape ratio, no text. A ruined street where vines and green growth now cover roughly half of the structures. Ruins and nature coexisting equally. Warm amber light across the scene. Equal grey ruin and vivid green, warm amber glow.
+---
+# apocalypse_level4.png
+Post-apocalyptic illustration style, mostly green recovering landscape, warm amber glow, 4:3 landscape ratio, no text. A landscape where green trees and plants dominate, with only occasional crumbled ruin visible beneath or behind the growth. Nature reclaiming the city. Dominant vivid green, warm amber light, partial ruin forms visible beneath growth.
+---
+# apocalypse_level5.png
+Post-apocalyptic illustration style, lush green renewed landscape with ruin traces, warm golden glow, 4:3 landscape ratio, no text. A lush green landscape with trees, flowers, and clear water, only faint crumbled ruin outlines visible at the very edges of the scene. Near-complete renewal. Rich vivid green and warm gold, ruin forms barely visible at frame edges.
+---
+# home_card_apocalypse.png
+Post-apocalyptic illustration style, dark atmospheric background, warm ember amber glow, 4:3 landscape ratio, no text. A dark ruined city skyline silhouette at dusk, broken buildings and structures outlined against a deep amber and orange glowing sky. Moody and evocative. Dark near-black city silhouette, rich warm amber and orange sky gradient.
+---
+# apocalypse-session-enter-bg.png
+Post-apocalyptic illustration style, dark ruined interior background, warm amber and ember glow, 16:9 landscape ratio, no text. A survivor standing at the entrance to the ruined city, seen from behind, the vast devastated cityscape stretching ahead under an amber haze sky. A beginning. Dark figure at threshold, warm amber light ahead, dark rubble framing the sides.
+---
+# apocalypse-listen-bg.png
+Post-apocalyptic illustration style, dim abandoned room interior background, soft amber listening glow, 16:9 landscape ratio, no text. Two figures seated facing each other in a dim abandoned room, a small candle or ember between them, leaning slightly forward in quiet conversation. Intimate listening in the ruins. Warm amber candle glow, dark crumbled walls, close quiet figures.
+---
+# apocalypse-research-bg.png
+Post-apocalyptic illustration style, ruined wall interior background, focused amber investigation glow, 16:9 landscape ratio, no text. A wide ruined interior wall covered in collected notes, maps, and observations, a figure standing before it illuminated by a lantern. Gathering information from the wreckage. Amber lantern light on detailed wall arrangement, dark ruin interior.
+---
+# apocalypse-conclude-bg.png
+Post-apocalyptic illustration style, wide open ruined vista background, warm amber dusk glow, 16:9 landscape ratio, no text. Two figures sitting together at the edge of a ruined rooftop, looking out over the city below in quiet thought. Conclusion and reflection in the ruins. Warm amber dusk, dark ruined city below, contemplative stillness.
+---
+# apocalypse-complete-bg.png
+Post-apocalyptic illustration style, hilltop panoramic background, warm amber dawn and green, 16:9 landscape ratio, no text. A wide hilltop scene at dawn, two figures standing looking at the horizon where ruins give way to returning green land. Journey complete, something new ahead. Wide warm amber dawn sky, ruin behind, green ahead, open horizon.
+---
+# apocalypse-avatar.png
+Post-apocalyptic illustration style, dark neutral background, warm soft amber glow, square 1:1 ratio, no text. A companion character in a worn hooded jacket, hood slightly down, looking gently toward the viewer with a warm and steady expression. A survivor who feels safe. Warm amber tones on face and jacket, soft dark background, approachable and intimate.
+---
+# apocalypse-enter-bg.png
+Post-apocalyptic illustration style, wide panoramic ruined cityscape background, rich amber and orange sunset glow, 16:9 landscape ratio, no text. A breathtaking wide panorama of a devastated city at golden sunset — collapsed skyscrapers, empty highways, and overgrown streets stretching to the horizon under a blazing amber and orange sky. Epic and melancholy. Rich warm amber and orange sky, deep grey-green ruined cityscape silhouette.
+---
+# landing_1.png
+Soft mixed illustration style, dark atmospheric background, warm inviting glow, 16:9 landscape ratio, no text. A hero panoramic scene showing all four theme worlds side by side blending into each other — enchanted forest, moonlit garden, dark office at night, and starry observatory — lit from within. Pullim's universe at a glance. Warm amber and purple and indigo tones, cohesive dark background.
+---
+# landing_2.png
+Soft illustration style, dark background, warm glowing center, 16:9 landscape ratio, no text. A single glowing doorway standing in darkness, warm golden light pouring out from within, a path of light spreading outward from the entrance. "Come find your way" feeling. Minimal and compelling. Warm gold doorway glow, deep dark background, light path forward.
+---
+# landing_3.png
+Soft illustration style, dark night background, warm intimate glow, 16:9 landscape ratio, no text. A wide cozy scene of a figure sitting alone at a small lit window at night, surrounded by the dark, with soft warm light within. Safe internal space against a vast unknown outside. Warm amber window glow, deep dark exterior, intimate interior light.
+---
+# landing_4.png
+Soft illustration style, dark flowing abstract background, warm calm glow, 16:9 landscape ratio, no text. Abstract flowing lines of soft light gently untangling and separating in dark space, like a knot slowly releasing. Pullim's core metaphor — untangling complexity. Warm amber and soft gold flowing lines on deep dark background, smooth organic motion.
+---
+# landing_5.png
+Soft illustration style, dark open sky background, warm hopeful glow, 16:9 landscape ratio, no text. A wide open night landscape with a single warm light on a distant hill and a figure walking toward it on a path that is barely visible. The journey toward clarity. Deep dark foreground, warm amber destination light on horizon, quiet hope and forward motion.

@@ -3,7 +3,7 @@
 // 선택은 이야기의 일부처럼 느끼게, 성격 측정은 뒤에서.
 // "벤치에 앉을래 지나갈래?" > "너는 분석적이야 직관적이야?"
 
-export type ThemeType = "adventure" | "garden" | "strategy" | "stargazer";
+export type ThemeType = "adventure" | "garden" | "strategy" | "stargazer" | "apocalypse";
 export type Axis = "approach" | "risk" | "coping" | "decision";
 
 export interface Signal {
@@ -674,7 +674,6 @@ const STARGAZER_SCENES: StoryScene[] = [
   {
     id: "stargazer_11",
     illustration: "작은 망원경을 조립하는 안내서, 부품이 여러 개 흩어져 있음",
-    imagePath: "/images/v3/stargazer_11.png",
     narrative: "작은 망원경 키트가 있어.\n안내서대로 하면 만들 수 있어.\n\n부품이 생각보다 많아.",
     choices: [
       { emoji: "📋", label: "안내서를 먼저 다 읽는다", spicyLabel: "ㅋㅋ 모범생 코스", signals: [{ axis: "approach", value: -1 }] },
@@ -685,7 +684,6 @@ const STARGAZER_SCENES: StoryScene[] = [
   {
     id: "stargazer_12",
     illustration: "지구에서 가장 가까운 별 알파 센타우리까지의 거리가 적힌 안내판",
-    imagePath: "/images/v3/stargazer_12.png",
     narrative: "안내판에 적혀 있어.\n\"가장 가까운 별까지 4.2광년.\"\n\n빛의 속도로 4년.\n뭔가 멀고도 가까운 느낌.",
     choices: [
       { emoji: "🤯", label: "우주의 크기에 압도된다", spicyLabel: "나 = 먼지 ㅋ 실감남", signals: [{ axis: "coping", value: 1 }] },
@@ -696,7 +694,6 @@ const STARGAZER_SCENES: StoryScene[] = [
   {
     id: "stargazer_13",
     illustration: "천문대 카페에 관측 일지들이 쌓여 있음, 방문자들이 남긴 것",
-    imagePath: "/images/v3/stargazer_13.png",
     narrative: "천문대 한쪽에\n방문자 관측 일지들이 쌓여 있어.\n\n아무나 남길 수 있대.\n빈 페이지가 있어.",
     choices: [
       { emoji: "✍️", label: "오늘 본 것을 적는다", spicyLabel: "기록은 남는 게 맞음", signals: [{ axis: "approach", value: 1 }], recommended: true },
@@ -707,7 +704,6 @@ const STARGAZER_SCENES: StoryScene[] = [
   {
     id: "stargazer_14",
     illustration: "새벽빛이 지평선에 올라오기 시작, 별이 하나씩 사라짐",
-    imagePath: "/images/v3/stargazer_14.png",
     narrative: "어느새 새벽이야.\n별이 하나씩 사라지고 있어.\n\n곧 다 사라질 거야.",
     choices: [
       { emoji: "🌅", label: "마지막 별을 찾아 눈에 담는다", spicyLabel: "사라지기 전에 봐야지", signals: [{ axis: "coping", value: 1 }], recommended: true },
@@ -718,12 +714,183 @@ const STARGAZER_SCENES: StoryScene[] = [
   {
     id: "stargazer_15",
     illustration: "천문대 출구, 열린 문 너머로 새벽빛이 쏟아짐",
-    imagePath: "/images/v3/stargazer_15.png",
     narrative: "천문대 문 앞에 서 있어.\n밖은 이미 새벽이야.\n\n밤새 본 것들이\n머릿속에 남아 있어.",
     choices: [
       { emoji: "🌄", label: "새벽 공기를 마시며 나간다", spicyLabel: "끝냈으면 나가야지", signals: [{ axis: "decision", value: 1 }] },
       { emoji: "🔭", label: "망원경을 한 번 더 들여다본다", spicyLabel: "조금만 더 — 항상 이래", signals: [{ axis: "coping", value: 1 }], recommended: true },
       { emoji: "📓", label: "오늘 밤을 정리하고 나간다", spicyLabel: "마무리가 있어야 다음이 있음", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════
+// 종말 — 극한 속 감성, 살아남으며 느끼는 것
+// ═══════════════════════════════════════════
+
+const APOCALYPSE_SCENES: StoryScene[] = [
+  {
+    id: "apocalypse_1",
+    imagePath: "/assets/discovery/apocalypse_1.png",
+    illustration: "텅 빈 도시, 잡초가 아스팔트를 뚫고 올라옴, 먼지 낀 하늘",
+    narrative: "조용해.\n너무 조용해서 네 발소리가 전부야.\n\n도시는 텅 비었고\n잡초가 도로를 뚫고 올라왔어.\n\n갈림길이야.\n한쪽은 도심 깊숙이,\n다른 쪽은 강이 보이는 언덕.",
+    choices: [
+      { emoji: "🏚️", label: "도심으로 — 남겨진 흔적이 궁금하다", spicyLabel: "사람 없는 도시 = 자유 아님?", signals: [{ axis: "risk", value: 1 }] },
+      { emoji: "🌊", label: "언덕으로 — 물소리가 들린다", spicyLabel: "폐허에서 물소리면 거의 축복", signals: [{ axis: "risk", value: -1 }], recommended: true },
+    ],
+  },
+  {
+    id: "apocalypse_2",
+    imagePath: "/assets/discovery/apocalypse_2.png",
+    illustration: "무너진 건물 사이에서 누군가의 그림자, 경계하는 눈",
+    narrative: "발소리.\n네 것이 아닌 발소리.\n\n무너진 벽 뒤에서\n누군가 이쪽을 보고 있어.\n\n경계하는 눈이야.\n근데 적대적이진 않아 보여.",
+    choices: [
+      { emoji: "🤝", label: "먼저 손을 든다", spicyLabel: "총 없는 세상에서 손 드는 건 용기", signals: [{ axis: "approach", value: 1 }, { axis: "risk", value: 1 }] },
+      { emoji: "👀", label: "가만히 서서 지켜본다", spicyLabel: "먼저 움직이면 지는 거 아님?", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "💬", label: "\"혼자야?\" 말을 건다", spicyLabel: "이 상황에 대화가 되나 ㅋ", signals: [{ axis: "coping", value: 1 }, { axis: "approach", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_3",
+    imagePath: "/assets/discovery/apocalypse_3.png",
+    illustration: "두 사람이 나란히 걷는 폐허의 거리, 석양빛",
+    narrative: "이름을 주고받았어.\n어색한 침묵 뒤에\n걷기 시작해.\n\n그 사람이 물어.\n\"여기서 뭘 찾고 있어?\"",
+    choices: [
+      { emoji: "🏠", label: "\"돌아갈 곳\"", spicyLabel: "없는 걸 찾는 건 미련인가 희망인가", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "🤷", label: "\"나도 몰라. 그냥 걷고 있어\"", spicyLabel: "목적 없는 게 편할 때도 있음", signals: [{ axis: "decision", value: -1 }], recommended: true },
+      { emoji: "👥", label: "\"누군가\"", spicyLabel: "혼자는 진짜 무섭다", signals: [{ axis: "coping", value: -1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_4",
+    imagePath: "/assets/discovery/apocalypse_4.png",
+    illustration: "깨진 유리창 너머로 보이는 낡은 카페, 컵이 그대로 놓여있음",
+    narrative: "카페가 있어.\n유리가 깨졌는데\n안에 컵이 그대로야.\n\n누군가 마시다 두고 간 것 같아.\n\n그 사람이 안으로 들어가.\n\"잠깐 쉬어가자.\"",
+    choices: [
+      { emoji: "☕", label: "마주 앉는다", spicyLabel: "세상 망해도 카페 감성은 살아있음", signals: [{ axis: "approach", value: 1 }], recommended: true },
+      { emoji: "🚪", label: "문 앞에서 망을 본다", spicyLabel: "쉬는 것도 사치인 세상", signals: [{ axis: "risk", value: -1 }] },
+      { emoji: "📖", label: "벽에 적힌 낙서를 읽는다", spicyLabel: "다른 사람들의 흔적이 궁금함", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  // ─── 보너스 장면 ───
+  {
+    id: "apocalypse_5",
+    imagePath: "/assets/discovery/apocalypse_5.png",
+    illustration: "비가 내리는 폐허, 무너진 지붕 아래에서 둘이 비를 피함",
+    narrative: "비가 와.\n무너진 지붕 아래로 들어가.\n좁아서 어깨가 닿아.\n\n빗소리 말고는\n아무 소리도 없어.",
+    choices: [
+      { emoji: "🌧️", label: "그냥 비를 듣는다", spicyLabel: "비 오면 말 안 해도 되는 거 아님?", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "💬", label: "\"비 전엔 뭐 했어?\"", spicyLabel: "세상 끝나기 전 이야기가 제일 서글픔", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "🔥", label: "불을 피울 재료를 찾는다", spicyLabel: "감성은 배부를 때 하는 거", signals: [{ axis: "coping", value: -1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_6",
+    imagePath: "/assets/discovery/apocalypse_6.png",
+    illustration: "버려진 슈퍼마켓, 선반은 비었지만 한쪽에 통조림이 남아있음",
+    narrative: "슈퍼마켓을 발견했어.\n선반은 대부분 비었는데\n한쪽 구석에 통조림이 남아 있어.\n\n두 개뿐이야.",
+    choices: [
+      { emoji: "🤝", label: "하나씩 나눈다", spicyLabel: "당연한 거 아님? 둘이잖아", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🎁", label: "\"네가 다 가져\"", spicyLabel: "양보 본능 발동", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📦", label: "더 있는지 뒤져본다", spicyLabel: "2개로 만족하면 안 됨", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_7",
+    imagePath: "/assets/discovery/apocalypse_7.png",
+    illustration: "버려진 집 안, 열린 일기장, 아이의 그림이 끼워져 있음",
+    narrative: "집 안에 일기장이 있어.\n펼쳐진 페이지에\n아이가 그린 그림이 끼워져 있어.\n\n가족 네 명.\n전부 웃고 있어.",
+    choices: [
+      { emoji: "😢", label: "잠깐 멈춘다", spicyLabel: "이런 거 보면 멈출 수밖에 없음", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "📕", label: "덮는다", spicyLabel: "남의 기억에 들어가면 안 나옴", signals: [{ axis: "risk", value: -1 }] },
+      { emoji: "🖼️", label: "그림을 챙긴다", spicyLabel: "누군가의 기억을 지켜주고 싶음", signals: [{ axis: "approach", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_8",
+    imagePath: "/assets/discovery/apocalypse_8.png",
+    illustration: "밤, 모닥불 앞에 둘이 앉아있고, 별이 쏟아지는 하늘",
+    narrative: "밤이야.\n모닥불을 피웠어.\n\n도시 불빛이 없으니\n별이 미칠 듯이 선명해.\n\n그 사람이 하늘을 보며 말해.\n\"이렇게 예쁜 건 처음이야.\"",
+    choices: [
+      { emoji: "⭐", label: "\"세상이 망해야 보이는 것들이 있나봐\"", spicyLabel: "아이러니가 진짜 현실", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "🔥", label: "불만 바라본다", spicyLabel: "별 볼 기분 아님", signals: [{ axis: "coping", value: -1 }] },
+      { emoji: "🌌", label: "같이 올려다본다", spicyLabel: "지금 이 순간이 전부임", signals: [{ axis: "coping", value: 1 }], recommended: true },
+    ],
+  },
+  {
+    id: "apocalypse_9",
+    imagePath: "/assets/discovery/apocalypse_9.png",
+    illustration: "먼 곳에서 깜빡이는 불빛, 연기가 올라옴",
+    narrative: "멀리서 불빛이 보여.\n연기도 올라와.\n\n다른 사람들이 있다는 뜻이야.\n\n그 사람이 물어.\n\"가볼까?\"",
+    choices: [
+      { emoji: "🚶", label: "간다 — 사람이 더 있다면", spicyLabel: "둘보다 여럿이 나을 수도", signals: [{ axis: "risk", value: 1 }, { axis: "decision", value: 1 }] },
+      { emoji: "🤔", label: "\"조심해서 가까이만\"", spicyLabel: "좋은 사람일 거란 보장 없음", signals: [{ axis: "risk", value: -1 }], recommended: true },
+      { emoji: "🏕️", label: "\"여기가 좋아\"", spicyLabel: "모르는 사람보다 아는 한 명", signals: [{ axis: "approach", value: -1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_10",
+    imagePath: "/assets/discovery/apocalypse_10.png",
+    illustration: "갈림길, 한쪽은 둘이 함께하는 길, 다른 쪽은 혼자의 길",
+    narrative: "길이 갈라져.\n한쪽은 해안,\n다른 쪽은 산.\n\n그 사람이 원하는 곳과\n네가 원하는 곳이 다를 수도 있어.\n\n\"너는 어디로 가고 싶어?\"",
+    choices: [
+      { emoji: "🏖️", label: "\"네가 가는 쪽으로\"", spicyLabel: "방향보다 사람이 중요함", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "⛰️", label: "\"산으로. 높은 곳에서 보고 싶어\"", spicyLabel: "내 방향은 내가 정해야지", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "🤝", label: "\"같이 정하자\"", spicyLabel: "둘이니까 같이 결정해야지", signals: [{ axis: "approach", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_11",
+    imagePath: "/assets/discovery/apocalypse_11.png",
+    illustration: "콘크리트 틈에서 핀 작은 꽃, 주변은 잿빛 폐허",
+    narrative: "콘크리트 틈에서\n꽃이 피어 있어.\n\n작고 연약한데\n색이 놀라울 정도로 선명해.\n\n이 폐허에서 이게 자랐다는 게.",
+    choices: [
+      { emoji: "🌸", label: "사진을 찍을 수 없으니, 오래 본다", spicyLabel: "기록 못 하면 기억이라도", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "🌱", label: "물을 조금 준다", spicyLabel: "살리고 싶은 본능", signals: [{ axis: "approach", value: 1 }] },
+      { emoji: "💭", label: "\"우리도 저럴 수 있을까\"", spicyLabel: "꽃이 되고 싶은 건지 부러운 건지", signals: [{ axis: "risk", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_12",
+    imagePath: "/assets/discovery/apocalypse_12.png",
+    illustration: "맑은 강, 두 사람이 발을 담그고 앉아있음",
+    narrative: "강을 찾았어.\n물이 맑아.\n\n신발 벗고 발을 담가.\n차가운데 기분이 좋아.\n\n그 사람이 웃어.\n오랜만에 보는 웃음이야.",
+    choices: [
+      { emoji: "😊", label: "따라 웃는다", spicyLabel: "웃음이 전염되는 건 세상 끝나도 같음", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "💧", label: "물에 비친 얼굴을 본다", spicyLabel: "내가 어떤 표정인지 모르겠음", signals: [{ axis: "approach", value: -1 }], recommended: true },
+      { emoji: "🏊", label: "더 깊이 들어간다", spicyLabel: "발만 담그면 아쉽잖아", signals: [{ axis: "risk", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_13",
+    imagePath: "/assets/discovery/apocalypse_13.png",
+    illustration: "낡은 우체통 앞, 손에 쥔 빈 종이",
+    narrative: "우체통이 있어.\n받을 사람은 없겠지만\n종이와 펜은 있어.\n\n뭔가 쓸 수 있어.\n보낼 수는 없지만.",
+    choices: [
+      { emoji: "✉️", label: "편지를 쓴다", spicyLabel: "안 보내도 쓰는 건 의미 있음", signals: [{ axis: "coping", value: 1 }] },
+      { emoji: "📝", label: "\"여기 사람 있었음\" 만 적는다", spicyLabel: "존재 증명이 가장 중요", signals: [{ axis: "decision", value: 1 }], recommended: true },
+      { emoji: "🚶", label: "지나친다", spicyLabel: "보낼 수 없는 편지는 의미 없음", signals: [{ axis: "risk", value: -1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_14",
+    imagePath: "/assets/discovery/apocalypse_14.png",
+    illustration: "새벽, 폐허 위로 해가 떠오르는 순간, 하늘이 붉게 물듦",
+    narrative: "새벽이야.\n폐허 위로 해가 올라와.\n\n하늘이 붉고\n세상이 잠깐 아름다워.\n\n그 사람이 조용히 말해.\n\"내일도 뜨겠지.\"",
+    choices: [
+      { emoji: "🌅", label: "\"그래, 그게 중요한 거지\"", spicyLabel: "해 뜨는 건 약속 같은 거", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "😶", label: "말없이 같이 본다", spicyLabel: "말보다 함께 보는 게 나을 때", signals: [{ axis: "approach", value: -1 }] },
+      { emoji: "🚶", label: "\"가자, 해 뜨기 전에\"", spicyLabel: "감상할 시간은 없음", signals: [{ axis: "decision", value: 1 }] },
+    ],
+  },
+  {
+    id: "apocalypse_15",
+    imagePath: "/assets/discovery/apocalypse_15.png",
+    illustration: "언덕 위, 두 사람이 나란히 서서 먼 곳을 바라봄, 폐허와 초록이 공존하는 풍경",
+    narrative: "언덕 꼭대기에 올랐어.\n뒤로는 지나온 폐허,\n앞으로는 초록이 돌아오는 땅.\n\n세상은 끝났는데\n뭔가 시작되는 것 같기도 해.\n\n옆에 사람이 있어.\n그걸로 충분한 것 같아.",
+    choices: [
+      { emoji: "🌿", label: "\"가보자\"", spicyLabel: "끝이 아니라 다음이었네", signals: [{ axis: "decision", value: 1 }] },
+      { emoji: "🧡", label: "\"고마워, 같이 와줘서\"", spicyLabel: "혼자였으면 여기까지 못 옴", signals: [{ axis: "coping", value: 1 }], recommended: true },
+      { emoji: "⏸️", label: "잠깐, 여기서 좀 더 보고 싶다", spicyLabel: "전환점에선 멈춰야 함", signals: [{ axis: "decision", value: -1 }] },
     ],
   },
 ];
@@ -783,6 +950,19 @@ export const THEME_STORIES: Record<ThemeType, ThemeStory> = {
     outroImagePath: "/assets/discovery/strategy_outro.jpg",
     minScenes: 10,
     continuePrompt: "다음 미션 받을래?",
+    startPrompt: "여기서 시작하기",
+  },
+  apocalypse: {
+    theme: "apocalypse",
+    name: "종말",
+    bgImage: "/assets/campfire-bg.webp",
+    introText: "세상은 끝났는데,\n너는 여기 있어.",
+    scenes: APOCALYPSE_SCENES,
+    outroNarrative: "언덕 위에서 바라본 세상.\n폐허와 초록이 공존해.\n\n끝이라고 생각했는데\n옆에 사람이 있었어.\n그걸로 충분했어.",
+    outroButtonText: "☄️ 이 세상에서 시작하기",
+    outroImagePath: "/assets/discovery/apocalypse_outro.png",
+    minScenes: 10,
+    continuePrompt: "좀 더 걸어볼래?",
     startPrompt: "여기서 시작하기",
   },
 };

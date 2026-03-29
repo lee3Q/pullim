@@ -19,6 +19,7 @@ const STAGE_CONFIG = {
       친구: "이야기를 찾아보는 중...",
       코치: "자료를 조사하는 중...",
       별지기: "별자리를 읽는 중...",
+      동행자: "흔적을 따라가는 중...",
     } as Record<CharacterName, string>,
   },
   analyze: {
@@ -30,6 +31,7 @@ const STAGE_CONFIG = {
       친구: "꽃봉오리가 피어나는 중...",
       코치: "분석을 진행하는 중...",
       별지기: "별빛이 비추는 중...",
+      동행자: "잿빛 속에서 빛을 찾는 중...",
     } as Record<CharacterName, string>,
   },
   debate: {
@@ -41,6 +43,7 @@ const STAGE_CONFIG = {
       친구: "꽃들이 속삭이는 중...",
       코치: "의견을 나누는 중...",
       별지기: "별들이 대화하는 중...",
+      동행자: "폐허에서 이야기를 나누는 중...",
     } as Record<CharacterName, string>,
   },
   conclude: {
@@ -52,6 +55,7 @@ const STAGE_CONFIG = {
       친구: "마음을 정리하는 중...",
       코치: "결론을 정리하는 중...",
       별지기: "밤하늘에 기록하는 중...",
+      동행자: "마지막 페이지를 넘기는 중...",
     } as Record<CharacterName, string>,
   },
 };

@@ -1,0 +1,23 @@
+[stargazer_level2] Cosmic illustration style, dark background, growing starlight glow, mobile app card size 4:3 ratio, no text. Star charts spread across a desk with patterns being traced by candlelight. Connections forming. Warm amber lines on indigo maps. Level 2: observing patterns.
+---
+[stargazer_level5] Cosmic illustration style, dark background, warm dawn cosmic glow, mobile app card size 4:3 ratio, no text. Standing at the observatory dome opening, dawn breaking with the last bright star (Venus) visible. Clear direction found. Warm gold horizon against fading stars. Level 5: decision.
+---
+[crystal_magnify] Soft illustration style, dark background (#12101a), warm analytical glow, square 1:1 ratio, no text. A magnifying glass hovering over a map, the area under the lens glowing brighter and revealing hidden details. Deep investigation feeling. Warm gold lens glow against cool blue map.
+---
+[crystal_puzzle] Soft illustration style, dark background (#12101a), interconnected glow, square 1:1 ratio, no text. Multiple floating puzzle pieces with edges glowing, slowly drifting toward each other as if magnetized. Connections forming feeling. Warm gold edges against deep purple space.
+---
+[crystal_compass] Soft illustration style, dark background (#12101a), decisive glow, square 1:1 ratio, no text. A compass rose with one direction glowing brighter than the others, settled and certain. Direction found feeling. Bright gold north against subtle silver other directions.
+---
+[summary_adventure] Soft illustration style, dark background (#12101a), magical glow, 16:9 landscape ratio, no text. A wide enchanted forest scene at golden hour with a path that has been clearly walked, footprints glowing faintly. A completed journey through the adventure world. Warm amber and deep green. Session summary card background.
+---
+[summary_strategy] Clean digital art, dark background (#12101a), ambient professional glow, 16:9 landscape ratio, no text. A wide modern office at sunrise, screens off, a completed strategy document on the desk, city awakening outside the window. A completed journey through the strategy world. Cool blue to warm morning. Session summary card background.
+---
+[summary_stargazer] Cosmic illustration style, dark background (#12101a), dawn cosmic glow, 16:9 landscape ratio, no text. A wide observatory terrace at dawn, telescope resting, the last constellation fading as warm sunrise fills the sky. Stars and sun coexisting. A completed journey through the stargazer world. Deep indigo to warm gold. Session summary card background.
+---
+[bg_onboarding] Soft illustration style, dark background (#12101a), warm welcoming glow, 9:16 vertical full screen ratio, no text. A winding path through three different landscapes merging seamlessly — garden flowers, forest trees, and city lights — leading toward a warm glowing doorway in the distance. First-time welcome and onboarding feeling. Inviting and safe.
+---
+[bg_achievement] Soft illustration style, dark background (#12101a), celebratory warm glow, square 1:1 ratio, no text. A treasure chest opening with warm golden light and sparkles flowing upward, small gems floating gently. Positive achievement moment. Something wonderful unlocked feeling. Gold and warm purple tones.
+---
+[bg_settings] Soft illustration style, dark background (#12101a), calm ambient glow, 9:16 vertical full screen ratio, no text. A cozy study nook with a small desk, warm lamp, and a window showing a starry night. Personal and intimate. Your space feeling for profile and settings. Warm amber lamp against cool starry window.
+---
+[marketing_summary_v2] Soft illustration style, dark background (#12101a), warm inviting glow, square 1:1 ratio, no text. A single glowing doorway standing alone in complete darkness, warm golden light spilling out invitingly through the open door. Simple but compelling come discover yourself feeling. Minimal composition. Gold and deep purple tones.

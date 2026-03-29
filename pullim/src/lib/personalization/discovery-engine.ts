@@ -178,7 +178,7 @@ export function buildProbabilityProfile(
   selections: SelectionRecord[],
   userName: string = "",
   speechStyle: "casual" | "formal" = "casual",
-  selectedTheme: "adventure" | "garden" | "strategy" | "stargazer" = "adventure"
+  selectedTheme: "adventure" | "garden" | "strategy" | "stargazer" | "apocalypse" = "adventure"
 ): ProbabilityProfile {
   const profile = createEmptyProfile();
   profile.userName = userName;

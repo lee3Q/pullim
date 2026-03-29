@@ -10,6 +10,7 @@ export interface ThemedLabel {
   garden: string;
   strategy: string;
   stargazer: string;
+  apocalypse: string;
 }
 
 export interface PersonalityType {
@@ -35,9 +36,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "quiet-strategist",
     name: "조용한 전략가",
     emoji: "🧭",
-    themedName: { adventure: "지도를 먼저 펴는 모험가", garden: "은은한 달빛을 가진 사람", strategy: "시스템 아키텍트", stargazer: "좌표를 먼저 잡는 별을 가진 사람" },
-    themedEmoji: { adventure: "🗺️", garden: "🌑", strategy: "🧭", stargazer: "🌐" },
-    themedAttitude: { adventure: "당신이 길을 잃지 않도록, 선택지를 구조화해서 보여줄게요. 분석할 시간도 충분히 줄 거예요.", garden: "조용히 옆에 앉아서, 생각이 정리될 때까지 기다려줄게요. 재촉하지 않을게요.", strategy: "데이터와 근거를 먼저 펼쳐놓고, 당신이 직접 판단할 수 있게 도울게요.", stargazer: "어느 방향으로 가고 싶은지 같이 찾아볼게요. 별자리처럼 점들을 이어서 길을 만들어줄게요." },
+    themedName: { adventure: "지도를 먼저 펴는 모험가", garden: "은은한 달빛을 가진 사람", strategy: "시스템 아키텍트", stargazer: "좌표를 먼저 잡는 별을 가진 사람", apocalypse: "폐허에서 지도를 그리는 생존자" },
+    themedEmoji: { adventure: "🗺️", garden: "🌑", strategy: "🧭", stargazer: "🌐", apocalypse: "🗺️" },
+    themedAttitude: { adventure: "당신이 길을 잃지 않도록, 선택지를 구조화해서 보여줄게요. 분석할 시간도 충분히 줄 거예요.", garden: "조용히 옆에 앉아서, 생각이 정리될 때까지 기다려줄게요. 재촉하지 않을게요.", strategy: "데이터와 근거를 먼저 펼쳐놓고, 당신이 직접 판단할 수 있게 도울게요.", stargazer: "어느 방향으로 가고 싶은지 같이 찾아볼게요. 별자리처럼 점들을 이어서 길을 만들어줄게요.", apocalypse: "폐허에서도 구조를 찾아줄게요. 남은 것들로 다시 시작하는 길을 같이 그려요." },
     description:
       "당신은 감정보다 구조를 믿는 사람이에요. 복잡한 상황을 차분히 분해하고, 혼자서 깊이 생각한 뒤 움직이는 스타일이죠. 대화보다 메모나 다이어그램이 더 편할 때가 많아요.",
     pullimTone:
@@ -54,9 +55,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "empathic-deliberator",
     name: "신중한 공감자",
     emoji: "🌿",
-    themedName: { adventure: "동료의 등을 지키는 모험가", garden: "따뜻한 안개빛을 가진 사람", strategy: "인사 컨설턴트", stargazer: "조용히 곁에 있는 별을 가진 사람" },
-    themedEmoji: { adventure: "🛡️", garden: "🌫️", strategy: "🤝", stargazer: "🌙" },
-    themedAttitude: { adventure: "당신이 망설일 때, '괜찮아요'가 아니라 '뭐가 걸려요?'를 먼저 물을게요.", garden: "감정을 먼저 알아채고, 결정은 그 다음에 천천히 같이 해요.", strategy: "사람 관계에서 오는 고민을 먼저 풀어주고, 업무 결정은 그 뒤에 도울게요.", stargazer: "어느 방향인지 모르는 게 당연해요. 밤하늘처럼 천천히, 같이 바라볼게요." },
+    themedName: { adventure: "동료의 등을 지키는 모험가", garden: "따뜻한 안개빛을 가진 사람", strategy: "인사 컨설턴트", stargazer: "조용히 곁에 있는 별을 가진 사람", apocalypse: "동행자의 등을 지키는 생존자" },
+    themedEmoji: { adventure: "🛡️", garden: "🌫️", strategy: "🤝", stargazer: "🌙", apocalypse: "🤲" },
+    themedAttitude: { adventure: "당신이 망설일 때, '괜찮아요'가 아니라 '뭐가 걸려요?'를 먼저 물을게요.", garden: "감정을 먼저 알아채고, 결정은 그 다음에 천천히 같이 해요.", strategy: "사람 관계에서 오는 고민을 먼저 풀어주고, 업무 결정은 그 뒤에 도울게요.", stargazer: "어느 방향인지 모르는 게 당연해요. 밤하늘처럼 천천히, 같이 바라볼게요.", apocalypse: "세상이 무너져도 옆에 있을게요. 같이 걸으면 길이 돼요." },
     description:
       "당신은 천천히, 하지만 깊이 연결되는 사람이에요. 결정을 내리기 전에 상대방의 감정까지 고려하고, 관계를 소중히 여겨요. 서두르지 않는 것이 바로 강점이에요.",
     pullimTone:
@@ -73,9 +74,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "analytical-explorer",
     name: "분석적 탐험가",
     emoji: "🔭",
-    themedName: { adventure: "미지의 길을 계산하는 모험가", garden: "호기심 가득한 새벽빛을 가진 사람", strategy: "데이터 전략가", stargazer: "은하수를 분석하는 별을 가진 사람" },
-    themedEmoji: { adventure: "🧪", garden: "🌅", strategy: "📊", stargazer: "🔭" },
-    themedAttitude: { adventure: "모험 전에 리스크를 같이 따져보고, 준비된 상태에서 뛰어들게 도울게요.", garden: "궁금한 것을 하나씩 풀어가면서, 알아가는 재미를 같이 느낄게요.", strategy: "불확실한 것과 확실한 것을 나눠서, 결정의 근거를 함께 만들어요.", stargazer: "가능성을 하나씩 관측하면서, 어떤 별이 당신의 방향인지 같이 찾아볼게요." },
+    themedName: { adventure: "미지의 길을 계산하는 모험가", garden: "호기심 가득한 새벽빛을 가진 사람", strategy: "데이터 전략가", stargazer: "은하수를 분석하는 별을 가진 사람", apocalypse: "폐허에서 법칙을 찾는 생존자" },
+    themedEmoji: { adventure: "🧪", garden: "🌅", strategy: "📊", stargazer: "🔭", apocalypse: "🔍" },
+    themedAttitude: { adventure: "모험 전에 리스크를 같이 따져보고, 준비된 상태에서 뛰어들게 도울게요.", garden: "궁금한 것을 하나씩 풀어가면서, 알아가는 재미를 같이 느낄게요.", strategy: "불확실한 것과 확실한 것을 나눠서, 결정의 근거를 함께 만들어요.", stargazer: "가능성을 하나씩 관측하면서, 어떤 별이 당신의 방향인지 같이 찾아볼게요.", apocalypse: "무너진 것 속에서도 패턴을 찾아줄게요. 데이터가 없어도 관찰은 가능하니까요." },
     description:
       "당신은 논리로 무장하고 모험에 뛰어드는 사람이에요. 새로운 것을 두려워하지 않지만, 아무렇게나 달려가진 않아요. 데이터와 직관을 동시에 쓰는 희귀한 유형이에요.",
     pullimTone:
@@ -92,9 +93,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "bold-designer",
     name: "대담한 설계자",
     emoji: "⚡",
-    themedName: { adventure: "모두를 이끌고 뛰어드는 모험가", garden: "불꽃 같은 빛을 가진 사람", strategy: "프로덕트 디렉터", stargazer: "유성처럼 빠르게 타오르는 별을 가진 사람" },
-    themedEmoji: { adventure: "⚔️", garden: "🔥", strategy: "🎯", stargazer: "🌠" },
-    themedAttitude: { adventure: "당신의 큰 그림을 존중하면서, 놓치기 쉬운 디테일을 챙겨줄게요.", garden: "에너지가 넘칠 때는 같이 달리고, 지칠 때는 쉬어가자고 말할게요.", strategy: "방향은 당신이 정하고, 실행 계획은 같이 짤게요. 번아웃만 조심해요.", stargazer: "당신이 보고 싶은 별 쪽으로 망원경을 맞춰줄게요. 방향이 많아도 괜찮아요." },
+    themedName: { adventure: "모두를 이끌고 뛰어드는 모험가", garden: "불꽃 같은 빛을 가진 사람", strategy: "프로덕트 디렉터", stargazer: "유성처럼 빠르게 타오르는 별을 가진 사람", apocalypse: "폐허 위에 깃발을 꽂는 생존자" },
+    themedEmoji: { adventure: "⚔️", garden: "🔥", strategy: "🎯", stargazer: "🌠", apocalypse: "🏴" },
+    themedAttitude: { adventure: "당신의 큰 그림을 존중하면서, 놓치기 쉬운 디테일을 챙겨줄게요.", garden: "에너지가 넘칠 때는 같이 달리고, 지칠 때는 쉬어가자고 말할게요.", strategy: "방향은 당신이 정하고, 실행 계획은 같이 짤게요. 번아웃만 조심해요.", stargazer: "당신이 보고 싶은 별 쪽으로 망원경을 맞춰줄게요. 방향이 많아도 괜찮아요.", apocalypse: "당신이 앞장서면 같이 뛸게요. 이 세상에서도 이끌 수 있는 사람이에요." },
     description:
       "당신은 도전하면서 남도 끌어안는 사람이에요. 새로운 상황에 강하고, 공감력까지 높아서 팀에서 든든한 존재가 되는 경우가 많아요. 단, 너무 많은 것을 동시에 하려는 경향이 있어요.",
     pullimTone:
@@ -111,9 +112,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "free-healer",
     name: "자유로운 치유자",
     emoji: "🌊",
-    themedName: { adventure: "흐름을 따라가는 모험가", garden: "물결치는 빛을 가진 사람", strategy: "크리에이티브 디렉터", stargazer: "바람 부는 대로 떠도는 별을 가진 사람" },
-    themedEmoji: { adventure: "🍃", garden: "💧", strategy: "🎨", stargazer: "💫" },
-    themedAttitude: { adventure: "정해진 길 말고, 당신만의 방식을 같이 찾아갈게요. 자유롭게요.", garden: "느낌을 먼저 물어보고, 거기서부터 이야기를 풀어갈게요.", strategy: "틀에 가두지 않을게요. 당신의 직감을 믿으면서, 방향만 같이 잡아요.", stargazer: "어디로 가고 싶은지 느낌부터 물어볼게요. 별자리 이름 몰라도 괜찮아요." },
+    themedName: { adventure: "흐름을 따라가는 모험가", garden: "물결치는 빛을 가진 사람", strategy: "크리에이티브 디렉터", stargazer: "바람 부는 대로 떠도는 별을 가진 사람", apocalypse: "폐허를 정원으로 바꾸는 생존자" },
+    themedEmoji: { adventure: "🍃", garden: "💧", strategy: "🎨", stargazer: "💫", apocalypse: "🌱" },
+    themedAttitude: { adventure: "정해진 길 말고, 당신만의 방식을 같이 찾아갈게요. 자유롭게요.", garden: "느낌을 먼저 물어보고, 거기서부터 이야기를 풀어갈게요.", strategy: "틀에 가두지 않을게요. 당신의 직감을 믿으면서, 방향만 같이 잡아요.", stargazer: "어디로 가고 싶은지 느낌부터 물어볼게요. 별자리 이름 몰라도 괜찮아요.", apocalypse: "규칙 없는 세상이 오히려 자유일 수도 있어요. 느낌대로 걸어요." },
     description:
       "당신은 직감으로 느끼고 혼자 해결해나가는 사람이에요. 규칙보다 흐름을 믿고, 자기만의 방식으로 상황을 풀어가요. 자유롭게 두면 엄청난 것을 만들어내는 유형이에요.",
     pullimTone:
@@ -130,9 +131,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "warm-guardian",
     name: "따뜻한 수호자",
     emoji: "🌙",
-    themedName: { adventure: "모닥불을 지키는 모험가", garden: "포근한 달빛을 가진 사람", strategy: "팀 매니저", stargazer: "누군가를 오래 바라보는 별을 가진 사람" },
-    themedEmoji: { adventure: "🏕️", garden: "🌙", strategy: "👥", stargazer: "🌟" },
-    themedAttitude: { adventure: "당신이 지쳤을 때 먼저 알아채고, 쉬어가자고 말할게요.", garden: "마음이 무거울 때 옆에 있어줄게요. 해결보다 함께 있는 게 먼저예요.", strategy: "혼자 다 짊어지지 않도록, 나눌 수 있는 것을 같이 찾아줄게요.", stargazer: "밤하늘 아래 당신 옆에 있을게요. 어떤 별을 보고 싶은지 먼저 들을게요." },
+    themedName: { adventure: "모닥불을 지키는 모험가", garden: "포근한 달빛을 가진 사람", strategy: "팀 매니저", stargazer: "누군가를 오래 바라보는 별을 가진 사람", apocalypse: "모닥불 옆에서 기다리는 생존자" },
+    themedEmoji: { adventure: "🏕️", garden: "🌙", strategy: "👥", stargazer: "🌟", apocalypse: "🔥" },
+    themedAttitude: { adventure: "당신이 지쳤을 때 먼저 알아채고, 쉬어가자고 말할게요.", garden: "마음이 무거울 때 옆에 있어줄게요. 해결보다 함께 있는 게 먼저예요.", strategy: "혼자 다 짊어지지 않도록, 나눌 수 있는 것을 같이 찾아줄게요.", stargazer: "밤하늘 아래 당신 옆에 있을게요. 어떤 별을 보고 싶은지 먼저 들을게요.", apocalypse: "세상이 끝나도 불을 지켜줄 사람이에요. 옆에 있을게요." },
     description:
       "당신은 직관으로 상황을 파악하고 주변 사람을 돌보는 사람이에요. 감정을 언어화하는 데 탁월하고, 누군가 힘들 때 가장 먼저 알아채는 타입이에요.",
     pullimTone:
@@ -149,9 +150,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "intuitive-breaker",
     name: "직관적 돌파자",
     emoji: "🔥",
-    themedName: { adventure: "벽을 부수고 나아가는 모험가", garden: "번개 같은 빛을 가진 사람", strategy: "그로스 해커", stargazer: "유성처럼 한 방향으로 돌진하는 별을 가진 사람" },
-    themedEmoji: { adventure: "💥", garden: "⚡", strategy: "🚀", stargazer: "⚡" },
-    themedAttitude: { adventure: "당신의 돌진을 막지 않을게요. 대신, 뛰기 전에 한 가지만 같이 확인해요.", garden: "에너지를 존중하면서, 방향이 맞는지만 가끔 물어볼게요.", strategy: "빠른 실행을 도우면서, 놓친 리스크가 없는지 옆에서 체크할게요.", stargazer: "달려가고 싶은 별 방향이 생기면 같이 뛸게요. 방향만 한 번 같이 잡고요." },
+    themedName: { adventure: "벽을 부수고 나아가는 모험가", garden: "번개 같은 빛을 가진 사람", strategy: "그로스 해커", stargazer: "유성처럼 한 방향으로 돌진하는 별을 가진 사람", apocalypse: "벽을 뚫고 길을 만드는 생존자" },
+    themedEmoji: { adventure: "💥", garden: "⚡", strategy: "🚀", stargazer: "⚡", apocalypse: "💥" },
+    themedAttitude: { adventure: "당신의 돌진을 막지 않을게요. 대신, 뛰기 전에 한 가지만 같이 확인해요.", garden: "에너지를 존중하면서, 방향이 맞는지만 가끔 물어볼게요.", strategy: "빠른 실행을 도우면서, 놓친 리스크가 없는지 옆에서 체크할게요.", stargazer: "달려가고 싶은 별 방향이 생기면 같이 뛸게요. 방향만 한 번 같이 잡고요.", apocalypse: "이 세상에서 당신의 돌파력이 빛나요. 부수고 나가면 같이 따라갈게요." },
     description:
       "당신은 느끼는 대로 뛰어드는 사람이에요. 분석보다 행동이 앞서고, 위기 상황에서 오히려 빛을 발해요. 규칙을 따르기보다 새로운 길을 만드는 유형이에요.",
     pullimTone:
@@ -168,9 +169,9 @@ const PERSONALITY_TYPES: PersonalityType[] = [
     id: "sensory-adventurer",
     name: "감각적 모험가",
     emoji: "✨",
-    themedName: { adventure: "바람을 따라가는 모험가", garden: "무지갯빛을 가진 사람", strategy: "브랜드 스토리텔러", stargazer: "오로라처럼 빛나는 별을 가진 사람" },
-    themedEmoji: { adventure: "🌬️", garden: "🌈", strategy: "✍️", stargazer: "🌌" },
-    themedAttitude: { adventure: "당신이 느끼는 것을 같이 느끼면서, 그 감각을 언어로 만들어줄게요.", garden: "지금 이 순간의 감정을 소중히 다루면서, 거기서 의미를 찾아갈게요.", strategy: "숫자보다 이야기로, 당신만의 언어로 상황을 정리해줄게요.", stargazer: "오늘 밤 어떤 별이 제일 예뻐 보이는지 먼저 물어볼게요. 감각이 방향이 돼요." },
+    themedName: { adventure: "바람을 따라가는 모험가", garden: "무지갯빛을 가진 사람", strategy: "브랜드 스토리텔러", stargazer: "오로라처럼 빛나는 별을 가진 사람", apocalypse: "폐허에서 아름다움을 찾는 생존자" },
+    themedEmoji: { adventure: "🌬️", garden: "🌈", strategy: "✍️", stargazer: "🌌", apocalypse: "🌸" },
+    themedAttitude: { adventure: "당신이 느끼는 것을 같이 느끼면서, 그 감각을 언어로 만들어줄게요.", garden: "지금 이 순간의 감정을 소중히 다루면서, 거기서 의미를 찾아갈게요.", strategy: "숫자보다 이야기로, 당신만의 언어로 상황을 정리해줄게요.", stargazer: "오늘 밤 어떤 별이 제일 예뻐 보이는지 먼저 물어볼게요. 감각이 방향이 돼요.", apocalypse: "콘크리트 틈의 꽃을 먼저 발견하는 사람이에요. 그 감각이 이 세상에서 빛나요." },
     description:
       "당신은 감각과 감정으로 세상을 탐험하는 사람이에요. 새로운 경험을 좋아하고, 사람과의 연결에서 에너지를 얻어요. 있는 그대로의 순간을 즐기는 능력이 뛰어나요.",
     pullimTone:
