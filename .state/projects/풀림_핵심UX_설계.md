@@ -88,3 +88,8 @@
 - 2026-03-28: 피드백 2라운드 반영. 연타 버그 수정(isTransitioning), 추천 배지 ✦, Android 폰트 수정, 파악 스킵 추가, 데이터/대화 안내 문구, 결과 텍스트 밝기, technique 태그 제거. 매운맛 모드 구현(88개 spicyLabel + 톱니바퀴 토글). 홈 화면 재설계(기분5버튼→테마3카드). 2-model CC로 안전 이슈 6건 수정.
 - 2026-03-28 (2): API 테스트 설계 3-model CC 3라운드 완료. 토큰 로깅 코드(모델별 단가 맵 + dev-only SSE) + 테스트 가이드(시나리오3+안전테스트+2회전Go/No-Go) 작성. 빌드 통과.
 - 2026-03-29: **전면 점검**. 대표 피드백 기반 13개 문제 식별. P1 즉시 수정(스트리밍 태그 노출→regex split). 밤배치 5개 하네스 작성: H1(데모응답확충+완주), H2(텍스트게임UX), H3(약속기능기반), H4(이미지+배포), H5(내면사고개선). 결정 기록: .state/decisions/2026-03-29_전면점검_분석.md
+- 2026-03-30 (2): **H5 완료** (커밋 f5f67bd). behind-the-scenes.ts toneAdjustment 4→12종(복합조건4+레벨별3+첫턴1+단일4), describeBehindInference() 추가. useSettings showBehindThoughts 추가. LadderSession에 currentInference state + 💭 표시 UI(설정 on 시 레벨 인디케이터 아래). 빌드 통과.
+- 2026-03-30: **H1 P2/P3 완료** (커밋 d70df4f). demo-ladder.ts 레벨 1-4 응답 3→8개 확충, 5테마 THEME_RESPONSES 추가(달빛정원/전략실/천문대/종말), getDemoSummary 테마별 5종. route.ts resolveTheme 종말 누락 버그 수정. generateSummary catch → getDemoSummary 폴백. 빌드 통과.
+- 2026-03-30 (3): **H2 완료** (커밋 c750b4a). 진입 옵션 3→2개(🎮이야기로풀어볼래/💬직접말할게), 레벨별 배경이미지 28vh+250ms fade 트랜지션, 25개 내러티브 텍스트(5테마×5레벨). LadderSession.tsx만 수정. 빌드 통과.
+- 2026-03-30 (4): **H3 완료** (커밋 96833bd). PullimPromise 타입 추가, promise-store.ts 신규(localStorage CRUD), SessionSummary에 약속 제안 UI(테마별 3개 예시+수락/거절), LadderSession 진입화면에 active 약속 확인 UI(했어/못했어/나중에+긍정 피드백). 빌드 통과.
+- 2026-03-30 (5): **밤배치 6/6 전체 완료 검증** — 빌드 통과, Vercel 푸시 완료. 전면 점검(P1~P7) 중 P1~P5 해결, P6(배포) 완료, P7(내면사고) 개선.
