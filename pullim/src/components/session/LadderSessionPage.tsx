@@ -37,6 +37,7 @@ export default function LadderSessionPage({
         "전략실": "/strategy",
         "달빛정원": "/garden",
         "천문대": "/stargazer",
+        "종말": "/apocalypse",
       };
       const route = themeRoutes[targetTheme] || "/adventure";
       router.push(`${route}/new?mode=ladder&entry=${entryMode}`);

@@ -134,7 +134,7 @@ export default function LadderSession({
   onThemeChange,
 }: LadderSessionProps) {
   const router = useRouter();
-  const { settings } = useSettings();
+  const { settings, update: updateSettings } = useSettings();
   const store = useLadderStore();
 
   const [phase, setPhase] = useState<Phase>("entry");
@@ -565,6 +565,8 @@ export default function LadderSession({
           "모험가": "/adventure",
           "전략실": "/strategy",
           "달빛정원": "/garden",
+          "천문대": "/stargazer",
+          "종말": "/apocalypse",
         };
         const route = themeRoutes[targetTheme] || "/adventure";
         const sessionId = store.sessionId || "new";
@@ -588,7 +590,7 @@ export default function LadderSession({
           >
             지난번 약속 기억해?
           </h2>
-          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>
+          <p className="text-xs font-rpg-sm" style={{ color: "rgba(232,213,181,0.85)" }}>
             💫 해봤어?
           </p>
         </div>
@@ -598,7 +600,7 @@ export default function LadderSession({
             <div
               className="rpg-panel rounded-2xl p-5 space-y-3"
             >
-              <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.55)" }}>
+              <p className="text-xs font-rpg-sm" style={{ color: "rgba(232,213,181,0.75)" }}>
                 <span style={{ color: "var(--fantasy-gold)" }}>만약</span>{" "}
                 {activePromise.trigger}
               </p>
@@ -634,7 +636,7 @@ export default function LadderSession({
                   setPromiseChecked(true);
                 }}
                 className="w-full py-2 text-center text-xs font-rpg-sm transition-colors"
-                style={{ color: "rgba(192,167,136,0.40)" }}
+                style={{ color: "rgba(232,213,181,0.60)" }}
               >
                 나중에 얘기할게
               </button>
@@ -671,7 +673,7 @@ export default function LadderSession({
           >
             오늘은 어떻게 시작할까?
           </h2>
-          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>편한 방식을 골라봐</p>
+          <p className="text-xs font-rpg-sm" style={{ color: "rgba(232,213,181,0.85)" }}>편한 방식을 골라봐</p>
         </div>
 
         <div className="space-y-3">
@@ -700,7 +702,7 @@ export default function LadderSession({
                     >
                       {opt.label}
                     </p>
-                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
+                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.80)" }}>
                       {opt.sub}
                     </p>
                   </div>
@@ -779,23 +781,33 @@ export default function LadderSession({
                 }}
               />
             ))}
-            <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(192,167,136,0.55)" }}>
+            <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(232,213,181,0.75)" }}>
               {LEVEL_LABELS[level]}
             </span>
           </div>
-          <button
-            onClick={generateSummary}
-            disabled={isLoading}
-            className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
-            style={{ color: "rgba(192,163,116,0.55)" }}
-          >
-            오늘은 여기까지
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => updateSettings({ themeMode: settings.themeMode === "dark" ? "light" : "dark" })}
+              className="text-[13px] transition-opacity hover:opacity-80 py-2 px-1"
+              style={{ opacity: 0.55 }}
+              title={settings.themeMode === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+            >
+              {settings.themeMode === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+            </button>
+            <button
+              onClick={generateSummary}
+              disabled={isLoading}
+              className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
+              style={{ color: "rgba(192,163,116,0.55)" }}
+            >
+              오늘은 여기까지
+            </button>
+          </div>
         </div>
         {/* 내러티브 텍스트 */}
         <p
           className="text-[10px] font-rpg-sm italic mt-0.5 ml-1 animate-in fade-in duration-500"
-          style={{ color: "rgba(192,167,136,0.45)" }}
+          style={{ color: "rgba(232,213,181,0.65)" }}
         >
           {LEVEL_NARRATIVES[THEME_IMAGE_MAP[theme] ?? "adventure"]?.[level] ?? ""}
         </p>
@@ -890,7 +902,7 @@ export default function LadderSession({
                 <p className="text-sm font-rpg text-center leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
                   {cheatPostAction.themeSuggestion.reason}
                 </p>
-                <p className="text-xs font-rpg-sm text-center" style={{ color: "rgba(192,167,136,0.55)" }}>
+                <p className="text-xs font-rpg-sm text-center" style={{ color: "rgba(232,213,181,0.75)" }}>
                   분위기 바꿔볼까?
                 </p>
                 <div className="flex gap-2">

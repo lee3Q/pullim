@@ -112,10 +112,16 @@ export default function HomePage() {
 
   const [showThemeHelp, setShowThemeHelp] = useState(false);
 
-  const handleThemeSelect = (themeKey: ThemeType) => {
+  const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {
     setSelectedTheme(themeKey);
     setSelectedEntry("concern");
-    setPhase("discover");
+    if (discover) {
+      // 파악(스토리 디스커버리) 먼저 진행
+      setPhase("discover");
+      return;
+    }
+    // 기본: 파악 건너뛰고 바로 세션 진입
+    handleStartSession(THEME_TO_NAME[themeKey], "concern");
   };
 
   const handleDiscoveryComplete = useCallback(
@@ -282,8 +288,8 @@ export default function HomePage() {
               >
                 어떤 분위기에서 이야기할까?
               </h1>
-              <p className="text-sm font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
-                분위기를 골라봐. 나중에 바꿀 수도 있어.
+              <p className="text-sm font-rpg-sm" style={{ color: "rgba(232,213,181,0.70)" }}>
+                분위기를 골라봐. 바로 대화가 시작돼.
               </p>
             </div>
 
@@ -312,7 +318,7 @@ export default function HomePage() {
                       <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
                         {t.desc}
                       </p>
-                      <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.45)" }}>
+                      <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.60)" }}>
                         {t.when}
                       </p>
                     </div>
@@ -321,8 +327,8 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* 모르겠어 → 더 설명 */}
-            <div className="text-center">
+            {/* 모르겠어 → 더 설명 / 파악 먼저 */}
+            <div className="text-center space-y-1">
               <button
                 onClick={() => setShowThemeHelp((v) => !v)}
                 className="text-xs font-rpg-sm transition-colors py-3 px-2"
@@ -340,19 +346,19 @@ export default function HomePage() {
                   border: "1px solid rgba(255,255,255,0.07)",
                 }}
               >
-                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(232,213,181,0.8)" }}>
                   <strong style={{ color: "#a78bfa" }}>달빛정원</strong>은 감정에 집중해요. 위로받고 싶거나, 마음이 복잡할 때. 조용하고 따뜻한 톤.
                 </p>
-                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(232,213,181,0.8)" }}>
                   <strong style={{ color: "#ff9f1c" }}>모험가의 숲</strong>은 직관에 집중해요. 뭘 원하는지 모르겠거나, 막막할 때. 이야기를 따라가다 보면 실마리가 보여요.
                 </p>
-                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(232,213,181,0.8)" }}>
                   <strong style={{ color: "#60a5fa" }}>전략실</strong>은 논리에 집중해요. 선택지를 비교하거나, 체계적으로 정리하고 싶을 때. 데이터 기반.
                 </p>
-                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(192,167,136,0.7)" }}>
+                <p className="text-xs font-rpg-sm leading-relaxed" style={{ color: "rgba(232,213,181,0.8)" }}>
                   <strong style={{ color: "#4338ca" }}>천문대</strong>는 가능성에 집중해요. 방향을 모르겠거나, 새로운 길을 찾고 싶을 때. 별처럼 가능성을 탐색해요.
                 </p>
-                <p className="text-[10px] font-rpg-sm mt-2" style={{ color: "rgba(192,167,136,0.35)" }}>
+                <p className="text-[10px] font-rpg-sm mt-2" style={{ color: "rgba(232,213,181,0.50)" }}>
                   어떤 걸 골라도 대화 중에 분위기를 바꿀 수 있어요.
                 </p>
               </div>
@@ -375,7 +381,7 @@ export default function HomePage() {
             <button
               onClick={() => handleStartSession(THEME_TO_NAME[selectedTheme], selectedEntry)}
               className="w-full text-center text-xs font-rpg-sm transition-colors pt-4 pb-2"
-              style={{ color: "rgba(192,163,116,0.35)" }}
+              style={{ color: "rgba(232,213,181,0.60)" }}
             >
               건너뛰고 바로 대화하기 →
             </button>

@@ -51,11 +51,108 @@ body {
   --fantasy-gold: #C0A374;
   --fantasy-gold-bright: #F1E1C5;
   --fantasy-gold-dark: #b8860b;
-  --fantasy-text: #C0A788;
+  --fantasy-text: #E8D5B5;
   --fantasy-leather: #4b2b1a;
   --fantasy-leather-deep: #2a140c;
   --fantasy-leather-darkest: #1a0b06;
   --fantasy-button-text: #f3e3c4;
+}
+
+/* ========================================
+   Light Mode Override
+   data-theme="light" 속성이 html에 설정되면 활성화
+   ======================================== */
+[data-theme="light"] {
+  --rpg-gold: rgba(184, 120, 20, 1);
+  --rpg-gold-50: rgba(184, 120, 20, 0.5);
+  --rpg-gold-25: rgba(184, 120, 20, 0.25);
+  --rpg-gold-15: rgba(184, 120, 20, 0.15);
+  --rpg-gold-light: rgba(200, 160, 60, 0.5);
+  --rpg-brown-dark: rgba(78, 52, 26, 0.1);
+  --rpg-brown: rgba(139, 90, 43, 0.08);
+
+  --fantasy-card: #FFFFFF;
+  --fantasy-card-deep: #FFF8F0;
+  --fantasy-gold: #A07840;
+  --fantasy-gold-bright: #5C3D1E;
+  --fantasy-gold-dark: #8B6914;
+  --fantasy-text: #3D2B1F;
+  --fantasy-leather: #D4C4A8;
+  --fantasy-leather-deep: #C8B898;
+  --fantasy-leather-darkest: #B8A888;
+  --fantasy-button-text: #3D2B1F;
+
+  --color-background: #FAF6F0;
+  --color-foreground: #3D2B1F;
+}
+
+[data-theme="light"] body {
+  background: #FAF6F0;
+  color: #3D2B1F;
+}
+
+[data-theme="light"] html {
+  background: #FAF6F0;
+}
+
+[data-theme="light"] .rpg-panel {
+  background: linear-gradient(145deg, #FFFFFF, #FFF8F0);
+  border-color: #C8A96E;
+  box-shadow:
+    inset 0 0 30px rgba(200, 180, 140, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 4px 16px rgba(100, 80, 50, 0.12);
+}
+
+[data-theme="light"] .rpg-panel-light {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 248, 240, 0.95));
+  border-color: rgba(160, 120, 64, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 2px 8px rgba(100, 80, 50, 0.1);
+}
+
+[data-theme="light"] .rpg-button {
+  background: linear-gradient(145deg, #A07840, #8B6914);
+  border-color: #C8A96E;
+  box-shadow:
+    0 2px 0 #7A5A10,
+    0 3px 8px rgba(100, 80, 50, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #FFF8F0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .rpg-button:hover {
+  background: linear-gradient(145deg, #8B6914, #7A5A10);
+  border-color: #A07840;
+}
+
+[data-theme="light"] .rpg-button-ghost {
+  background: rgba(255, 248, 240, 0.6);
+  border-color: rgba(160, 120, 64, 0.3);
+  color: #4A3728;
+}
+
+[data-theme="light"] .rpg-button-ghost:hover {
+  background: rgba(212, 196, 168, 0.3);
+  border-color: rgba(160, 120, 64, 0.5);
+  color: #3D2B1F;
+}
+
+[data-theme="light"] .rpg-input {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(160, 120, 64, 0.3);
+  color: #3D2B1F;
+}
+
+[data-theme="light"] .rpg-input::placeholder {
+  color: rgba(61, 43, 31, 0.35);
+}
+
+[data-theme="light"] .rpg-input:focus {
+  border-color: #A07840;
+  box-shadow: 0 0 12px rgba(160, 120, 64, 0.15);
 }
 
 /* ========================================

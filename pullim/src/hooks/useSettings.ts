@@ -4,17 +4,31 @@ import { useState, useCallback, useEffect } from "react";
 
 const STORAGE_KEY = "pullim_settings";
 
+type ThemeMode = "dark" | "light";
+
 interface PullimSettings {
   showRecommendations: boolean;
   spicyMode: boolean;
   showBehindThoughts: boolean;
+  themeMode: ThemeMode;
 }
 
 const DEFAULTS: PullimSettings = {
   showRecommendations: true,
   spicyMode: false,
   showBehindThoughts: false,
+  themeMode: "dark",
 };
+
+function applyTheme(mode: ThemeMode) {
+  if (typeof document !== "undefined") {
+    if (mode === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  }
+}
 
 export function useSettings() {
   const [settings, setSettings] = useState<PullimSettings>(DEFAULTS);
@@ -23,7 +37,10 @@ export function useSettings() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setSettings({ ...DEFAULTS, ...JSON.parse(stored) });
+        const parsed = { ...DEFAULTS, ...JSON.parse(stored) };
+        setSettings(parsed);
+        // 저장된 테마 즉시 적용
+        applyTheme(parsed.themeMode);
       }
     } catch {
       // localStorage 실패 무시
@@ -38,6 +55,9 @@ export function useSettings() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         } catch {
           // localStorage 실패 무시
+        }
+        if (patch.themeMode !== undefined) {
+          applyTheme(patch.themeMode);
         }
         return next;
       });
