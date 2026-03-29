@@ -295,35 +295,43 @@ export default function HomePage() {
 
             <div className="space-y-3">
               {THEME_CARDS.map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => handleThemeSelect(t.key)}
-                  className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
-                             hover:scale-[1.01] active:scale-[0.98]"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                      <Image
-                        src={t.imagePath}
-                        alt={t.name}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
+                <div key={t.key} className="space-y-1">
+                  <button
+                    onClick={() => handleThemeSelect(t.key)}
+                    className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
+                               hover:scale-[1.01] active:scale-[0.98]"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                        <Image
+                          src={t.imagePath}
+                          alt={t.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
+                          {t.name}
+                        </p>
+                        <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
+                          {t.desc}
+                        </p>
+                        <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.60)" }}>
+                          {t.when}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
-                        {t.name}
-                      </p>
-                      <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
-                        {t.desc}
-                      </p>
-                      <p className="text-[11px] mt-1.5 font-rpg-sm" style={{ color: "rgba(232,213,181,0.60)" }}>
-                        {t.when}
-                      </p>
-                    </div>
-                  </div>
-                </button>
+                  </button>
+                  <button
+                    onClick={() => handleThemeSelect(t.key, true)}
+                    className="w-full text-center text-[10px] font-rpg-sm py-1 transition-colors"
+                    style={{ color: "rgba(232,213,181,0.40)" }}
+                  >
+                    나를 먼저 파악해줘 →
+                  </button>
+                </div>
               ))}
             </div>
 
