@@ -7,7 +7,7 @@
 
 PROJECT_ROOT="$HOME/study/main/pullim"
 HARNESS_DIR="$PROJECT_ROOT/.state/harnesses"
-TASK_TIMEOUT=2400  # 40분 (각 태스크)
+TASK_TIMEOUT=2700  # 45분 (각 태스크, H2 대비 여유)
 
 tasks() {
   # Task 1: 이미지 매핑 + 아포칼립스 배포 (가장 단순, 빌드 확인 포함)
@@ -19,8 +19,8 @@ tasks() {
   # Task 3: 내면사고 개선
   run_task 3 "내면사고" "$COMMON 하네스 파일을 읽어라: $HARNESS_DIR/2026-03-29_H5_내면사고개선.md — 모든 작업 항목을 AC에 맞춰 실행하라. 빌드 통과 확인."
 
-  # Task 4: 텍스트 게임 UX (가장 큰 작업)
-  run_task 4 "텍스트게임UX" "$COMMON 하네스 파일을 읽어라: $HARNESS_DIR/2026-03-29_H2_텍스트게임UX.md — 모든 작업 항목을 AC에 맞춰 실행하라. 철학 참조: ~/study/main/pullim/제품/풀림_미션과_진짜UX_2026-03-25.md 와 ~/study/main/pullim/제품/풀림_진짜시작_2026-03-24.md 를 반드시 읽고 반영하라. 빌드 통과 확인."
+  # Task 4: 텍스트 게임 UX (가장 큰 작업 — 우선순위: Task 1-2만 필수, 3-4는 시간 허용 시)
+  run_task 4 "텍스트게임UX" "$COMMON 하네스 파일을 읽어라: $HARNESS_DIR/2026-03-29_H2_텍스트게임UX.md — 우선순위: Task 1(진입화면 분리)과 Task 2(배경이미지)가 필수. Task 3(내러티브)과 Task 4(선택지 게임화)는 시간이 남으면 실행. 반드시 기존 LadderSession.tsx를 먼저 읽고 최신 코드 위에 수정하라(이전 태스크가 수정했을 수 있음). 철학 참조: ~/study/main/pullim/제품/풀림_미션과_진짜UX_2026-03-25.md 와 ~/study/main/pullim/제품/풀림_진짜시작_2026-03-24.md 를 반드시 읽고 반영하라. 빌드 통과 확인."
 
   # Task 5: 약속 기능 기반 (신규 기능)
   run_task 5 "약속기능" "$COMMON 하네스 파일을 읽어라: $HARNESS_DIR/2026-03-29_H3_약속기능기반.md — 모든 작업 항목을 AC에 맞춰 실행하라. 철학 참조: ~/study/main/pullim/.state/projects/풀림_철학개선.md 의 '약속' 섹션을 반드시 읽고 반영하라. 빌드 통과 확인."
