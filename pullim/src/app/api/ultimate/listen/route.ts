@@ -5,7 +5,7 @@ import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { readBehavior, type BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { CRYSTALS, CrystalName, type ThemeName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
-import { getDemoLadderResponse } from "@/lib/session/demo-ladder";
+import { getDemoLadderResponse, type ThemeKey } from "@/lib/session/demo-ladder";
 
 // 한국 정서 맥락 — 프롬프트 레벨에서만 처리, 글로벌 확장 시 이 블록만 교체
 const CULTURAL_CONTEXT = `
@@ -371,7 +371,7 @@ ${CRYSTALS.map((c) => `- ${c.name}: ${c.analysisFocus}`).join("\n")}
 }
 
 function resolveTheme(theme?: string): ThemeName {
-  if (theme === "전략실" || theme === "달빛정원" || theme === "모험가" || theme === "천문대") return theme;
+  if (theme === "전략실" || theme === "달빛정원" || theme === "모험가" || theme === "천문대" || theme === "종말") return theme;
   return "모험가";
 }
 
@@ -399,7 +399,7 @@ export async function POST(req: NextRequest) {
       const isSummaryMode = sensoryLadderContext.includes("[SESSION_SUMMARY_MODE]");
 
       const { getDemoLadderResponse } = await import("@/lib/session/demo-ladder");
-      const demoText = getDemoLadderResponse(level, turnCount, isSummaryMode);
+      const demoText = getDemoLadderResponse(level, turnCount, isSummaryMode, resolvedTheme as ThemeKey);
 
       const demoStream = new ReadableStream({
         async start(controller) {

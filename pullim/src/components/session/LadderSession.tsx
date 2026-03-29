@@ -13,6 +13,7 @@ import type {
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
+import { getDemoSummary } from "@/lib/session/demo-ladder";
 import { inferState, buildBehindContext, inferCheatAction } from "@/lib/session/behind-the-scenes";
 import { buildLevelPrompt, buildEndDetectionPrompt } from "@/lib/session/prompt-builder";
 import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/session/level-detector";
@@ -408,7 +409,7 @@ export default function LadderSession({
         .trim();
       store.endSession(clean || "오늘 이야기를 나눴어.");
     } catch {
-      store.endSession("오늘도 수고했어.");
+      store.endSession(getDemoSummary(theme));
     }
     setPhase("summary");
     setIsLoading(false);
