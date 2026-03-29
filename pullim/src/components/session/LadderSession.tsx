@@ -47,24 +47,80 @@ interface EntryOption {
   recommended?: boolean;
 }
 
+const THEME_IMAGE_MAP: Record<string, string> = {
+  "모험가": "adventure",
+  "달빛정원": "garden",
+  "전략실": "strategy",
+  "천문대": "stargazer",
+  "종말": "apocalypse",
+};
+
+const LEVEL_NARRATIVES: Record<string, Record<number, string>> = {
+  adventure: {
+    1: "갈림길 앞에 섰다. 모닥불이 흔들린다.",
+    2: "두 갈래 길이 나타났다. 어느 쪽이 더 끌려?",
+    3: "낡은 지도를 펼쳤다. 선명하게 보이는 것들이 있다.",
+    4: "동료가 물었다. 어디로 향할 건지.",
+    5: "마침내 직접 말할 차례다.",
+  },
+  garden: {
+    1: "달빛이 내려앉은 정원. 꽃들이 저마다 다른 방향으로 피었다.",
+    2: "두 갈래 오솔길이 나뉜다. 어느 쪽이 더 마음에 끌려?",
+    3: "달빛 아래 물웅덩이에 무언가가 비친다.",
+    4: "정원 한켠의 벤치. 이제 선택할 시간이다.",
+    5: "마음 속 이야기를 직접 들어줄게.",
+  },
+  strategy: {
+    1: "회의실 불이 켜졌다. 무엇부터 짚어볼까.",
+    2: "두 선택지가 화이트보드에 나란히 적혔다.",
+    3: "데이터를 정리했다. 패턴이 보이기 시작한다.",
+    4: "결정을 내릴 시간이다. 어떻게 할 건지.",
+    5: "직접 상황을 설명해줘.",
+  },
+  stargazer: {
+    1: "별자리들이 빛난다. 어떤 별이 먼저 눈에 들어와?",
+    2: "두 개의 별이 서로 다른 방향으로 이끈다.",
+    3: "망원경을 통해 더 선명하게 보인다.",
+    4: "우주의 좌표를 설정할 시간이다.",
+    5: "직접 탐색 방향을 말해줘.",
+  },
+  apocalypse: {
+    1: "폐허 속에서도 감각은 살아있다.",
+    2: "두 갈래 생존 경로가 눈앞을 막는다.",
+    3: "잔해들 사이로 패턴이 보이기 시작했다.",
+    4: "마지막 선택의 순간이 왔다.",
+    5: "있는 그대로 말해줘.",
+  },
+};
+
 function getEntryOptions(profileContext?: string): EntryOption[] {
-  // 프로필이 있으면 selfAwareness 기반 추천, 없으면 Level 4 기본 추천
-  let recommendedLevel: LadderLevel = 4;
+  // 프로필 기반: 분석적 성향이면 직접 말하기 추천, 나머지는 이야기 모드 추천
+  let recommendLevel5 = false;
   if (profileContext) {
     const saMatch = profileContext.match(/selfAwareness:\s*([-\d.]+)/);
     const apMatch = profileContext.match(/approachStyle:\s*([-\d.]+)/);
     if (saMatch && apMatch) {
       const sa = parseFloat(saMatch[1]);
       const ap = parseFloat(apMatch[1]);
-      if (sa > 0.3 && ap < -0.3) recommendedLevel = 5; // 분석적 → 직접 말하기
-      else if (sa < -0.3) recommendedLevel = 1; // 자기이해 낮음 → 감각
+      if (sa > 0.3 && ap < -0.3) recommendLevel5 = true;
     }
   }
 
   return [
-    { level: 5, emoji: "💬", label: "직접 말할게", sub: "자유롭게 이야기", recommended: recommendedLevel === 5 },
-    { level: 4, emoji: "📋", label: "선택지 보여줘", sub: "골라가면서 진행", recommended: recommendedLevel === 4 },
-    { level: 1, emoji: "🎴", label: "느낌으로 할래", sub: "감각적으로 시작", recommended: recommendedLevel === 1 },
+    {
+      level: 1,
+      emoji: "🎮",
+      label: "이야기로 풀어볼래",
+      sub: "레벨 1부터 선택지로 시작",
+      recommended: !recommendLevel5,
+    },
+    {
+      level: 5,
+      emoji: "💬",
+      label: "직접 말할게",
+      sub: "자유롭게 이야기",
+      recommended: recommendLevel5,
+    },
   ];
 }
 
@@ -102,11 +158,27 @@ export default function LadderSession({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // 배경 이미지 fade 트랜지션
+  const [bgImage, setBgImage] = useState<string>("");
+  const [bgOpacity, setBgOpacity] = useState<number>(0);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }
   }, [store.messages, streamText]);
+
+  useEffect(() => {
+    if (phase !== "session") return;
+    const themeEn = THEME_IMAGE_MAP[theme] ?? "adventure";
+    const newImage = `/images/levels/${themeEn}_level${store.currentLevel}.png`;
+    setBgOpacity(0);
+    const timer = setTimeout(() => {
+      setBgImage(newImage);
+      setBgOpacity(1);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [store.currentLevel, theme, phase]);
 
   // ── 세션 시작 ──
   const handleStartLevel = useCallback(
@@ -494,14 +566,14 @@ export default function LadderSession({
   if (phase === "entry") {
     return (
       <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto space-y-8 animate-in fade-in duration-500">
-        <div className="text-center">
+        <div className="text-center space-y-2">
           <h2
-            className="text-lg md:text-xl font-bold mb-2 font-rpg-lg"
+            className="text-lg md:text-xl font-bold font-rpg-lg"
             style={{ color: "var(--fantasy-gold-bright)", textShadow: "0 0 20px rgba(192,163,116,0.3)" }}
           >
             오늘은 어떻게 시작할까?
           </h2>
-          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.70)" }}>편한 방식을 골라봐</p>
+          <p className="text-xs font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>편한 방식을 골라봐</p>
         </div>
 
         <div className="space-y-3">
@@ -509,21 +581,38 @@ export default function LadderSession({
             <button
               key={opt.level}
               onClick={() => handleStartLevel(opt.level)}
-              className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all active:scale-[0.98] hover:scale-[1.01]"
+              className="rpg-panel-light w-full text-left rounded-2xl transition-all active:scale-[0.98] hover:scale-[1.01]"
+              style={
+                opt.recommended
+                  ? { padding: "20px", borderColor: "rgba(192,163,116,0.45)", borderWidth: "1px", borderStyle: "solid" }
+                  : { padding: "16px 20px" }
+              }
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <span className="text-2xl">{opt.emoji}</span>
+                  <span style={{ fontSize: opt.recommended ? "2rem" : "1.5rem" }}>{opt.emoji}</span>
                   <div>
-                    <p className="text-sm font-medium font-rpg" style={{ color: "var(--fantasy-text)" }}>
+                    <p
+                      className="font-rpg"
+                      style={{
+                        color: "var(--fantasy-text)",
+                        fontSize: opt.recommended ? "0.9rem" : "0.8rem",
+                        fontWeight: opt.recommended ? 600 : 400,
+                      }}
+                    >
                       {opt.label}
                     </p>
-                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.65)" }}>{opt.sub}</p>
+                    <p className="text-xs mt-0.5 font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
+                      {opt.sub}
+                    </p>
                   </div>
                 </div>
                 {opt.recommended && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(192,163,116,0.2)", color: "var(--fantasy-gold)" }}>
-                    추천
+                  <span
+                    className="text-[10px] px-2 py-0.5 rounded-full flex-shrink-0"
+                    style={{ background: "rgba(192,163,116,0.2)", color: "var(--fantasy-gold)" }}
+                  >
+                    ✦ 추천
                   </span>
                 )}
               </div>
@@ -553,32 +642,64 @@ export default function LadderSession({
   // 세션 화면
   return (
     <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto flex flex-col" style={{ height: "calc(100dvh - 120px)" }}>
-      {/* 레벨 인디케이터 */}
-      <div className="flex items-center justify-between py-3 px-1">
-        <div className="flex items-center gap-2">
-          {([1, 2, 3, 4, 5] as LadderLevel[]).map((l) => (
-            <div
-              key={l}
-              className="w-1.5 h-1.5 rounded-full transition-all"
-              style={{
-                background: l === level ? "var(--fantasy-gold)" : "rgba(192,163,116,0.2)",
-                transform: l === level ? "scale(1.25)" : "scale(1)",
-                boxShadow: l === level ? "0 0 6px rgba(192,163,116,0.4)" : "none",
-              }}
-            />
-          ))}
-          <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(192,167,136,0.60)" }}>
-            {LEVEL_LABELS[level]}
-          </span>
-        </div>
-        <button
-          onClick={generateSummary}
-          disabled={isLoading}
-          className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
-          style={{ color: "rgba(192,163,116,0.55)" }}
+      {/* 배경 이미지 */}
+      {bgImage && (
+        <div
+          className="w-full rounded-xl overflow-hidden flex-shrink-0 relative"
+          style={{
+            height: "28vh",
+            opacity: bgOpacity,
+            transition: "opacity 250ms ease",
+          }}
         >
-          오늘은 여기까지
-        </button>
+          <img
+            src={bgImage}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ filter: "brightness(0.65)" }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, transparent 35%, var(--fantasy-bg, #1a1612) 100%)" }}
+          />
+        </div>
+      )}
+
+      {/* 레벨 인디케이터 + 내러티브 */}
+      <div className="py-2 px-1 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {([1, 2, 3, 4, 5] as LadderLevel[]).map((l) => (
+              <div
+                key={l}
+                className="w-1.5 h-1.5 rounded-full transition-all"
+                style={{
+                  background: l === level ? "var(--fantasy-gold)" : "rgba(192,163,116,0.2)",
+                  transform: l === level ? "scale(1.25)" : "scale(1)",
+                  boxShadow: l === level ? "0 0 6px rgba(192,163,116,0.4)" : "none",
+                }}
+              />
+            ))}
+            <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(192,167,136,0.55)" }}>
+              {LEVEL_LABELS[level]}
+            </span>
+          </div>
+          <button
+            onClick={generateSummary}
+            disabled={isLoading}
+            className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
+            style={{ color: "rgba(192,163,116,0.55)" }}
+          >
+            오늘은 여기까지
+          </button>
+        </div>
+        {/* 내러티브 텍스트 */}
+        <p
+          className="text-[10px] font-rpg-sm italic mt-0.5 ml-1 animate-in fade-in duration-500"
+          style={{ color: "rgba(192,167,136,0.45)" }}
+        >
+          {LEVEL_NARRATIVES[THEME_IMAGE_MAP[theme] ?? "adventure"]?.[level] ?? ""}
+        </p>
       </div>
 
       {/* 이면사고 표시 (showBehindThoughts 설정 on 시) */}
