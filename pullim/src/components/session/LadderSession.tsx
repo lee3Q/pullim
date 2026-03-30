@@ -31,6 +31,28 @@ import ChoiceLevel from "./levels/ChoiceLevel";
 import TextInputLevel from "./levels/TextInputLevel";
 import SessionSummary from "./SessionSummary";
 
+// 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
+function stripStreamTags(text: string): string {
+  let result = text;
+
+  // 1. 완전한 [TAG]...[/TAG] 블록 제거 (멀티라인, non-greedy)
+  result = result.replace(/\[[A-Z][A-Z_]*\][\s\S]*?\[\/[A-Z][A-Z_]*\]/g, "");
+
+  // 2. 불완전한 [TAG... — 아직 닫히지 않은 태그 시작 이후 전부 제거
+  result = result.replace(/\[[A-Z][A-Z_]*[\s\S]*/g, "");
+
+  // 3. HTML 태그 제거 (<option>, </option> 등)
+  result = result.replace(/<[^>]+>/g, "");
+
+  // 4. 구조화 키-값 제거 (A_emoji:, A_title:, B_emoji:, B_text: 등)
+  result = result.replace(/^[A-Z]_\w+:.*$/gm, "");
+
+  // 5. 연속 빈 줄 정리 (3줄 이상 → 1줄 빈줄)
+  result = result.replace(/\n{3,}/g, "\n\n");
+
+  return result.trim();
+}
+
 interface LadderSessionProps {
   theme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말";
   entryMode: EntryMode;
@@ -856,7 +878,7 @@ export default function LadderSession({
         {/* 스트리밍 중 — 구조화 태그 제거 후 표시 */}
         {isLoading && streamText && (
           <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-            {streamText.split(/\[(?:COMPARISON|SENSORY|ANALYSIS|OPTIONS|CHEAT|WRAP_SUGGEST|LISTEN_COMPLETE|SUMMARY|SESSION_SUMMARY_MODE|BEHIND_THE_SCENES)/)[0].trim() || "..."}
+            {stripStreamTags(streamText) || "..."}
           </div>
         )}
         {isLoading && !streamText && (
