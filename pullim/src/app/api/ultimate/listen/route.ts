@@ -403,6 +403,7 @@ export async function POST(req: NextRequest) {
 
       const demoStream = new ReadableStream({
         async start(controller) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ demoMode: true, message: "데모 모드로 전환됩니다" })}\n\n`));
           const chars = demoText.split("");
           for (let i = 0; i < chars.length; i += 3) {
             const chunk = chars.slice(i, i + 3).join("");
@@ -424,6 +425,7 @@ export async function POST(req: NextRequest) {
     const demo = getDemoListenResponse(turnCount, resolvedTheme);
     const demoStream = new ReadableStream({
       async start(controller) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ demoMode: true, message: "데모 모드로 전환됩니다" })}\n\n`));
         const words = demo.text.split("");
         for (let i = 0; i < words.length; i += 3) {
           const chunk = words.slice(i, i + 3).join("");
@@ -700,10 +702,22 @@ export async function POST(req: NextRequest) {
 
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
-      } catch {
+      } catch (err) {
+        let errorCode = "UNKNOWN";
+        let errorMsg = persona.errorMessage;
+        if (err instanceof Error) {
+          const msg = err.message.toLowerCase();
+          if (msg.includes("401") || msg.includes("authentication") || msg.includes("invalid x-api-key")) {
+            errorCode = "INVALID_KEY";
+            errorMsg = "API 키가 유효하지 않아요. Vercel 환경변수를 확인해주세요.";
+          } else if (msg.includes("429") || msg.includes("rate limit") || msg.includes("rate_limit")) {
+            errorCode = "RATE_LIMIT";
+            errorMsg = "요청이 너무 많아요. 잠시 후 다시 시도해주세요.";
+          }
+        }
         controller.enqueue(
           encoder.encode(
-            `data: ${JSON.stringify({ text: persona.errorMessage, error: true })}\n\n`
+            `data: ${JSON.stringify({ text: errorMsg, error: true, errorCode })}\n\n`
           )
         );
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));

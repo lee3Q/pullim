@@ -167,6 +167,9 @@ export default function LadderSession({
   // 이면사고 추론 상태 (표시용)
   const [currentInference, setCurrentInference] = useState<BehindInference | null>(null);
 
+  // 데모 모드 알림
+  const [demoNotice, setDemoNotice] = useState(false);
+
   // 약속 확인 상태 (진입 화면)
   const [activePromise, setActivePromise] = useState<PullimPromise | null>(null);
   const [promiseChecked, setPromiseChecked] = useState(false);
@@ -315,6 +318,11 @@ export default function LadderSession({
 
             try {
               const parsed = JSON.parse(data);
+
+              // 데모 모드 알림
+              if (parsed.demoMode) {
+                setDemoNotice(true);
+              }
 
               // Tier A 위기 감지: 즉시 중단 + 모달
               if (parsed.crisis && parsed.tier === "A") {
@@ -765,6 +773,13 @@ export default function LadderSession({
   // 세션 화면
   return (
     <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto flex flex-col" style={{ height: "calc(100dvh - 120px)" }}>
+      {/* 데모 모드 알림 */}
+      {demoNotice && (
+        <div className="text-xs text-center py-1 px-3 rounded-full opacity-60 flex-shrink-0" style={{ color: "var(--fantasy-text-muted, #888)" }}>
+          🔑 API 키 미설정 — 데모 모드로 동작 중
+        </div>
+      )}
+
       {/* 배경 이미지 */}
       {bgImage && (
         <div
