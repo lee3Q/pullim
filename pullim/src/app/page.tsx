@@ -270,6 +270,29 @@ export default function HomePage() {
               />
             </button>
           </label>
+          <label className="flex items-center justify-between cursor-pointer mt-3">
+            <span className="text-xs text-white/60">💭 내면사고 보기</span>
+            <button
+              onClick={() =>
+                updateSettings({
+                  showBehindThoughts: !settings.showBehindThoughts,
+                })
+              }
+              className="relative w-10 h-5 rounded-full transition-colors"
+              style={{
+                background: settings.showBehindThoughts
+                  ? "#a78bfa"
+                  : "rgba(255,255,255,0.15)",
+              }}
+            >
+              <span
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform"
+                style={{
+                  left: settings.showBehindThoughts ? "calc(100% - 18px)" : "2px",
+                }}
+              />
+            </button>
+          </label>
         </div>
       )}
 
