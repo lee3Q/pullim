@@ -110,9 +110,10 @@ declare -a TASK_RESULTS=()
 MAX_RATE_LIMIT_RETRIES="${MAX_RATE_LIMIT_RETRIES:-3}"
 
 # rate limit 감지: 로그에서 resetsAt 타임스탬프 추출
+# rate_limit_event는 status="allowed"이면 정상 모니터링 이벤트 — 오탐 방지
 check_rate_limit() {
   local logfile=$1
-  if grep -q "rate_limit\|hit your limit" "$logfile" 2>/dev/null; then
+  if grep -q '"status":"rejected"' "$logfile" 2>/dev/null || grep -q "hit your limit" "$logfile" 2>/dev/null; then
     # resetsAt 유닉스 타임스탬프 추출
     local resets_at
     resets_at=$(grep -o '"resetsAt":[0-9]*' "$logfile" 2>/dev/null | tail -1 | grep -o '[0-9]*')
