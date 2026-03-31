@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type {
   LadderLevel,
@@ -193,6 +193,28 @@ export default function LadderSession({
   // 배경 이미지 fade 트랜지션
   const [bgImage, setBgImage] = useState<string>("");
   const [bgOpacity, setBgOpacity] = useState<number>(0);
+
+  // 카드형 / 대화형 전환
+  const [viewMode, setViewMode] = useState<"card" | "chat">("card");
+  const [cardIndex, setCardIndex] = useState(-1);
+
+  // 턴 그룹화: assistant + user 쌍
+  const turns = useMemo(() => {
+    const result: { ai: LadderMessage; user?: LadderMessage }[] = [];
+    for (const msg of store.messages) {
+      if (msg.role === "assistant") {
+        result.push({ ai: msg });
+      } else if (msg.role === "user" && result.length > 0) {
+        result[result.length - 1].user = msg;
+      }
+    }
+    return result;
+  }, [store.messages]);
+
+  // 최신 턴으로 자동 이동
+  useEffect(() => {
+    if (turns.length > 0) setCardIndex(turns.length - 1);
+  }, [turns.length]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -860,50 +882,142 @@ export default function LadderSession({
         </div>
       )}
 
-      {/* 대화 히스토리 */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4 px-1">
-        {store.messages.map((msg) => {
-          // 구조화 데이터(감각카드/선택지/분석/대비)가 있는 assistant 메시지는 텍스트 숨김
-          const hasStructured = msg.role === "assistant" && (
-            (msg.sensoryCards && msg.sensoryCards.length > 0) ||
-            (msg.options && msg.options.length > 0) ||
-            msg.analysisCard ||
-            msg.comparisonCards
-          );
-          return (
-            <div key={msg.id}>
-              {msg.role === "user" ? (
-                <div className="flex justify-end">
-                  <span
-                    className="text-[11px] font-rpg-sm italic"
-                    style={{ color: "rgba(192,163,116,0.40)" }}
-                  >
-                    {msg.content}
-                  </span>
-                </div>
-              ) : hasStructured ? null : (
-                <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-                  {msg.content}
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* 스트리밍 중 — 구조화 태그 제거 후 표시 */}
-        {isLoading && streamText && (
-          <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-            {stripStreamTags(streamText) || "..."}
-          </div>
-        )}
-        {isLoading && !streamText && (
-          <div className="flex gap-1 py-2">
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,163,116,0.3)" }} />
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
-          </div>
-        )}
+      {/* 뷰 모드 토글 + 카드 내비 */}
+      <div className="flex items-center justify-between px-1 pb-2">
+        <div className="flex items-center gap-2">
+          {viewMode === "card" && turns.length > 1 && (
+            <button
+              onClick={() => setCardIndex(Math.max(0, cardIndex - 1))}
+              disabled={cardIndex <= 0}
+              className="text-xs px-2 py-1 rounded-lg transition-all active:scale-95 disabled:opacity-20"
+              style={{ color: "var(--fantasy-gold-bright)", background: "rgba(255,255,255,0.05)" }}
+            >
+              ◀ 이전
+            </button>
+          )}
+          {viewMode === "card" && cardIndex < turns.length - 1 && (
+            <button
+              onClick={() => setCardIndex(Math.min(turns.length - 1, cardIndex + 1))}
+              className="text-xs px-2 py-1 rounded-lg transition-all active:scale-95"
+              style={{ color: "var(--fantasy-gold-bright)", background: "rgba(255,255,255,0.05)" }}
+            >
+              다음 ▶
+            </button>
+          )}
+          {viewMode === "card" && turns.length > 0 && (
+            <span className="text-[10px] font-rpg-sm" style={{ color: "rgba(192,163,116,0.35)" }}>
+              {cardIndex + 1} / {turns.length}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => setViewMode(viewMode === "card" ? "chat" : "card")}
+          className="text-[10px] px-2 py-1 rounded-lg transition-all"
+          style={{ color: "rgba(232,213,181,0.45)", background: "rgba(255,255,255,0.03)" }}
+        >
+          {viewMode === "card" ? "💬 대화형" : "🃏 카드형"}
+        </button>
       </div>
+
+      {/* ── 카드형 뷰 ── */}
+      {viewMode === "card" ? (
+        <div ref={scrollRef} className="flex-1 flex flex-col justify-center px-1 overflow-hidden">
+          {/* 현재 카드 */}
+          {turns.length > 0 && cardIndex >= 0 && cardIndex < turns.length && (() => {
+            const turn = turns[cardIndex];
+            const isLatest = cardIndex === turns.length - 1;
+            return (
+              <div className="space-y-4 animate-in fade-in duration-300" key={turn.ai.id}>
+                {/* AI 텍스트 */}
+                {turn.ai.content && (
+                  <div
+                    className="text-sm md:text-base leading-relaxed font-rpg text-center px-2"
+                    style={{ color: "var(--fantasy-text)" }}
+                  >
+                    {turn.ai.content}
+                  </div>
+                )}
+
+                {/* 이전 턴: 사용자가 뭘 골랐는지 표시 */}
+                {!isLatest && turn.user && (
+                  <div className="text-center pt-2">
+                    <span
+                      className="inline-block text-sm font-rpg px-4 py-2 rounded-xl"
+                      style={{
+                        color: "var(--fantasy-gold-bright)",
+                        background: "rgba(192,163,116,0.10)",
+                        border: "1px solid rgba(192,163,116,0.15)",
+                      }}
+                    >
+                      {turn.user.content}
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* 스트리밍 중 */}
+          {isLoading && streamText && (
+            <div className="text-sm leading-relaxed font-rpg text-center px-2" style={{ color: "var(--fantasy-text)" }}>
+              {stripStreamTags(streamText) || "..."}
+            </div>
+          )}
+          {isLoading && !streamText && (
+            <div className="flex gap-1 py-4 justify-center">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,163,116,0.3)" }} />
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── 대화형 뷰 ── */
+        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4 px-1">
+          {store.messages.map((msg) => {
+            const hasStructured = msg.role === "assistant" && (
+              (msg.sensoryCards && msg.sensoryCards.length > 0) ||
+              (msg.options && msg.options.length > 0) ||
+              msg.analysisCard ||
+              msg.comparisonCards
+            );
+            return (
+              <div key={msg.id}>
+                {msg.role === "user" ? (
+                  <div className="flex justify-end">
+                    <span
+                      className="text-sm font-rpg px-3 py-1.5 rounded-xl"
+                      style={{
+                        color: "var(--fantasy-gold-bright)",
+                        background: "rgba(192,163,116,0.10)",
+                      }}
+                    >
+                      {msg.content}
+                    </span>
+                  </div>
+                ) : hasStructured ? null : (
+                  <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
+                    {msg.content}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {isLoading && streamText && (
+            <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
+              {stripStreamTags(streamText) || "..."}
+            </div>
+          )}
+          {isLoading && !streamText && (
+            <div className="flex gap-1 py-2">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,163,116,0.3)" }} />
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 치트 후 분기 UI */}
       {cheatPostAction?.show && (
