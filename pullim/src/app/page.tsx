@@ -324,7 +324,7 @@ export default function HomePage() {
                 어떤 분위기에서 이야기할까?
               </h1>
               <p className="text-sm font-rpg-sm" style={{ color: "rgba(232,213,181,0.70)" }}>
-                분위기를 골라봐. 바로 대화가 시작돼.
+                분위기를 골라봐. 탭하면 바로 대화가 시작돼.
               </p>
             </div>
 
@@ -362,8 +362,8 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* 테마 선택 없이 진입하는 옵션들 */}
-            <div className="flex gap-3 pt-1">
+            {/* 파악 + 바로시작 */}
+            <div className="space-y-2 pt-1">
               <button
                 onClick={() => {
                   const keys: ThemeType[] = ["garden", "adventure", "strategy", "stargazer", "apocalypse"];
@@ -371,27 +371,27 @@ export default function HomePage() {
                   setSelectedTheme(randomTheme);
                   handleThemeSelect(randomTheme, true);
                 }}
-                className="flex-1 py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
+                className="w-full py-3.5 px-4 rounded-xl text-sm font-rpg-sm transition-all active:scale-[0.97]"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "rgba(232,213,181,0.65)",
+                  background: "linear-gradient(145deg, rgba(167,139,250,0.12), rgba(167,139,250,0.04))",
+                  border: "1px solid rgba(167,139,250,0.2)",
+                  color: "rgba(232,213,181,0.85)",
                 }}
               >
-                알아서 골라줘
+                🔮 나를 먼저 파악해줘
               </button>
               <button
                 onClick={() => {
                   handleStartSession("전략실", "concern");
                 }}
-                className="flex-1 py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
+                className="w-full py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.08)",
-                  color: "rgba(232,213,181,0.65)",
+                  color: "rgba(232,213,181,0.50)",
                 }}
               >
-                바로 시작할래
+                건너뛰고 바로 시작할래
               </button>
             </div>
 

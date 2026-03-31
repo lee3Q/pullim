@@ -106,10 +106,9 @@ export default function LadderSessionPage({
         />
       </main>
 
-      {/* Footer */}
-      <footer className="text-center text-xs text-white/25 py-3 relative z-10">
-        풀림은 전문 상담을 대체하지 않습니다.{" "}
-        <a href="tel:109" className="text-white/40 underline">109</a>
+      {/* Footer — 세션 중에는 숨김 (선택지와 겹침 방지) */}
+      <footer className="text-center text-xs text-white/15 py-2 relative z-0 pointer-events-none select-none">
+        <span className="opacity-0">풀림</span>
       </footer>
     </div>
   );
