@@ -116,16 +116,15 @@ export default function HomePage() {
   const primaryColor = THEME_COLORS[selectedTheme];
 
   const [showThemeHelp, setShowThemeHelp] = useState(false);
+  const [pickedTheme, setPickedTheme] = useState<ThemeType | null>(null);
 
   const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {
     setSelectedTheme(themeKey);
     setSelectedEntry("concern");
     if (discover) {
-      // 파악(스토리 디스커버리) 먼저 진행
       setPhase("discover");
       return;
     }
-    // 기본: 파악 건너뛰고 바로 세션 진입
     handleStartSession(THEME_TO_NAME[themeKey], "concern");
   };
 
@@ -332,9 +331,13 @@ export default function HomePage() {
               {THEME_CARDS.map((t) => (
                 <button
                   key={t.key}
-                  onClick={() => handleThemeSelect(t.key)}
+                  onClick={() => setPickedTheme(pickedTheme === t.key ? null : t.key)}
                   className="rpg-panel-light w-full text-left py-4 px-5 rounded-2xl transition-all
                              hover:scale-[1.01] active:scale-[0.98]"
+                  style={{
+                    outline: pickedTheme === t.key ? `2px solid ${t.color}` : "none",
+                    outlineOffset: "-1px",
+                  }}
                 >
                   <div className="flex items-start gap-4">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
@@ -362,38 +365,40 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* 파악 + 바로시작 */}
-            <div className="space-y-2 pt-1">
-              <button
-                onClick={() => {
-                  const keys: ThemeType[] = ["garden", "adventure", "strategy", "stargazer", "apocalypse"];
-                  const randomTheme = keys[Math.floor(Math.random() * keys.length)];
-                  setSelectedTheme(randomTheme);
-                  handleThemeSelect(randomTheme, true);
-                }}
-                className="w-full py-3.5 px-4 rounded-xl text-sm font-rpg-sm transition-all active:scale-[0.97]"
-                style={{
-                  background: "linear-gradient(145deg, rgba(167,139,250,0.12), rgba(167,139,250,0.04))",
-                  border: "1px solid rgba(167,139,250,0.2)",
-                  color: "rgba(232,213,181,0.85)",
-                }}
-              >
-                🔮 나를 먼저 파악해줘
-              </button>
-              <button
-                onClick={() => {
-                  handleStartSession("전략실", "concern");
-                }}
-                className="w-full py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "rgba(232,213,181,0.50)",
-                }}
-              >
-                건너뛰고 바로 시작할래
-              </button>
-            </div>
+            {/* 테마 선택 후 액션 버튼 */}
+            {pickedTheme && (
+              <div className="space-y-2 pt-1 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <button
+                  onClick={() => handleThemeSelect(pickedTheme)}
+                  className="w-full py-3.5 px-4 rounded-xl text-sm font-rpg transition-all active:scale-[0.97]"
+                  style={{
+                    background: `linear-gradient(145deg, ${THEME_COLORS[pickedTheme]}20, ${THEME_COLORS[pickedTheme]}08)`,
+                    border: `1px solid ${THEME_COLORS[pickedTheme]}40`,
+                    color: "rgba(232,213,181,0.90)",
+                  }}
+                >
+                  바로 대화할래
+                </button>
+                <button
+                  onClick={() => handleThemeSelect(pickedTheme, true)}
+                  className="w-full py-3 px-4 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                    color: "rgba(232,213,181,0.65)",
+                  }}
+                >
+                  🔮 먼저 파악해줘
+                </button>
+              </div>
+            )}
+
+            {/* 테마 미선택 시 안내 */}
+            {!pickedTheme && (
+              <p className="text-center text-[11px] font-rpg-sm pt-2" style={{ color: "rgba(232,213,181,0.35)" }}>
+                분위기를 탭해서 골라봐
+              </p>
+            )}
 
             {/* 모르겠어 → 더 설명 / 파악 먼저 */}
             <div className="text-center space-y-1">
