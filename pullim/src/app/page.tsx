@@ -17,6 +17,7 @@ const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscove
 const PersonalityResult = dynamic(() => import("@/components/discovery/PersonalityResult"));
 import CrisisAlert from "@/components/CrisisAlert";
 import { useSettings } from "@/hooks/useSettings";
+import { useBGM } from "@/hooks/useBGM";
 
 // ThemeType ↔ ThemeName 매핑
 const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
@@ -107,6 +108,10 @@ export default function HomePage() {
   } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const { settings, update: updateSettings } = useSettings();
+
+  // BGM — 선택된 테마의 트랙 재생
+  const themeBgmTracks = THEMES[THEME_TO_NAME[selectedTheme]]?.assets?.bgmTracks;
+  const { playing: bgmPlaying, toggle: toggleBGM } = useBGM(themeBgmTracks);
 
   const primaryColor = THEME_COLORS[selectedTheme];
 
@@ -205,6 +210,13 @@ export default function HomePage() {
           풀림
         </button>
         <div className="flex items-center gap-3">
+          <button
+            onClick={toggleBGM}
+            className="text-sm text-white/60 hover:text-white/80 transition-colors p-3"
+            aria-label="BGM 토글"
+          >
+            {bgmPlaying ? "🔊" : "🔇"}
+          </button>
           <button
             onClick={() => setShowSettings((v) => !v)}
             className="text-sm text-white/60 hover:text-white/80 transition-colors p-3"
@@ -370,9 +382,7 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => {
-                  const keys: ThemeType[] = ["garden", "adventure", "strategy", "stargazer", "apocalypse"];
-                  const randomTheme = keys[Math.floor(Math.random() * keys.length)];
-                  handleStartSession(THEME_TO_NAME[randomTheme], "concern");
+                  handleStartSession("전략실", "concern");
                 }}
                 className="flex-1 py-3 px-3 rounded-xl text-xs font-rpg-sm transition-all active:scale-[0.97]"
                 style={{
@@ -381,7 +391,7 @@ export default function HomePage() {
                   color: "rgba(232,213,181,0.65)",
                 }}
               >
-                그냥 대화할래
+                바로 시작할래
               </button>
             </div>
 

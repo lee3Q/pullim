@@ -132,6 +132,11 @@ export function parseResponse(raw: string): ParsedResponse {
     .replace(/\[WRAP_SUGGEST\][\s\S]*?\[\/WRAP_SUGGEST\]/g, "")
     .replace(/\[LISTEN_COMPLETE\]/g, "")
     .replace(/\[SUMMARY\][\s\S]*?\[\/SUMMARY\]/g, "")
+    // HTML 태그 제거 (<option>, </option> 등 LLM이 간혹 출력)
+    .replace(/<[^>]+>/g, "")
+    // 구조화 키-값 제거 (A_emoji:, B_title: 등)
+    .replace(/^[A-Z]_\w+:.*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 
   return result;

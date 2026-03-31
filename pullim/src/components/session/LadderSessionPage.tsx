@@ -7,6 +7,8 @@ import type { ThemeName } from "@/lib/types-ultimate";
 import type { EntryMode } from "@/lib/session/ladder-types";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { buildSensoryLadderContext } from "@/lib/personalization/sensory-ladder";
+import { THEMES } from "@/lib/themes";
+import { useBGM } from "@/hooks/useBGM";
 import LadderSession from "./LadderSession";
 import CrisisAlert from "@/components/CrisisAlert";
 import { useState, useCallback } from "react";
@@ -25,6 +27,10 @@ export default function LadderSessionPage({
   const entryMode = (searchParams.get("entry") as EntryMode) || "concern";
   const { profile } = useUserProfile();
   const [crisis, setCrisis] = useState<{ message: string; hotline: string } | null>(null);
+
+  // BGM
+  const themeConfig = THEMES[theme];
+  const { playing, trackLabel, toggle: toggleBGM, nextTrack } = useBGM(themeConfig?.assets?.bgmTracks);
 
   // 프로필 기반 개인화 컨텍스트
   const profileContext = profile ? buildSensoryLadderContext(profile) : undefined;
@@ -69,6 +75,24 @@ export default function LadderSessionPage({
         <Link href="/" className="text-lg font-bold text-white/80 font-rpg">
           풀림
         </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleBGM}
+            className="text-xs text-white/50 hover:text-white/70 transition-colors p-2"
+            aria-label="BGM 토글"
+          >
+            {playing ? "🔊" : "🔇"}
+          </button>
+          {playing && (
+            <button
+              onClick={nextTrack}
+              className="text-xs text-white/40 hover:text-white/60 transition-colors p-2"
+              aria-label="다음 트랙"
+            >
+              ⏭
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Main */}
