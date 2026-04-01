@@ -377,6 +377,8 @@ export const THEMES: Record<ThemeName, Theme> = {
       bgmTracks: [
         { src: "/assets/stargazer-bgm.mp3", label: "천문대 1" },
         { src: "/assets/stargazer-bgm-2.mp3", label: "천문대 2" },
+        { src: "/assets/stargazer-bgm-3.mp3", label: "천문대 3" },
+        { src: "/assets/stargazer-bgm-4.mp3", label: "천문대 4" },
       ],
     },
     crystalLabel: "별의 조각",
@@ -485,6 +487,9 @@ export const THEMES: Record<ThemeName, Theme> = {
       avatar: "/assets/apocalypse-avatar.png",
       bgmTracks: [
         { src: "/assets/apocalypse-bgm.mp3", label: "종말 1" },
+        { src: "/assets/apocalypse-bgm-2.mp3", label: "종말 2" },
+        { src: "/assets/apocalypse-bgm-3.mp3", label: "종말 3" },
+        { src: "/assets/apocalypse-bgm-4.mp3", label: "종말 4" },
       ],
     },
     crystalLabel: "잿빛 조각",
