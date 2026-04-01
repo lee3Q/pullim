@@ -23,6 +23,8 @@ import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/sess
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { updateRecommendationRate } from "@/lib/personalization/probability-profile";
 import { useSettings } from "@/hooks/useSettings";
+import AdInterstitial from "@/components/AdInterstitial";
+import { useAdGate } from "@/hooks/useAdGate";
 
 import SensoryLevel from "./levels/SensoryLevel";
 import ComparisonLevel from "./levels/ComparisonLevel";
@@ -61,7 +63,7 @@ interface LadderSessionProps {
   onThemeChange?: (theme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말") => void;
 }
 
-type Phase = "entry" | "session" | "summary";
+type Phase = "entry" | "ad-start" | "session" | "ad-end" | "summary";
 
 interface EntryOption {
   level: LadderLevel;
@@ -189,6 +191,10 @@ export default function LadderSession({
   const choiceChanges = useRef<number>(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pendingLevelRef = useRef<LadderLevel>(1);
+  const pendingStartRef = useRef(false);
+
+  const { shouldShowAd, markAdShown } = useAdGate();
 
   // 배경 이미지 fade 트랜지션
   const [bgImage, setBgImage] = useState<string>("");
@@ -242,16 +248,30 @@ export default function LadderSession({
     }
   }, []);
 
+  // phase가 "session"이 될 때 첫 AI 메시지 요청 (광고 유무와 무관하게 동일 경로)
+  useEffect(() => {
+    if (phase === "session" && pendingStartRef.current) {
+      pendingStartRef.current = false;
+      sendToAI([], pendingLevelRef.current, "세션을 시작합니다. 첫 번째 질문을 하세요.");
+    }
+    // sendToAI는 메모이즈되어 있으나 phase만 감지하면 충분
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   // ── 세션 시작 ──
   const handleStartLevel = useCallback(
     (level: LadderLevel) => {
       store.initSession({ theme, entryMode, startLevel: level });
-      setPhase("session");
+      pendingLevelRef.current = level;
+      pendingStartRef.current = true;
 
-      // 첫 AI 메시지 요청
-      sendToAI([], level, "세션을 시작합니다. 첫 번째 질문을 하세요.");
+      if (shouldShowAd) {
+        setPhase("ad-start");
+      } else {
+        setPhase("session");
+      }
     },
-    [theme, entryMode]
+    [theme, entryMode, shouldShowAd, store]
   );
 
   // ── AI에게 메시지 전송 ──
@@ -394,7 +414,7 @@ export default function LadderSession({
         // 세션 종료 제안 감지
         if (result.wrapSuggest && result.summary) {
           store.endSession(result.summary);
-          setPhase("summary");
+          setPhase("ad-end");
         }
       } catch {
         store.addMessage({
@@ -505,7 +525,7 @@ export default function LadderSession({
 
     if (userMessages.length === 0) {
       store.endSession("오늘은 여기까지.");
-      setPhase("summary");
+      setPhase("ad-end");
       setIsLoading(false);
       return;
     }
@@ -556,8 +576,8 @@ export default function LadderSession({
     } catch {
       store.endSession(getDemoSummary(theme));
     }
-    setPhase("summary");
     setIsLoading(false);
+    setPhase("ad-end");
   }, [store, theme]);
 
   // ── 치트 선택지 ──
@@ -772,6 +792,34 @@ export default function LadderSession({
           ))}
         </div>
       </div>
+    );
+  }
+
+  // 광고 — 세션 진입
+  if (phase === "ad-start") {
+    return (
+      <AdInterstitial
+        placement="session-start"
+        theme={theme}
+        onClose={() => {
+          markAdShown();
+          setPhase("session"); // useEffect가 pendingStartRef 감지 → sendToAI 호출
+        }}
+      />
+    );
+  }
+
+  // 광고 — 세션 종료
+  if (phase === "ad-end") {
+    return (
+      <AdInterstitial
+        placement="session-end"
+        theme={theme}
+        onClose={() => {
+          markAdShown();
+          setPhase("summary");
+        }}
+      />
     );
   }
 
