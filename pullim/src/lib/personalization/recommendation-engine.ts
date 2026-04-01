@@ -2,6 +2,7 @@
 // 추천은 관찰 도구: 맞추려는 게 아니라, 틀림이 데이터.
 
 import type { ProbabilityProfile } from "./probability-profile";
+import type { ThemeType } from "./story-scenes";
 
 export interface ChoiceRecord {
   turnNumber: number;
@@ -53,6 +54,50 @@ function scoreOption(text: string, profile: ProbabilityProfile): number {
   }
 
   return score;
+}
+
+/**
+ * 테마 자동 추천
+ * 프로필 axis 기반으로 가장 적합한 테마를 점수화하여 반환
+ * totalObservations < 3 이면 "adventure" 기본값
+ */
+export function getRecommendedTheme(profile: ProbabilityProfile): ThemeType {
+  if (profile.totalObservations < 3) return "adventure";
+
+  const { approachStyle, riskTolerance, copingStyle, decisionSpeed } = profile;
+
+  const scores: Record<ThemeType, number> = {
+    // 달빛정원: 공감형(copingStyle > 0) + 신중(riskTolerance < 0)
+    garden:
+      Math.max(0, copingStyle.value) + Math.max(0, -riskTolerance.value),
+
+    // 모험가: 모험적(riskTolerance > 0) + 직관(approachStyle > 0)
+    adventure:
+      Math.max(0, riskTolerance.value) + Math.max(0, approachStyle.value),
+
+    // 전략실: 분석적(approachStyle < 0) + 숙고(decisionSpeed < 0)
+    strategy:
+      Math.max(0, -approachStyle.value) + Math.max(0, -decisionSpeed.value),
+
+    // 천문대: 모험적(riskTolerance > 0) + copingStyle 중립(0 근처)
+    stargazer:
+      Math.max(0, riskTolerance.value) * (1 - Math.abs(copingStyle.value)),
+
+    // 종말: riskTolerance > 0.3 + 즉흥적(decisionSpeed > 0)
+    apocalypse:
+      Math.max(0, riskTolerance.value - 0.3) + Math.max(0, decisionSpeed.value),
+  };
+
+  let bestTheme: ThemeType = "adventure";
+  let bestScore = -Infinity;
+  for (const [theme, score] of Object.entries(scores) as [ThemeType, number][]) {
+    if (score > bestScore) {
+      bestScore = score;
+      bestTheme = theme;
+    }
+  }
+
+  return bestTheme;
 }
 
 /**
