@@ -730,7 +730,7 @@ const STARGAZER_SCENES: StoryScene[] = [
 const APOCALYPSE_SCENES: StoryScene[] = [
   {
     id: "apocalypse_1",
-    imagePath: "/assets/discovery/apocalypse_1.png",
+    imagePath: "/assets/discovery/apocalypse_8.png",
     illustration: "텅 빈 도시, 잡초가 아스팔트를 뚫고 올라옴, 먼지 낀 하늘",
     narrative: "조용해.\n너무 조용해서 네 발소리가 전부야.\n\n도시는 텅 비었고\n잡초가 도로를 뚫고 올라왔어.\n\n갈림길이야.\n한쪽은 도심 깊숙이,\n다른 쪽은 강이 보이는 언덕.",
     choices: [
@@ -740,7 +740,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_2",
-    imagePath: "/assets/discovery/apocalypse_2.png",
+    imagePath: "/assets/discovery/apocalypse_15.png",
     illustration: "무너진 건물 사이에서 누군가의 그림자, 경계하는 눈",
     narrative: "발소리.\n네 것이 아닌 발소리.\n\n무너진 벽 뒤에서\n누군가 이쪽을 보고 있어.\n\n경계하는 눈이야.\n근데 적대적이진 않아 보여.",
     choices: [
@@ -751,7 +751,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_3",
-    imagePath: "/assets/discovery/apocalypse_3.png",
+    imagePath: "/assets/discovery/apocalypse_1.png",
     illustration: "두 사람이 나란히 걷는 폐허의 거리, 석양빛",
     narrative: "이름을 주고받았어.\n어색한 침묵 뒤에\n걷기 시작해.\n\n그 사람이 물어.\n\"여기서 뭘 찾고 있어?\"",
     choices: [
@@ -762,7 +762,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_4",
-    imagePath: "/assets/discovery/apocalypse_4.png",
+    imagePath: "/assets/discovery/apocalypse_2.png",
     illustration: "깨진 유리창 너머로 보이는 낡은 카페, 컵이 그대로 놓여있음",
     narrative: "카페가 있어.\n유리가 깨졌는데\n안에 컵이 그대로야.\n\n누군가 마시다 두고 간 것 같아.\n\n그 사람이 안으로 들어가.\n\"잠깐 쉬어가자.\"",
     choices: [
@@ -774,7 +774,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   // ─── 보너스 장면 ───
   {
     id: "apocalypse_5",
-    imagePath: "/assets/discovery/apocalypse_5.png",
+    imagePath: "/assets/discovery/apocalypse_3.png",
     illustration: "비가 내리는 폐허, 무너진 지붕 아래에서 둘이 비를 피함",
     narrative: "비가 와.\n무너진 지붕 아래로 들어가.\n좁아서 어깨가 닿아.\n\n빗소리 말고는\n아무 소리도 없어.",
     choices: [
@@ -785,7 +785,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_6",
-    imagePath: "/assets/discovery/apocalypse_6.png",
+    imagePath: "/assets/discovery/apocalypse_4.png",
     illustration: "버려진 슈퍼마켓, 선반은 비었지만 한쪽에 통조림이 남아있음",
     narrative: "슈퍼마켓을 발견했어.\n선반은 대부분 비었는데\n한쪽 구석에 통조림이 남아 있어.\n\n두 개뿐이야.",
     choices: [
@@ -796,7 +796,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_7",
-    imagePath: "/assets/discovery/apocalypse_7.png",
+    imagePath: "/assets/discovery/apocalypse_5.png",
     illustration: "버려진 집 안, 열린 일기장, 아이의 그림이 끼워져 있음",
     narrative: "집 안에 일기장이 있어.\n펼쳐진 페이지에\n아이가 그린 그림이 끼워져 있어.\n\n가족 네 명.\n전부 웃고 있어.",
     choices: [
@@ -807,7 +807,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_8",
-    imagePath: "/assets/discovery/apocalypse_8.png",
+    imagePath: "/assets/discovery/apocalypse_6.png",
     illustration: "밤, 모닥불 앞에 둘이 앉아있고, 별이 쏟아지는 하늘",
     narrative: "밤이야.\n모닥불을 피웠어.\n\n도시 불빛이 없으니\n별이 미칠 듯이 선명해.\n\n그 사람이 하늘을 보며 말해.\n\"이렇게 예쁜 건 처음이야.\"",
     choices: [
@@ -818,7 +818,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_9",
-    imagePath: "/assets/discovery/apocalypse_9.png",
+    imagePath: "/assets/discovery/apocalypse_7.png",
     illustration: "먼 곳에서 깜빡이는 불빛, 연기가 올라옴",
     narrative: "멀리서 불빛이 보여.\n연기도 올라와.\n\n다른 사람들이 있다는 뜻이야.\n\n그 사람이 물어.\n\"가볼까?\"",
     choices: [
@@ -829,7 +829,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_10",
-    imagePath: "/assets/discovery/apocalypse_10.png",
+    imagePath: "/assets/discovery/apocalypse_14.png",
     illustration: "갈림길, 한쪽은 둘이 함께하는 길, 다른 쪽은 혼자의 길",
     narrative: "길이 갈라져.\n한쪽은 해안,\n다른 쪽은 산.\n\n그 사람이 원하는 곳과\n네가 원하는 곳이 다를 수도 있어.\n\n\"너는 어디로 가고 싶어?\"",
     choices: [
@@ -840,7 +840,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_11",
-    imagePath: "/assets/discovery/apocalypse_11.png",
+    imagePath: "/assets/discovery/apocalypse_9.png",
     illustration: "콘크리트 틈에서 핀 작은 꽃, 주변은 잿빛 폐허",
     narrative: "콘크리트 틈에서\n꽃이 피어 있어.\n\n작고 연약한데\n색이 놀라울 정도로 선명해.\n\n이 폐허에서 이게 자랐다는 게.",
     choices: [
@@ -851,7 +851,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_12",
-    imagePath: "/assets/discovery/apocalypse_12.png",
+    imagePath: "/assets/discovery/apocalypse_10.png",
     illustration: "맑은 강, 두 사람이 발을 담그고 앉아있음",
     narrative: "강을 찾았어.\n물이 맑아.\n\n신발 벗고 발을 담가.\n차가운데 기분이 좋아.\n\n그 사람이 웃어.\n오랜만에 보는 웃음이야.",
     choices: [
@@ -862,7 +862,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_13",
-    imagePath: "/assets/discovery/apocalypse_13.png",
+    imagePath: "/assets/discovery/apocalypse_11.png",
     illustration: "낡은 우체통 앞, 손에 쥔 빈 종이",
     narrative: "우체통이 있어.\n받을 사람은 없겠지만\n종이와 펜은 있어.\n\n뭔가 쓸 수 있어.\n보낼 수는 없지만.",
     choices: [
@@ -873,7 +873,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_14",
-    imagePath: "/assets/discovery/apocalypse_14.png",
+    imagePath: "/assets/discovery/apocalypse_12.png",
     illustration: "새벽, 폐허 위로 해가 떠오르는 순간, 하늘이 붉게 물듦",
     narrative: "새벽이야.\n폐허 위로 해가 올라와.\n\n하늘이 붉고\n세상이 잠깐 아름다워.\n\n그 사람이 조용히 말해.\n\"내일도 뜨겠지.\"",
     choices: [
@@ -884,7 +884,7 @@ const APOCALYPSE_SCENES: StoryScene[] = [
   },
   {
     id: "apocalypse_15",
-    imagePath: "/assets/discovery/apocalypse_15.png",
+    imagePath: "/assets/discovery/apocalypse_13.png",
     illustration: "언덕 위, 두 사람이 나란히 서서 먼 곳을 바라봄, 폐허와 초록이 공존하는 풍경",
     narrative: "언덕 꼭대기에 올랐어.\n뒤로는 지나온 폐허,\n앞으로는 초록이 돌아오는 땅.\n\n세상은 끝났는데\n뭔가 시작되는 것 같기도 해.\n\n옆에 사람이 있어.\n그걸로 충분한 것 같아.",
     choices: [

@@ -916,8 +916,8 @@ export default function LadderSession({
         </div>
       )}
 
-      {/* 배경 이미지 */}
-      {bgImage && (
+      {/* 배경 이미지 — 카드형에서만 표시 */}
+      {bgImage && viewMode === "card" && (
         <div
           className="w-full rounded-xl overflow-hidden flex-shrink-0 relative"
           style={{
