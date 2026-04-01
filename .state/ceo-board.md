@@ -55,6 +55,13 @@
 | 앱스토어 하이브리드 구조 | Apple 4.2 리젝 위험 | 앱스토어 제출 결정 시 |
 | GitHub branch protection | 1인 개발 | 팀원 합류 시 |
 
+## 🔧 밤배치 준비 완료 (대표 실행만 남음)
+
+통합 배치 10 Task: 자동매칭 + 광고 + 사다리-도구 연결
+```
+caffeinate -s bash ~/study/main/pullim/scripts/night-batch.sh ~/study/main/pullim/scripts/batch-tasks/2026-04-01-night-all.sh
+```
+
 ---
-*최종 갱신: 2026-04-01 12:09*
-*갱신 주체: Claude (ICC 발표자료 최종 점검 + 제출 완료 세션)*
+*최종 갱신: 2026-04-01 12:42*
+*갱신 주체: Claude (사다리-도구 연결 하네스 작성 세션)*

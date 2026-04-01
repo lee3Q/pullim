@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { nanoid } from "nanoid";
@@ -11,6 +11,7 @@ import type { ProbabilityProfile } from "@/lib/personalization/probability-profi
 import type { StorySelectionRecord } from "@/lib/personalization/discovery-engine";
 import { getPersonalityType } from "@/lib/personalization/personality-type";
 import type { PersonalityType } from "@/lib/personalization/personality-type";
+import { getRecommendedTheme } from "@/lib/personalization/recommendation-engine";
 // ThemeSelector no longer used on home — theme cards are inline
 import dynamic from "next/dynamic";
 const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscovery"));
@@ -117,6 +118,20 @@ export default function HomePage() {
 
   const [showThemeHelp, setShowThemeHelp] = useState(false);
   const [pickedTheme, setPickedTheme] = useState<ThemeType | null>(null);
+  const [recommendedTheme, setRecommendedTheme] = useState<ThemeType | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("pullim_user_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const profile: ProbabilityProfile = parsed.profile ?? parsed;
+        setRecommendedTheme(getRecommendedTheme(profile));
+      }
+    } catch {
+      // 무시
+    }
+  }, []);
 
   const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {
     setSelectedTheme(themeKey);
@@ -350,9 +365,23 @@ export default function HomePage() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
-                        {t.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold font-rpg" style={{ color: t.color }}>
+                          {t.name}
+                        </p>
+                        {settings.showRecommendations && recommendedTheme === t.key && (
+                          <span
+                            className="text-[10px] font-rpg-sm px-1.5 py-0.5 rounded-full"
+                            style={{
+                              background: `${t.color}22`,
+                              border: `1px solid ${t.color}66`,
+                              color: t.color,
+                            }}
+                          >
+                            ✦ 추천
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs mt-1 font-rpg-sm leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
                         {t.desc}
                       </p>
