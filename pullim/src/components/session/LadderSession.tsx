@@ -25,6 +25,11 @@ import { updateRecommendationRate } from "@/lib/personalization/probability-prof
 import { useSettings } from "@/hooks/useSettings";
 import AdInterstitial from "@/components/AdInterstitial";
 import { useAdGate } from "@/hooks/useAdGate";
+import { checkToolTrigger, extractTopicSummary } from "@/lib/session/tool-trigger";
+import type { ToolTriggerState, ToolSuggestion } from "@/lib/session/tool-trigger";
+import { ResearchCards, AnalysisView } from "./ToolCards";
+import type { LadderPerspective } from "./ToolCards";
+import type { DataCard } from "@/lib/types-ultimate";
 
 import SensoryLevel from "./levels/SensoryLevel";
 import ComparisonLevel from "./levels/ComparisonLevel";
@@ -203,6 +208,51 @@ export default function LadderSession({
   // 카드형 / 대화형 전환
   const [viewMode, setViewMode] = useState<"card" | "chat">("card");
   const [cardIndex, setCardIndex] = useState(-1);
+
+  // 도구 트리거 상태
+  const toolStateRef = useRef<ToolTriggerState>({ researchTriggered: false, analysisTriggered: false, turnCount: 0, topicSummary: "" });
+  const [toolState, setToolState] = useState<ToolTriggerState>({ researchTriggered: false, analysisTriggered: false, turnCount: 0, topicSummary: "" });
+  const [toolSuggestion, setToolSuggestion] = useState<ToolSuggestion | null>(null);
+  const [researchCards, setResearchCards] = useState<DataCard[] | null>(null);
+  const [analysisPerspectives, setAnalysisPerspectives] = useState<LadderPerspective[] | null>(null);
+  const [analysisDisagreement, setAnalysisDisagreement] = useState<string | null>(null);
+  const [toolLoading, setToolLoading] = useState(false);
+  const [toolDemoMode, setToolDemoMode] = useState(false);
+
+  const triggerTool = useCallback(async (type: "research" | "analysis", topicSummary: string) => {
+    setToolLoading(true);
+    setToolSuggestion(null);
+    try {
+      if (type === "research") {
+        const res = await fetch("/api/ladder/research", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topicSummary, theme, currentLevel: store.currentLevel }),
+        });
+        const data = await res.json();
+        setResearchCards(data.cards);
+        setToolDemoMode(data.demoMode);
+        toolStateRef.current = { ...toolStateRef.current, researchTriggered: true };
+        setToolState(prev => ({ ...prev, researchTriggered: true }));
+      } else {
+        const recentMessages = store.messages.slice(-6).map((m: LadderMessage) => ({ role: m.role, content: m.content }));
+        const res = await fetch("/api/ladder/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topicSummary, messages: recentMessages, theme }),
+        });
+        const data = await res.json();
+        setAnalysisPerspectives(data.perspectives);
+        setAnalysisDisagreement(data.disagreement);
+        setToolDemoMode(data.demoMode);
+        toolStateRef.current = { ...toolStateRef.current, analysisTriggered: true };
+        setToolState(prev => ({ ...prev, analysisTriggered: true }));
+      }
+    } catch (e) {
+      console.error("Tool trigger failed:", e);
+    }
+    setToolLoading(false);
+  }, [theme, store]);
 
   // 턴 그룹화: assistant + user 쌍
   const turns = useMemo(() => {
@@ -411,6 +461,22 @@ export default function LadderSession({
         lastResponseTime.current = Date.now();
         choiceChanges.current = 0;
 
+        // 도구 트리거 체크
+        const newTurnCount = toolStateRef.current.turnCount + 1;
+        const newTopicSummary = extractTopicSummary(store.messages);
+        const newToolState = { ...toolStateRef.current, turnCount: newTurnCount, topicSummary: newTopicSummary };
+        toolStateRef.current = newToolState;
+        setToolState(newToolState);
+
+        const suggestion = checkToolTrigger(store.messages, newToolState, inference);
+        if (suggestion.type) {
+          if (suggestion.autoTrigger) {
+            triggerTool(suggestion.type, newTopicSummary);
+          } else {
+            setToolSuggestion(suggestion);
+          }
+        }
+
         // 세션 종료 제안 감지
         if (result.wrapSuggest && result.summary) {
           store.endSession(result.summary);
@@ -426,7 +492,7 @@ export default function LadderSession({
         setIsLoading(false);
       }
     },
-    [theme, profileContext, store]
+    [theme, profileContext, store, triggerTool]
   );
 
   // ── 사용자 응답 처리 ──
@@ -1065,6 +1131,47 @@ export default function LadderSession({
             </div>
           )}
         </div>
+      )}
+
+      {/* 도구 제안 버튼 */}
+      {toolSuggestion && !toolLoading && (
+        <button
+          onClick={() => triggerTool(toolSuggestion.type!, toolState.topicSummary)}
+          className="mx-auto my-2 px-4 py-2 rounded-xl bg-indigo-900/30 border border-indigo-500/20 text-indigo-300 text-sm hover:bg-indigo-900/50 transition-colors"
+        >
+          {toolSuggestion.type === "research" ? "📚" : "🔬"} {toolSuggestion.reason}
+        </button>
+      )}
+
+      {/* 도구 로딩 */}
+      {toolLoading && (
+        <div className="text-center text-indigo-400/60 text-sm my-2 animate-pulse">
+          처리 중...
+        </div>
+      )}
+
+      {/* 리서치 결과 */}
+      {researchCards && (
+        <ResearchCards
+          cards={researchCards}
+          demoMode={toolDemoMode}
+          onDismiss={() => setResearchCards(null)}
+        />
+      )}
+
+      {/* 분석 결과 */}
+      {analysisPerspectives && (
+        <AnalysisView
+          perspectives={analysisPerspectives}
+          disagreement={analysisDisagreement}
+          demoMode={toolDemoMode}
+          onDismiss={() => { setAnalysisPerspectives(null); setAnalysisDisagreement(null); }}
+          onSelectPerspective={(question) => {
+            setAnalysisPerspectives(null);
+            setAnalysisDisagreement(null);
+            handleUserResponse(question);
+          }}
+        />
       )}
 
       {/* 치트 후 분기 UI */}
