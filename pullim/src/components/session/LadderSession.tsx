@@ -198,6 +198,7 @@ export default function LadderSession({
   const scrollRef = useRef<HTMLDivElement>(null);
   const pendingLevelRef = useRef<LadderLevel>(1);
   const pendingStartRef = useRef(false);
+  const pendingLevelUpRef = useRef<LadderLevel | null>(null);
 
   const { shouldShowAd, markAdShown } = useAdGate();
 
@@ -452,10 +453,9 @@ export default function LadderSession({
           sensoryCards: result.sensoryCards.length > 0 ? result.sensoryCards : undefined,
         });
 
-        // 레벨 자동 조정 (이면 사고 기반)
+        // 레벨 자동 조정 — 즉시 적용하지 않고 다음 사용자 응답 시 적용 (UI 불일치 방지)
         if (inference.suggestLevelUp && shouldLevelUp(level, inference, store.messages, store.behindEvents)) {
-          const nextLevel = Math.min(5, level + 1) as LadderLevel;
-          store.setLevel(nextLevel);
+          pendingLevelUpRef.current = Math.min(5, level + 1) as LadderLevel;
         }
 
         lastResponseTime.current = Date.now();
@@ -528,11 +528,19 @@ export default function LadderSession({
 
       let nextLevel = level;
       if (isUnknown && shouldLevelDown(level, inference, true)) {
+        // 레벨 다운: 이전 레벨 업 예약 취소
+        pendingLevelUpRef.current = null;
         nextLevel = Math.max(1, level - 1) as LadderLevel;
         store.setLevel(nextLevel);
       } else if (detectFreeTextIntent(text) && level === 4) {
+        pendingLevelUpRef.current = null;
         nextLevel = 5;
         store.setLevel(5);
+      } else if (pendingLevelUpRef.current !== null) {
+        // 이전 AI 응답에서 예약된 레벨 업 적용
+        nextLevel = pendingLevelUpRef.current;
+        store.setLevel(nextLevel);
+        pendingLevelUpRef.current = null;
       }
 
       // AI에게 전달
@@ -1042,8 +1050,8 @@ export default function LadderSession({
             const isLatest = cardIndex === turns.length - 1;
             return (
               <div className="space-y-4 animate-in fade-in duration-300" key={turn.ai.id}>
-                {/* AI 텍스트 */}
-                {turn.ai.content && (
+                {/* AI 텍스트 — 최신 카드 로딩 중엔 숨김 (새 응답 스트리밍과 동시 노출 방지) */}
+                {turn.ai.content && !(isLatest && isLoading) && (
                   <div
                     className="text-sm md:text-base leading-relaxed font-rpg text-center px-2"
                     style={{ color: "var(--fantasy-text)" }}
