@@ -17,8 +17,10 @@ import dynamic from "next/dynamic";
 const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscovery"));
 const PersonalityResult = dynamic(() => import("@/components/discovery/PersonalityResult"));
 import CrisisAlert from "@/components/CrisisAlert";
+import AuthModal from "@/components/AuthModal";
 import { useSettings } from "@/hooks/useSettings";
 import { useBGM } from "@/hooks/useBGM";
+import { useAuth } from "@/hooks/useAuth";
 
 // ThemeType ↔ ThemeName 매핑
 const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
@@ -108,7 +110,9 @@ export default function HomePage() {
     hotline: string;
   } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { settings, update: updateSettings } = useSettings();
+  const { user } = useAuth();
 
   // BGM — 선택된 테마의 트랙 재생
   const themeBgmTracks = THEMES[THEME_TO_NAME[selectedTheme]]?.assets?.bgmTracks;
@@ -244,8 +248,23 @@ export default function HomePage() {
           >
             내 기록
           </button>
+          <button
+            onClick={() => setShowAuthModal(true)}
+            className="text-xs font-rpg-sm transition-colors px-3 py-1.5 rounded-lg"
+            style={{
+              background: "rgba(167,139,250,0.12)",
+              border: "1px solid rgba(167,139,250,0.25)",
+              color: user ? "#a78bfa" : "rgba(232,213,181,0.60)",
+            }}
+          >
+            {user ? user.email.slice(0, 5) + "…" : "로그인"}
+          </button>
         </div>
       </header>
+
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
 
       {/* Settings dropdown */}
       {showSettings && (

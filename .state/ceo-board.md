@@ -14,10 +14,16 @@
 
 ## 🔴 해야 할 것 (대표만 가능)
 
-1. **ANTHROPIC_API_KEY 세팅** — 5분이면 끝남. 이거 하면 모델 테스트부터 배포까지 Claude가 다 돌림.
+1. **ANTHROPIC_API_KEY 세팅** — 5분이면 끝남. 이거 하면 Haiku 모델 테스트 가능.
    - `console.anthropic.com` → API Keys → Create Key → 복사
    - `vercel.com` → pullim → Settings → Environment Variables → `ANTHROPIC_API_KEY` 붙여넣기 → Save
    - Redeploy 한 번
+
+2. **밤배치 결과 확인** (배치 완료 후) — `tests/glm-테스트-결과.md` + `tests/screenshots/` 열어서 UI 직접 체크
+   - 선택지 제대로 나오는지, 이미지 맞는지, 흐름 이상한지
+
+3. **SQL 마이그레이션 실행** (배치 B 완료 후) — Supabase 대시보드 > SQL Editor
+   - 파일: `pullim/src/lib/supabase/migrations/001_sessions_table.sql`
 
 ## ✅ 사다리 세션 버그 3개 수정 + 배포 완료 (04-02)
 

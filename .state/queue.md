@@ -30,12 +30,14 @@
 ## 이번 주 (4/3~4/5): PMF Phase 0 진입
 
 - [ ] 🔴 **ANTHROPIC_API_KEY 세팅** — 5분. console.anthropic.com → Vercel 환경변수
-- [ ] **모델 테스트** — API 키 세팅 후 Claude가 자동 실행 (Haiku/Sonnet 비교, 전체 응답 기록)
+- [x] **GLM-5 프로바이더 추가** — z.ai 게이트웨이. 로컬 실험용 (.env.local). 배포 서버 제외. (04-04)
+- [ ] **GLM 밤배치 결과 확인** — `tests/glm-테스트-결과.md` + 스크린샷 직접 체크 (배치 완료 후)
+- [ ] **모델 확정** — GLM 실험 결과 + API 키 세팅 후 Haiku 비교
 - [ ] **치명적 UI 버그만 수정** — 새 기능 추가 안 함
 
 ## 다음 주 (4/6~4/9): 실사용 가능 상태
 
-- [ ] 세션 데이터 서버 저장 (localStorage → Supabase)
+- [ ] 세션 데이터 서버 저장 (localStorage → Supabase) — 밤배치 B에서 진행 중
 - [ ] 모델 확정 + 배포
 - [ ] 에브리타임 포스팅 가능 상태까지
 
