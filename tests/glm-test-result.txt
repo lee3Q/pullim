@@ -1,0 +1,18 @@
+[2m[WebServer] [22m[33m[1m⚠[22m[39m Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result.
+
+Running 5 tests using 1 worker
+
+[모험가] Turn 1: 90초 타임아웃
+  ✓  1 tests/e2e/ladder-glm.spec.ts:77:7 › GLM 사다리 세션 — 모험가 (1.6m)
+[전략실] Turn 1: 90초 타임아웃
+  ✓  2 tests/e2e/ladder-glm.spec.ts:77:7 › GLM 사다리 세션 — 전략실 (1.6m)
+[달빛정원] Turn 1: 90초 타임아웃
+  ✓  3 tests/e2e/ladder-glm.spec.ts:77:7 › GLM 사다리 세션 — 달빛정원 (1.6m)
+[천문대] Turn 1: 90초 타임아웃
+  ✓  4 tests/e2e/ladder-glm.spec.ts:77:7 › GLM 사다리 세션 — 천문대 (1.6m)
+[종말] Turn 1: 90초 타임아웃
+  ✓  5 tests/e2e/ladder-glm.spec.ts:77:7 › GLM 사다리 세션 — 종말 (1.6m)
+
+  Slow test file: tests/e2e/ladder-glm.spec.ts (7.9m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  5 passed (8.1m)
