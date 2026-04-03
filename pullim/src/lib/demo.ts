@@ -15,6 +15,7 @@ import {
 
 export function isDemoMode(): boolean {
   if (process.env.LLM_MODE === "local") return false;
+  if (process.env.GLM_API_KEY && process.env.GLM_BASE_URL) return false;
   return !process.env.ANTHROPIC_API_KEY;
 }
 

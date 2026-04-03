@@ -4,12 +4,14 @@ import { claudeProvider } from "./claude";
 import { openaiProvider } from "./openai";
 import { geminiProvider } from "./gemini";
 import { localProvider } from "./local";
+import { glmProvider } from "./glm";
 
 const PROVIDERS: Record<ModelProvider, LLMProvider> = {
   claude: claudeProvider,
   gpt: openaiProvider,
   gemini: geminiProvider,
   local: localProvider,
+  glm: glmProvider,
 };
 
 export function getProvider(name: ModelProvider): LLMProvider {
