@@ -23,6 +23,7 @@ import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/sess
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { updateRecommendationRate } from "@/lib/personalization/probability-profile";
 import { useSettings } from "@/hooks/useSettings";
+import { getAuthUser } from "@/lib/supabase/client";
 import AdInterstitial from "@/components/AdInterstitial";
 import { useAdGate } from "@/hooks/useAdGate";
 import { checkToolTrigger, extractTopicSummary } from "@/lib/session/tool-trigger";
@@ -658,13 +659,53 @@ export default function LadderSession({
         .replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/g, "")
         .replace(/\[CHEAT\][\s\S]*?\[\/CHEAT\]/g, "")
         .trim();
-      store.endSession(clean || "오늘 이야기를 나눴어.");
+      const finalSummary = clean || "오늘 이야기를 나눴어.";
+      store.endSession(finalSummary);
+      // fire-and-forget: 로그인 유저면 Supabase에도 저장
+      getAuthUser().then((authUser) => {
+        if (!authUser) return;
+        fetch("/api/session-save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: authUser.id,
+            session_id: store.sessionId,
+            theme,
+            summary: finalSummary,
+            turn_count: store.turnCount,
+            cheat_count: store.cheatCount,
+            messages_count: store.messages.length,
+            entry_mode: entryMode,
+            created_at: new Date().toISOString(),
+          }),
+        }).catch(() => {});
+      });
     } catch {
-      store.endSession(getDemoSummary(theme));
+      const fallbackSummary = getDemoSummary(theme);
+      store.endSession(fallbackSummary);
+      // fire-and-forget: 로그인 유저면 Supabase에도 저장
+      getAuthUser().then((authUser) => {
+        if (!authUser) return;
+        fetch("/api/session-save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: authUser.id,
+            session_id: store.sessionId,
+            theme,
+            summary: fallbackSummary,
+            turn_count: store.turnCount,
+            cheat_count: store.cheatCount,
+            messages_count: store.messages.length,
+            entry_mode: entryMode,
+            created_at: new Date().toISOString(),
+          }),
+        }).catch(() => {});
+      });
     }
     setIsLoading(false);
     setPhase("ad-end");
-  }, [store, theme]);
+  }, [store, theme, entryMode]);
 
   // ── 치트 선택지 ──
   const handleCheat = useCallback(() => {
