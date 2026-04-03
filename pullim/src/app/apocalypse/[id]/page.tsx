@@ -85,9 +85,7 @@ export default function ApocalypseSessionPage() {
   const searchParams = useSearchParams();
 
   // 양방향 사다리 모드
-  if (searchParams.get("mode") === "ladder") {
-    return <LadderSessionPage theme="종말" bgImage="/assets/apocalypse-listen-bg.png" />;
-  }
+  const isLadder = searchParams.get("mode") === "ladder";
 
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
@@ -324,6 +322,10 @@ export default function ApocalypseSessionPage() {
       setOptions(DEFAULT_CHOICES.ENTER || []);
     }
   }, [stage, enterPhase, setScene]);
+
+  if (isLadder) {
+    return <LadderSessionPage theme="종말" bgImage="/assets/apocalypse-listen-bg.png" />;
+  }
 
   // ─── API 호출 ───
 

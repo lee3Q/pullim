@@ -5,12 +5,23 @@ import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import type { BehindEvent, LadderMessage, LadderLevel } from "@/lib/session/ladder-types";
 
 export async function POST(req: NextRequest) {
-  const { signals, events, currentLevel, recentMessages } = (await req.json()) as {
+  let body: {
     signals: BehaviorSignals;
     events: BehindEvent[];
     currentLevel: LadderLevel;
     recentMessages: LadderMessage[];
   };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "잘못된 요청 형식" }, { status: 400 });
+  }
+
+  const { signals, events, currentLevel, recentMessages } = body;
+
+  if (!signals || currentLevel === undefined) {
+    return NextResponse.json({ error: "signals, currentLevel 필수" }, { status: 400 });
+  }
 
   // Gemini 키 없으면 → 규칙 기반 즉시 반환
   if (!process.env.GOOGLE_AI_API_KEY) {

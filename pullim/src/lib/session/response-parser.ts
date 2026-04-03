@@ -129,7 +129,7 @@ export function parseResponse(raw: string): ParsedResponse {
     .replace(/\[ANALYSIS\][\s\S]*?\[\/ANALYSIS\]/g, "")
     .replace(/\[COMPARISON\][\s\S]*?\[\/COMPARISON\]/g, "")
     .replace(/\[SENSORY\][\s\S]*?\[\/SENSORY\]/g, "")
-    .replace(/\[WRAP_SUGGEST\][\s\S]*?\[\/WRAP_SUGGEST\]/g, "")
+    .replace(/\[WRAP_SUGGEST\][\s\S]*?(\[\/WRAP_SUGGEST\]|$)/g, "")
     .replace(/\[LISTEN_COMPLETE\]/g, "")
     .replace(/\[SUMMARY\][\s\S]*?\[\/SUMMARY\]/g, "")
     // HTML 태그 제거 (<option>, </option> 등 LLM이 간혹 출력)

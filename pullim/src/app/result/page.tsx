@@ -23,10 +23,25 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const typeId = params.type || "";
   const pt = getPersonalityTypeById(typeId);
 
+  const fallbackOgImage = "/images/og/og_main.png";
+
   if (!pt) {
     return {
       title: "풀림 — 3분이면 나를 알 수 있어요",
       description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+      metadataBase: new URL(BASE_URL),
+      openGraph: {
+        title: "풀림 — 3분이면 나를 알 수 있어요",
+        description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+        images: [{ url: fallbackOgImage, width: 1200, height: 630 }],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: "풀림 — 3분이면 나를 알 수 있어요",
+        description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+        images: [fallbackOgImage],
+      },
     };
   }
 

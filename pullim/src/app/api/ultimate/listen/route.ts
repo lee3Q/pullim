@@ -288,6 +288,85 @@ ${CRYSTALS.map((c) => `- ${c.name}: ${c.analysisFocus}`).join("\n")}
         defaultOptions: ["계속 이야기할게요", "다른 이야기를 할게요", "아직 잘 모르겠어요"],
       };
 
+    case "종말":
+      return {
+        systemPrompt: `너는 "동료"다. 세상이 끝난 뒤 폐허 속에서 사용자 옆을 지키는 생존자.
+
+[톤 규칙]
+- 반말: "~야", "~지", "~해", "~거든", "~잖아"
+- 2-3문장 최대. 장황 금지.
+- 담담하지만 따뜻함. 세상이 무너져도 옆에 있다는 느낌.
+- 과잉 위로 금지. "괜찮아질 거야" 같은 빈말 없음.
+
+[금기어]
+- "힘드셨죠", "괜찮아요", "화이팅", "고민이 많으시네요", "제가 도와드릴게요" — 절대 사용 금지.
+- 대체: "그랬구나", "같이 있을게", "말해줘서 고마워", "조금 더 얘기해볼래"
+
+[역할]
+- 사용자 고민을 경청하고 핵심을 파악한다.
+- 한 번에 질문 1개만. 감정 반영 후 질문.
+- 답을 주지 않는다. 질문으로 사용자가 스스로 명확화하게 한다.
+
+[Socratic 질문 기법]
+1. Powerful Question: 30자 이내, 즉답 불가(응/아니 금지), 핵심을 꿰뚫는 질문만.
+   (O) "그걸 내려놓으면 뭐가 남아?"
+   (X) "그게 힘들었어?" — 즉답 가능, 금지.
+2. Mirroring: 사용자의 핵심 단어를 그대로 돌려줘. "~라고 했잖아" 형식. 해석/분석 추가 금지.
+3. Reframing: "~해야 해", "~밖에 없어" 감지 시 → 다른 각도의 질문으로 전환.
+
+[침묵 적응 — 2턴 이후 적용]
+사용자 발화 분석:
+1. 표면 질문 vs 진짜 질문 구분 ("어떻게 해야 해"=표면, "버텨도 되는 건지 모르겠어"=진짜)
+2. 회피 신호: 얘기하다가 갑자기 넘어간 주제
+3. 감정-텍스트 불일치: 말로는 "상관없어"인데 문체는 지침
+감지 시 → 표면에 바로 답하지 말고, 진짜 질문을 향한 리프레이밍 질문 1개.
+
+[자기가치감 보호]
+- 존재 가치/자기 평가를 흔드는 방향 금지.
+- "넌 왜 그래" ❌ → "네가 그렇게 느끼는 이유가 있겠지" ✅
+
+[선택지 생성 규칙]
+응답 마지막에 반드시 아래 형식으로 선택지를 포함:
+[OPTIONS]
+선택지1
+선택지2
+선택지3
+[/OPTIONS]
+
+선택지 규칙:
+- 3~4개 제시
+- 사용자가 "맞아" 하며 탭할 수 있는 짧은 문장
+- 마지막 선택지는 "아직 잘 모르겠어" 또는 "다른 얘기 할래" 계열
+`,
+        summaryFormat: `
+
+[중간 정리 — 지금 실행]
+대화 내용을 바탕으로 중간 정리를 해라.
+정리 형식: "{user_name}야, 내가 들은 거 정리해볼게. [상황 1~2문장 요약]. 지금 마음은 [감정 1문장]인 것 같아. 맞아?"
+
+응답 마지막에 반드시 [LISTEN_COMPLETE] 시그널을 출력.
+그 뒤에 1~2문장으로 상황과 감정을 요약한 텍스트를 출력 (이것이 listenSummary).
+형식: [SUMMARY]요약 텍스트[/SUMMARY]
+
+그리고 사용자 고민에 가장 적합한 수정구슬 3개를 추천해라.
+아래 구슬 목록에서 고민과 가장 관련 깊은 3개를 선택:
+${CRYSTALS.map((c) => `- ${c.name}: ${c.analysisFocus}`).join("\n")}
+
+형식: [CRYSTALS]구슬1,구슬2,구슬3[/CRYSTALS]
+`,
+        safetyGuard: `[안전 가드 — 활성]
+사용자가 심리적으로 힘든 상태일 수 있습니다.
+1. 고통을 축소하거나 빈말 금지
+2. 감정을 먼저 인정
+3. 응답 마지막에 자연스럽게: "혼자 감당하기 너무 힘들면 109(자살예방상담전화)에 전화해. 24시간 들어줘."
+4. 질문은 가볍게
+5. "안 한다" 옵션 항상 제시
+
+`,
+        errorMessage: "잠깐 신호가 끊겼어... 다시 해볼래?",
+        defaultOptions: ["계속 얘기할게", "다른 얘기 할래", "잘 모르겠어"],
+      };
+
     case "모험가":
     default:
       return {
@@ -386,6 +465,21 @@ export async function POST(req: NextRequest) {
     sensoryLadderContext?: string;
   };
 
+  if (!Array.isArray(messages)) {
+    const enc = new TextEncoder();
+    const errStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(enc.encode(`data: ${JSON.stringify({ error: true, text: "잘못된 요청입니다" })}\n\n`));
+        controller.enqueue(enc.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    return new Response(errStream, {
+      status: 400,
+      headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
+    });
+  }
+
   const resolvedTheme = resolveTheme(theme);
   const persona = getPersona(resolvedTheme);
   const encoder = new TextEncoder();
@@ -403,18 +497,24 @@ export async function POST(req: NextRequest) {
 
       const demoStream = new ReadableStream({
         async start(controller) {
+          let aborted = false;
+          req.signal.addEventListener('abort', () => { aborted = true; try { controller.close(); } catch {} });
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ demoMode: true, message: "데모 모드로 전환됩니다" })}\n\n`));
           const chars = demoText.split("");
           for (let i = 0; i < chars.length; i += 3) {
+            if (aborted) break;
             const chunk = chars.slice(i, i + 3).join("");
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`)
             );
             await new Promise((r) => setTimeout(r, 25));
           }
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
+          if (!aborted) {
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            controller.close();
+          }
         },
+        cancel() {},
       });
       return new Response(demoStream, {
         headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" },
@@ -425,36 +525,42 @@ export async function POST(req: NextRequest) {
     const demo = getDemoListenResponse(turnCount, resolvedTheme);
     const demoStream = new ReadableStream({
       async start(controller) {
+        let aborted = false;
+        req.signal.addEventListener('abort', () => { aborted = true; try { controller.close(); } catch {} });
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ demoMode: true, message: "데모 모드로 전환됩니다" })}\n\n`));
         const words = demo.text.split("");
         for (let i = 0; i < words.length; i += 3) {
+          if (aborted) break;
           const chunk = words.slice(i, i + 3).join("");
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`)
           );
           await new Promise((r) => setTimeout(r, 30));
         }
-        if ("options" in demo && demo.options) {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ options: demo.options })}\n\n`)
-          );
+        if (!aborted) {
+          if ("options" in demo && demo.options) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ options: demo.options })}\n\n`)
+            );
+          }
+          if ("listenSummary" in demo && demo.listenSummary) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ listenSummary: demo.listenSummary })}\n\n`)
+            );
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ recommendedCrystals: ["금화", "나침반", "모닥불"] })}\n\n`)
+            );
+          }
+          if ("listenComplete" in demo && demo.listenComplete) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ listenComplete: true })}\n\n`)
+            );
+          }
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
         }
-        if ("listenSummary" in demo && demo.listenSummary) {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ listenSummary: demo.listenSummary })}\n\n`)
-          );
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ recommendedCrystals: ["금화", "나침반", "모닥불"] })}\n\n`)
-          );
-        }
-        if ("listenComplete" in demo && demo.listenComplete) {
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ listenComplete: true })}\n\n`)
-          );
-        }
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-        controller.close();
       },
+      cancel() {},
     });
     return new Response(demoStream, {
       headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" },
@@ -560,6 +666,14 @@ export async function POST(req: NextRequest) {
 
   const readable = new ReadableStream({
     async start(controller) {
+      let aborted = false;
+      let claudeStream: { abort: () => void } | null = null;
+      req.signal.addEventListener('abort', () => {
+        aborted = true;
+        if (claudeStream) claudeStream.abort();
+        try { controller.close(); } catch {}
+      });
+
       try {
         let fullText = "";
 
@@ -570,6 +684,7 @@ export async function POST(req: NextRequest) {
             maxTokens: 1024,
             callbacks: {
               onText: (text) => {
+                if (aborted) return;
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
                 );
@@ -584,8 +699,10 @@ export async function POST(req: NextRequest) {
             system: systemPrompt,
             messages: chatMessages,
           });
+          claudeStream = stream;
 
           stream.on("text", (text) => {
+            if (aborted) return;
             fullText += text;
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
@@ -619,6 +736,8 @@ export async function POST(req: NextRequest) {
             );
           }
         }
+
+        if (aborted) return;
 
         // Extract options
         const optionsMatch = fullText.match(/\[OPTIONS\]([\s\S]*?)\[\/OPTIONS\]/);
@@ -703,6 +822,7 @@ export async function POST(req: NextRequest) {
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       } catch (err) {
+        if (aborted) return;
         let errorCode = "UNKNOWN";
         let errorMsg = persona.errorMessage;
         if (err instanceof Error) {
@@ -724,6 +844,7 @@ export async function POST(req: NextRequest) {
         controller.close();
       }
     },
+    cancel() {},
   });
 
   return new Response(readable, {

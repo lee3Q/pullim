@@ -77,9 +77,7 @@ export default function GardenSessionPage() {
   const sessionId = params.id as string;
   const searchParams = useSearchParams();
 
-  if (searchParams.get("mode") === "ladder") {
-    return <LadderSessionPage theme="달빛정원" bgImage="/assets/garden-listen-bg.png" />;
-  }
+  const isLadder = searchParams.get("mode") === "ladder";
 
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
@@ -262,6 +260,10 @@ export default function GardenSessionPage() {
       setOptions(DEFAULT_CHOICES.ENTER || []);
     }
   }, [stage, enterPhase, setScene]);
+
+  if (isLadder) {
+    return <LadderSessionPage theme="달빛정원" bgImage="/assets/garden-listen-bg.png" />;
+  }
 
   // ─── API 호출 (로직 동일) ───
 

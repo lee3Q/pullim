@@ -199,6 +199,7 @@ export default function LadderSession({
   const pendingLevelRef = useRef<LadderLevel>(1);
   const pendingStartRef = useRef(false);
   const pendingLevelUpRef = useRef<LadderLevel | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const { shouldShowAd, markAdShown } = useAdGate();
 
@@ -337,6 +338,13 @@ export default function LadderSession({
       setCurrentResponse(null);
       choiceStartTime.current = Date.now();
 
+      // 이전 요청 취소
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      abortRef.current = new AbortController();
+      const signal = abortRef.current.signal;
+
       const chatMessages = history
         .filter((m) => m.role !== "system")
         .slice(-20)
@@ -373,6 +381,7 @@ export default function LadderSession({
       try {
         const response = await fetch("/api/ultimate/listen", {
           method: "POST",
+          signal,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             messages: chatMessages.length > 0
@@ -396,13 +405,15 @@ export default function LadderSession({
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullText = "";
+        let sseBuffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
+          sseBuffer += decoder.decode(value, { stream: true });
+          const lines = sseBuffer.split("\n");
+          sseBuffer = lines.pop() ?? "";
 
           for (const line of lines) {
             if (!line.startsWith("data: ")) continue;
@@ -482,7 +493,8 @@ export default function LadderSession({
           store.endSession(result.summary);
           setPhase("ad-end");
         }
-      } catch {
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") return;
         store.addMessage({
           role: "assistant",
           content: "잠깐 연결이 끊겼어... 다시 한번 해볼래?",
@@ -656,9 +668,9 @@ export default function LadderSession({
 
   // ── 치트 선택지 ──
   const handleCheat = useCallback(() => {
-    // cheatCount 증가
-    store.incrementCheatCount();
+    // cheatCount 증가 (stale read 방지: increment 전에 +1 계산)
     const newCheatCount = store.cheatCount + 1;
+    store.incrementCheatCount();
 
     // 이면사고 기반 치트 분기 판단
     const { action, themeSuggestion } = inferCheatAction(

@@ -85,9 +85,7 @@ export default function AdventureSessionPage() {
   const searchParams = useSearchParams();
 
   // 양방향 사다리 모드
-  if (searchParams.get("mode") === "ladder") {
-    return <LadderSessionPage theme="모험가" bgImage="/assets/adventure-listen-bg.png" />;
-  }
+  const isLadder = searchParams.get("mode") === "ladder";
 
   const isGameMode = searchParams.get("mode") !== "chat";
   const activeGameUI = isGameMode ? theme.gameUI : undefined;
@@ -324,6 +322,10 @@ export default function AdventureSessionPage() {
       setOptions(DEFAULT_CHOICES.ENTER || []);
     }
   }, [stage, enterPhase, setScene]);
+
+  if (isLadder) {
+    return <LadderSessionPage theme="모험가" bgImage="/assets/adventure-listen-bg.png" />;
+  }
 
   // ─── API 호출 (로직 동일) ───
 
