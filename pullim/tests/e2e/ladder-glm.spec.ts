@@ -116,12 +116,12 @@ for (const theme of THEMES) {
       // React 상태 갱신 대기 (이전 버튼 사라지는 시간)
       await page.waitForTimeout(1_500);
 
-      // GLM 응답 대기 (최대 90초 — z.ai 게이트웨이 특성)
+      // GLM 응답 대기 (최대 180초 — z.ai 게이트웨이 특성)
       try {
-        await page.waitForSelector(SEL_ANY, { timeout: 90_000 });
+        await page.waitForSelector(SEL_ANY, { timeout: 180_000 });
       } catch {
         await shot(page, `glm-${theme.label}-${pad}-${turn}턴-타임아웃`);
-        console.log(`[${theme.label}] Turn ${turn}: 90초 타임아웃`);
+        console.log(`[${theme.label}] Turn ${turn}: 180초 타임아웃`);
         break;
       }
 

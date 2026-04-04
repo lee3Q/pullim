@@ -24,17 +24,13 @@ export default function ChoiceLevel({
 }: ChoiceLevelProps) {
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      {text && (
-        <p className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>{text}</p>
-      )}
-
       <div className="space-y-2">
         {options.map((opt) => (
           <button
             key={opt.id}
             onClick={() => onSelect(opt.id)}
-            className={`w-full text-left py-3 px-4 transition-all active:scale-[0.98] ${
-              opt.isFallback ? "rpg-button-ghost opacity-60" : "rpg-button"
+            className={`glass-btn w-full text-left py-3 px-4 transition-all active:scale-[0.98] ${
+              opt.isFallback ? "opacity-60" : ""
             }`}
           >
             <div className="flex items-center justify-between">
@@ -43,7 +39,7 @@ export default function ChoiceLevel({
                 <span className="text-sm">{opt.text}</span>
               </div>
               {opt.isRecommended && showRecommendations && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(192,163,116,0.25)", color: "var(--fantasy-gold-bright)" }}>
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)" }}>
                   추천
                 </span>
               )}
@@ -56,7 +52,7 @@ export default function ChoiceLevel({
         <button
           onClick={onFreeText}
           className="text-xs font-rpg-sm transition-colors"
-          style={{ color: "rgba(192,163,116,0.65)" }}
+          style={{ color: "rgba(255,255,255,0.5)" }}
         >
           직접 쓸게
         </button>

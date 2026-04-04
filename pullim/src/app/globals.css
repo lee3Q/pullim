@@ -274,6 +274,181 @@ body {
 }
 
 /* ========================================
+   Glassmorphism — 몰입형 UI
+   ======================================== */
+.glass-btn {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  transition: background 0.2s, transform 0.15s;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.glass-btn:hover,
+.glass-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+.glass-btn:active {
+  transform: scale(0.98);
+}
+
+.glass-input {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  font-family: var(--font-gowun), 'Gowun Batang', serif;
+  transition: all 0.2s;
+}
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+
+/* 대화형 말풍선 */
+.glass-bubble-ai {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px 18px 18px 4px;
+  max-width: 85%;
+}
+.glass-bubble-user {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px 18px 4px 18px;
+  max-width: 85%;
+}
+
+/* Light mode glassmorphism overrides */
+[data-theme="light"] .glass-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.8);
+}
+[data-theme="light"] .glass-btn:hover,
+[data-theme="light"] .glass-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.8);
+}
+[data-theme="light"] .glass-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .glass-bubble-ai {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .glass-bubble-user {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   Particle Animations — 테마별 CSS-only
+   ======================================== */
+
+/* 모험가: 반딧불 */
+.particle-firefly {
+  background: radial-gradient(circle, rgba(255, 220, 80, 0.9), rgba(255, 200, 50, 0));
+  border-radius: 50%;
+  animation: firefly-float linear infinite alternate;
+  will-change: transform, opacity;
+  box-shadow: 0 0 6px 2px rgba(255, 220, 80, 0.4);
+}
+@keyframes firefly-float {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.8); }
+  20% { opacity: 0.8; }
+  50% { opacity: 0.4; transform: translate(15px, -20px) scale(1.2); }
+  80% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-10px, -40px) scale(0.6); }
+}
+
+/* 전략실: 안개 */
+.particle-fog {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06), transparent);
+  border-radius: 50%;
+  animation: fog-drift linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes fog-drift {
+  0% { opacity: 0; transform: translateX(0); }
+  30% { opacity: 0.08; }
+  70% { opacity: 0.04; }
+  100% { opacity: 0; transform: translateX(60px); }
+}
+
+/* 달빛정원: 꽃잎 */
+.particle-petal {
+  background: rgba(255, 180, 200, 0.6);
+  border-radius: 50% 0 50% 0;
+  animation: petal-fall linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes petal-fall {
+  0% { opacity: 0; transform: translateY(0) rotate(0deg) translateX(0); }
+  10% { opacity: 0.7; }
+  50% { transform: translateY(50vh) rotate(180deg) translateX(30px); opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(110vh) rotate(360deg) translateX(-20px); }
+}
+
+/* 천문대: 별똥별 */
+.particle-star {
+  background: white;
+  border-radius: 50%;
+  animation: star-shoot linear infinite;
+  will-change: transform, opacity;
+  box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.6);
+}
+@keyframes star-shoot {
+  0% { opacity: 0; transform: translate(0, 0); }
+  5% { opacity: 1; }
+  30% { opacity: 0.8; transform: translate(-80px, 60px); }
+  50% { opacity: 0; transform: translate(-150px, 120px); }
+  100% { opacity: 0; transform: translate(-150px, 120px); }
+}
+
+/* 종말: 재/먼지 */
+.particle-ash {
+  background: rgba(180, 170, 160, 0.5);
+  border-radius: 50%;
+  animation: ash-rise linear infinite;
+  will-change: transform, opacity;
+}
+@keyframes ash-rise {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  20% { opacity: 0.5; }
+  60% { opacity: 0.3; transform: translateY(-50vh) translateX(15px); }
+  100% { opacity: 0; transform: translateY(-100vh) translateX(-10px); }
+}
+
+/* ========================================
    Campfire Animations
    ======================================== */
 @keyframes campfire-float {

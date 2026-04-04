@@ -40,10 +40,6 @@ export default function TextInputLevel({
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      {text && (
-        <p className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>{text}</p>
-      )}
-
       <div className="relative">
         <textarea
           ref={textareaRef}
@@ -53,12 +49,12 @@ export default function TextInputLevel({
           placeholder="편하게 말해봐..."
           disabled={isLoading}
           rows={2}
-          className="rpg-input w-full px-4 py-3 rounded-xl text-sm resize-none disabled:opacity-50"
+          className="glass-input w-full px-4 py-3 text-sm resize-none disabled:opacity-50"
         />
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || isLoading}
-          className="absolute right-2 bottom-2 rpg-button-ghost px-3 py-1 text-sm disabled:opacity-30 disabled:pointer-events-none"
+          className="absolute right-2 bottom-2 glass-btn px-3 py-1 text-sm disabled:opacity-30 disabled:pointer-events-none"
         >
           ↑
         </button>
@@ -68,7 +64,7 @@ export default function TextInputLevel({
         <button
           onClick={onSwitchToChoices}
           className="text-xs font-rpg-sm transition-colors"
-          style={{ color: "rgba(192,163,116,0.65)" }}
+          style={{ color: "rgba(255,255,255,0.5)" }}
         >
           선택지 보여줘
         </button>

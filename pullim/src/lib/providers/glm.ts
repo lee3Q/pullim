@@ -29,7 +29,7 @@ export const glmProvider: LLMProvider = {
         role: m.role === "system" ? "user" : m.role,
         content: m.content,
       })),
-    });
+    }, { timeout: 180_000 });  // 180초 — z.ai 게이트웨이 특성 반영
 
     const text = response.content[0].type === "text" ? response.content[0].text : "";
 

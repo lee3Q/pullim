@@ -104,6 +104,7 @@ function detectDisagreement(perspectives: LadderPerspective[]): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  console.log('[mode]', isDemoMode() ? 'demo' : 'glm');
   const body = (await req.json()) as LadderAnalyzeRequest;
   const { topicSummary } = body;
 

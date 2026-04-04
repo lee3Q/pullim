@@ -38,6 +38,7 @@ import AnalysisLevel from "./levels/AnalysisLevel";
 import ChoiceLevel from "./levels/ChoiceLevel";
 import TextInputLevel from "./levels/TextInputLevel";
 import SessionSummary from "./SessionSummary";
+import Particles from "./Particles";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
 function stripStreamTags(text: string): string {
@@ -969,39 +970,43 @@ export default function LadderSession({
 
   // 세션 화면
   return (
-    <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto flex flex-col" style={{ height: "calc(100dvh - 120px)" }}>
-      {/* 데모 모드 알림 */}
-      {demoNotice && (
-        <div className="text-xs text-center py-1 px-3 rounded-full opacity-60 flex-shrink-0" style={{ color: "var(--fantasy-text-muted, #888)" }}>
-          🔑 API 키 미설정 — 데모 모드로 동작 중
-        </div>
-      )}
-
-      {/* 배경 이미지 — 카드형에서만 표시 */}
-      {bgImage && viewMode === "card" && (
+    <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl mx-auto flex flex-col relative" style={{ height: "calc(100dvh - 120px)" }}>
+      {/* 전체 화면 배경 이미지 — 카드형/대화형 모두 */}
+      {bgImage && (
         <div
-          className="w-full rounded-xl overflow-hidden flex-shrink-0 relative"
+          className="fixed inset-0"
           style={{
-            height: "28vh",
+            zIndex: 0,
             opacity: bgOpacity,
-            transition: "opacity 250ms ease",
+            transition: "opacity 400ms ease",
           }}
         >
           <img
             src={bgImage}
             alt=""
             className="w-full h-full object-cover"
-            style={{ filter: "brightness(0.65)" }}
+            style={{ filter: "brightness(0.5)" }}
           />
+          {/* 하단 그라데이션 overlay — 텍스트 가독성 */}
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, transparent 35%, var(--fantasy-bg, #1a1612) 100%)" }}
+            style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.6) 100%)" }}
           />
         </div>
       )}
 
+      {/* 파티클 애니메이션 */}
+      <Particles theme={theme} />
+
+      {/* 데모 모드 알림 */}
+      {demoNotice && (
+        <div className="text-xs text-center py-1 px-3 rounded-full opacity-60 flex-shrink-0 relative" style={{ color: "var(--fantasy-text-muted, #888)", zIndex: 2 }}>
+          🔑 API 키 미설정 — 데모 모드로 동작 중
+        </div>
+      )}
+
       {/* 레벨 인디케이터 + 내러티브 */}
-      <div className="py-2 px-1 flex-shrink-0">
+      <div className="py-2 px-3 flex-shrink-0 relative glass-panel" style={{ zIndex: 2, margin: "0 4px", marginTop: "4px" }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {([1, 2, 3, 4, 5] as LadderLevel[]).map((l) => (
@@ -1009,13 +1014,13 @@ export default function LadderSession({
                 key={l}
                 className="w-1.5 h-1.5 rounded-full transition-all"
                 style={{
-                  background: l === level ? "var(--fantasy-gold)" : "rgba(192,163,116,0.2)",
+                  background: l === level ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.2)",
                   transform: l === level ? "scale(1.25)" : "scale(1)",
-                  boxShadow: l === level ? "0 0 6px rgba(192,163,116,0.4)" : "none",
+                  boxShadow: l === level ? "0 0 6px rgba(255,255,255,0.4)" : "none",
                 }}
               />
             ))}
-            <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(232,213,181,0.75)" }}>
+            <span className="text-[10px] ml-2 font-rpg-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
               {LEVEL_LABELS[level]}
             </span>
           </div>
@@ -1031,8 +1036,8 @@ export default function LadderSession({
             <button
               onClick={generateSummary}
               disabled={isLoading}
-              className="text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-2 px-1"
-              style={{ color: "rgba(192,163,116,0.55)" }}
+              className="glass-btn text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-1.5 px-3"
+              style={{ color: "rgba(255,255,255,0.6)" }}
             >
               오늘은 여기까지
             </button>
@@ -1040,8 +1045,8 @@ export default function LadderSession({
         </div>
         {/* 내러티브 텍스트 */}
         <p
-          className="text-[10px] font-rpg-sm italic mt-0.5 ml-1 animate-in fade-in duration-500"
-          style={{ color: "rgba(232,213,181,0.65)" }}
+          className="text-[10px] font-rpg-sm italic mt-1 animate-in fade-in duration-500"
+          style={{ color: "rgba(255,255,255,0.55)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
         >
           {LEVEL_NARRATIVES[THEME_IMAGE_MAP[theme] ?? "adventure"]?.[level] ?? ""}
         </p>
@@ -1050,22 +1055,21 @@ export default function LadderSession({
       {/* 이면사고 표시 (showBehindThoughts 설정 on 시) */}
       {settings.showBehindThoughts && currentInference && describeBehindInference(currentInference) && (
         <div
-          className="px-1 pb-1 text-[10px] font-rpg-sm animate-in fade-in duration-300"
-          style={{ color: "rgba(192,163,116,0.45)" }}
+          className="px-3 pb-1 text-[10px] font-rpg-sm animate-in fade-in duration-300 relative"
+          style={{ color: "rgba(255,255,255,0.4)", zIndex: 2 }}
         >
           {describeBehindInference(currentInference)}
         </div>
       )}
 
       {/* 뷰 모드 토글 + 카드 내비 */}
-      <div className="flex items-center justify-between px-1 pb-2">
+      <div className="flex items-center justify-between px-3 pb-2 relative" style={{ zIndex: 2 }}>
         <div className="flex items-center gap-2">
           {viewMode === "card" && turns.length > 1 && (
             <button
               onClick={() => setCardIndex(Math.max(0, cardIndex - 1))}
               disabled={cardIndex <= 0}
-              className="text-xs px-2 py-1 rounded-lg transition-all active:scale-95 disabled:opacity-20"
-              style={{ color: "var(--fantasy-gold-bright)", background: "rgba(255,255,255,0.05)" }}
+              className="glass-btn text-xs px-3 py-1 transition-all active:scale-95 disabled:opacity-20"
             >
               ◀ 이전
             </button>
@@ -1073,22 +1077,20 @@ export default function LadderSession({
           {viewMode === "card" && cardIndex < turns.length - 1 && (
             <button
               onClick={() => setCardIndex(Math.min(turns.length - 1, cardIndex + 1))}
-              className="text-xs px-2 py-1 rounded-lg transition-all active:scale-95"
-              style={{ color: "var(--fantasy-gold-bright)", background: "rgba(255,255,255,0.05)" }}
+              className="glass-btn text-xs px-3 py-1 transition-all active:scale-95"
             >
               다음 ▶
             </button>
           )}
           {viewMode === "card" && turns.length > 0 && (
-            <span className="text-[10px] font-rpg-sm" style={{ color: "rgba(192,163,116,0.35)" }}>
+            <span className="text-[10px] font-rpg-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
               {cardIndex + 1} / {turns.length}
             </span>
           )}
         </div>
         <button
           onClick={() => setViewMode(viewMode === "card" ? "chat" : "card")}
-          className="text-[10px] px-2 py-1 rounded-lg transition-all"
-          style={{ color: "rgba(232,213,181,0.45)", background: "rgba(255,255,255,0.03)" }}
+          className="glass-btn text-[10px] px-3 py-1 transition-all"
         >
           {viewMode === "card" ? "💬 대화형" : "🃏 카드형"}
         </button>
@@ -1096,18 +1098,21 @@ export default function LadderSession({
 
       {/* ── 카드형 뷰 ── */}
       {viewMode === "card" ? (
-        <div ref={scrollRef} className="flex-1 flex flex-col justify-center px-1 overflow-hidden">
+        <div ref={scrollRef} className="flex-1 flex flex-col justify-end px-3 overflow-y-auto relative" style={{ zIndex: 2 }}>
           {/* 현재 카드 */}
           {turns.length > 0 && cardIndex >= 0 && cardIndex < turns.length && (() => {
             const turn = turns[cardIndex];
             const isLatest = cardIndex === turns.length - 1;
             return (
               <div className="space-y-4 animate-in fade-in duration-300" key={turn.ai.id}>
-                {/* AI 텍스트 — 최신 카드 로딩 중엔 숨김 (새 응답 스트리밍과 동시 노출 방지) */}
+                {/* AI 텍스트 — 배경 위에 직접 표시, 가운데 정렬, Betwixt 스타일 */}
                 {turn.ai.content && !(isLatest && isLoading) && (
                   <div
-                    className="text-sm md:text-base leading-relaxed font-rpg text-center px-2"
-                    style={{ color: "var(--fantasy-text)" }}
+                    className="text-base md:text-lg leading-relaxed font-rpg text-center px-4"
+                    style={{
+                      color: "rgba(255,255,255,0.9)",
+                      textShadow: "0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.3)",
+                    }}
                   >
                     {turn.ai.content}
                   </div>
@@ -1117,12 +1122,7 @@ export default function LadderSession({
                 {!isLatest && turn.user && (
                   <div className="text-center pt-2">
                     <span
-                      className="inline-block text-sm font-rpg px-4 py-2 rounded-xl"
-                      style={{
-                        color: "var(--fantasy-gold-bright)",
-                        background: "rgba(192,163,116,0.10)",
-                        border: "1px solid rgba(192,163,116,0.15)",
-                      }}
+                      className="inline-block text-sm font-rpg px-4 py-2 glass-bubble-user"
                     >
                       {turn.user.content}
                     </span>
@@ -1134,21 +1134,27 @@ export default function LadderSession({
 
           {/* 스트리밍 중 */}
           {isLoading && streamText && (
-            <div className="text-sm leading-relaxed font-rpg text-center px-2" style={{ color: "var(--fantasy-text)" }}>
+            <div
+              className="text-base leading-relaxed font-rpg text-center px-4"
+              style={{
+                color: "rgba(255,255,255,0.9)",
+                textShadow: "0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.3)",
+              }}
+            >
               {stripStreamTags(streamText) || "..."}
             </div>
           )}
           {isLoading && !streamText && (
-            <div className="flex gap-1 py-4 justify-center">
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,163,116,0.3)" }} />
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+            <div className="flex gap-1.5 py-4 justify-center">
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "rgba(255,255,255,0.3)" }} />
+              <div className="w-2 h-2 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(255,255,255,0.3)" }} />
+              <div className="w-2 h-2 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(255,255,255,0.3)" }} />
             </div>
           )}
         </div>
       ) : (
         /* ── 대화형 뷰 ── */
-        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4 px-1">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pb-4 px-3 relative" style={{ zIndex: 2 }}>
           {store.messages.map((msg) => {
             const hasStructured = msg.role === "assistant" && (
               (msg.sensoryCards && msg.sensoryCards.length > 0) ||
@@ -1160,19 +1166,21 @@ export default function LadderSession({
               <div key={msg.id}>
                 {msg.role === "user" ? (
                   <div className="flex justify-end">
-                    <span
-                      className="text-sm font-rpg px-3 py-1.5 rounded-xl"
-                      style={{
-                        color: "var(--fantasy-gold-bright)",
-                        background: "rgba(192,163,116,0.10)",
-                      }}
+                    <div
+                      className="glass-bubble-user text-sm font-rpg px-4 py-2.5"
+                      style={{ color: "rgba(255,255,255,0.9)" }}
                     >
                       {msg.content}
-                    </span>
+                    </div>
                   </div>
                 ) : hasStructured ? null : (
-                  <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-                    {msg.content}
+                  <div className="flex justify-start">
+                    <div
+                      className="glass-bubble-ai text-sm leading-relaxed font-rpg px-4 py-3"
+                      style={{ color: "rgba(255,255,255,0.85)" }}
+                    >
+                      {msg.content}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1180,15 +1188,22 @@ export default function LadderSession({
           })}
 
           {isLoading && streamText && (
-            <div className="text-sm leading-relaxed font-rpg" style={{ color: "var(--fantasy-text)" }}>
-              {stripStreamTags(streamText) || "..."}
+            <div className="flex justify-start">
+              <div
+                className="glass-bubble-ai text-sm leading-relaxed font-rpg px-4 py-3"
+                style={{ color: "rgba(255,255,255,0.85)" }}
+              >
+                {stripStreamTags(streamText) || "..."}
+              </div>
             </div>
           )}
           {isLoading && !streamText && (
-            <div className="flex gap-1 py-2">
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "rgba(192,163,116,0.3)" }} />
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(192,163,116,0.3)" }} />
+            <div className="flex justify-start">
+              <div className="glass-bubble-ai px-4 py-3 flex gap-1.5">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "rgba(255,255,255,0.3)" }} />
+                <div className="w-2 h-2 rounded-full animate-pulse [animation-delay:200ms]" style={{ background: "rgba(255,255,255,0.3)" }} />
+                <div className="w-2 h-2 rounded-full animate-pulse [animation-delay:400ms]" style={{ background: "rgba(255,255,255,0.3)" }} />
+              </div>
             </div>
           )}
         </div>
@@ -1198,7 +1213,8 @@ export default function LadderSession({
       {toolSuggestion && !toolLoading && (
         <button
           onClick={() => triggerTool(toolSuggestion.type!, toolState.topicSummary)}
-          className="mx-auto my-2 px-4 py-2 rounded-xl bg-indigo-900/30 border border-indigo-500/20 text-indigo-300 text-sm hover:bg-indigo-900/50 transition-colors"
+          className="glass-btn mx-auto my-2 px-4 py-2 text-sm relative"
+          style={{ zIndex: 2 }}
         >
           {toolSuggestion.type === "research" ? "📚" : "🔬"} {toolSuggestion.reason}
         </button>
@@ -1206,49 +1222,52 @@ export default function LadderSession({
 
       {/* 도구 로딩 */}
       {toolLoading && (
-        <div className="text-center text-indigo-400/60 text-sm my-2 animate-pulse">
+        <div className="text-center text-sm my-2 animate-pulse relative" style={{ color: "rgba(255,255,255,0.5)", zIndex: 2 }}>
           처리 중...
         </div>
       )}
 
       {/* 리서치 결과 */}
       {researchCards && (
-        <ResearchCards
-          cards={researchCards}
-          demoMode={toolDemoMode}
-          onDismiss={() => setResearchCards(null)}
-        />
+        <div className="relative" style={{ zIndex: 2 }}>
+          <ResearchCards
+            cards={researchCards}
+            demoMode={toolDemoMode}
+            onDismiss={() => setResearchCards(null)}
+          />
+        </div>
       )}
 
       {/* 분석 결과 */}
       {analysisPerspectives && (
-        <AnalysisView
-          perspectives={analysisPerspectives}
-          disagreement={analysisDisagreement}
-          demoMode={toolDemoMode}
-          onDismiss={() => { setAnalysisPerspectives(null); setAnalysisDisagreement(null); }}
-          onSelectPerspective={(question) => {
-            setAnalysisPerspectives(null);
-            setAnalysisDisagreement(null);
-            handleUserResponse(question);
-          }}
-        />
+        <div className="relative" style={{ zIndex: 2 }}>
+          <AnalysisView
+            perspectives={analysisPerspectives}
+            disagreement={analysisDisagreement}
+            demoMode={toolDemoMode}
+            onDismiss={() => { setAnalysisPerspectives(null); setAnalysisDisagreement(null); }}
+            onSelectPerspective={(question) => {
+              setAnalysisPerspectives(null);
+              setAnalysisDisagreement(null);
+              handleUserResponse(question);
+            }}
+          />
+        </div>
       )}
 
       {/* 치트 후 분기 UI */}
       {cheatPostAction?.show && (
-        <div className="pb-4 px-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="rpg-panel rounded-2xl p-4 space-y-3">
+        <div className="pb-4 px-3 animate-in fade-in slide-in-from-bottom-2 duration-300 relative" style={{ zIndex: 2 }}>
+          <div className="glass-panel p-4 space-y-3">
             {cheatPostAction.action === "fold" ? (
               <>
-                <p className="text-sm font-rpg text-center" style={{ color: "var(--fantasy-text)" }}>
+                <p className="text-sm font-rpg text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
                   계속 안 맞는 것 같아... 접어둘까?
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleCheatAction("fold")}
-                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
-                    style={{ color: "var(--fantasy-text)" }}
+                    className="glass-btn flex-1 py-3 text-sm font-rpg"
                   >
                     🗂️ 오늘은 여기까지
                   </button>
@@ -1257,8 +1276,7 @@ export default function LadderSession({
                       setCheatPostAction(null);
                       sendToAI(store.messages, store.currentLevel, "[재생성 요청] 다른 접근으로 다시 시도해줘.");
                     }}
-                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
-                    style={{ color: "var(--fantasy-text)" }}
+                    className="glass-btn flex-1 py-3 text-sm font-rpg"
                   >
                     🔄 좀 더 해볼게
                   </button>
@@ -1266,17 +1284,16 @@ export default function LadderSession({
               </>
             ) : cheatPostAction.action === "theme_suggest" && cheatPostAction.themeSuggestion ? (
               <>
-                <p className="text-sm font-rpg text-center leading-relaxed" style={{ color: "var(--fantasy-text)" }}>
+                <p className="text-sm font-rpg text-center leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>
                   {cheatPostAction.themeSuggestion.reason}
                 </p>
-                <p className="text-xs font-rpg-sm text-center" style={{ color: "rgba(232,213,181,0.75)" }}>
+                <p className="text-xs font-rpg-sm text-center" style={{ color: "rgba(255,255,255,0.6)" }}>
                   분위기 바꿔볼까?
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleThemeSwitch(cheatPostAction.themeSuggestion!.targetTheme)}
-                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
-                    style={{ color: "var(--fantasy-gold-bright)" }}
+                    className="glass-btn flex-1 py-3 text-sm font-rpg"
                   >
                     ✨ {cheatPostAction.themeSuggestion.targetTheme}로 가볼게
                   </button>
@@ -1285,8 +1302,7 @@ export default function LadderSession({
                       setCheatPostAction(null);
                       sendToAI(store.messages, store.currentLevel, "[재생성 요청] 다른 접근으로 다시 시도해줘.");
                     }}
-                    className="rpg-panel-light flex-1 py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
-                    style={{ color: "var(--fantasy-text)" }}
+                    className="glass-btn flex-1 py-3 text-sm font-rpg"
                   >
                     🔄 여기서 계속할게
                   </button>
@@ -1294,13 +1310,12 @@ export default function LadderSession({
               </>
             ) : (
               <>
-                <p className="text-sm font-rpg text-center" style={{ color: "var(--fantasy-text)" }}>
+                <p className="text-sm font-rpg text-center" style={{ color: "rgba(255,255,255,0.85)" }}>
                   다른 방식으로 다시 해볼게
                 </p>
                 <button
                   onClick={() => handleCheatAction("regenerate")}
-                  className="rpg-panel-light w-full py-3 rounded-xl text-sm font-rpg transition-all active:scale-95"
-                  style={{ color: "var(--fantasy-text)" }}
+                  className="glass-btn w-full py-3 text-sm font-rpg"
                 >
                   🔄 다시 해보자
                 </button>
@@ -1312,7 +1327,7 @@ export default function LadderSession({
 
       {/* 현재 레벨 인터랙션 */}
       {!isLoading && currentResponse && !cheatPostAction?.show && (
-        <div className="pb-4">
+        <div className="pb-4 px-2 relative" style={{ zIndex: 2 }}>
           {level === 1 && currentResponse.sensoryCards.length > 0 && (
             <SensoryLevel
               question={currentResponse.text}
