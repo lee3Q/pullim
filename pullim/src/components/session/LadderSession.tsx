@@ -984,7 +984,7 @@ export default function LadderSession({
           <img
             src={bgImage}
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover animate-slow-zoom"
             style={{ filter: "brightness(0.5)" }}
           />
           {/* 하단 그라데이션 overlay — 텍스트 가독성 */}
@@ -1179,7 +1179,7 @@ export default function LadderSession({
                       className="glass-bubble-ai text-sm leading-relaxed font-rpg px-4 py-3"
                       style={{ color: "rgba(255,255,255,0.85)" }}
                     >
-                      {msg.content}
+                      {stripStreamTags(msg.content)}
                     </div>
                   </div>
                 )}
