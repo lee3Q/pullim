@@ -4,7 +4,7 @@
 - **이름**: 풀림 (Pullim)
 - **한줄**: AI가 답을 주지 않고, Socratic 질문으로 사용자가 스스로 명확화하는 의사결정/멘탈케어 서비스
 - **스택**: Next.js 15, React 19, TypeScript, Tailwind CSS 4, Supabase, Claude API (Sonnet), Zustand
-- **위치**: ~/study/main/pullim/pullim/ (Next.js 웹앱)
+- **위치**: ~/pp/pullim/pullim/ (Next.js 웹��)
 
 ## 안전 규칙 (절대 불변)
 - 위기 감지 3단계: GREEN / YELLOW(Tier B) / RED(Tier A)
