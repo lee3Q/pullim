@@ -21,6 +21,7 @@ import AuthModal from "@/components/AuthModal";
 import { useSettings } from "@/hooks/useSettings";
 import { useBGM } from "@/hooks/useBGM";
 import { useAuth } from "@/hooks/useAuth";
+import { getUnfinishedTrail, clearTrail, type SessionTrail } from "@/lib/session/session-trail";
 
 // ThemeType ↔ ThemeName 매핑
 const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
@@ -123,6 +124,7 @@ export default function HomePage() {
   const [showThemeHelp, setShowThemeHelp] = useState(false);
   const [pickedTheme, setPickedTheme] = useState<ThemeType | null>(null);
   const [recommendedTheme, setRecommendedTheme] = useState<ThemeType | null>(null);
+  const [unfinishedTrail, setUnfinishedTrail] = useState<SessionTrail | null>(null);
 
   useEffect(() => {
     try {
@@ -135,6 +137,8 @@ export default function HomePage() {
     } catch {
       // 무시
     }
+    // 미완 세션 확인
+    setUnfinishedTrail(getUnfinishedTrail());
   }, []);
 
   const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {
@@ -187,6 +191,24 @@ export default function HomePage() {
     const sessionId = nanoid(12);
     const route = THEMES[themeName].route;
     router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=${entry}`);
+  };
+
+  const handleResumeSession = (trail: SessionTrail) => {
+    setIsNavigating(true);
+    const themeName = trail.theme as ThemeName;
+    if (!THEMES[themeName]) {
+      clearTrail();
+      setUnfinishedTrail(null);
+      return;
+    }
+    const sessionId = nanoid(12);
+    const route = THEMES[themeName].route;
+    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=concern&resume=1`);
+  };
+
+  const handleDismissTrail = () => {
+    clearTrail();
+    setUnfinishedTrail(null);
   };
 
   return (
@@ -247,6 +269,13 @@ export default function HomePage() {
             className="text-sm text-white/60 hover:text-white/80 transition-colors font-rpg-sm p-3"
           >
             내 기록
+          </button>
+          <button
+            onClick={() => router.push("/archive")}
+            className="text-sm text-white/60 hover:text-white/80 transition-colors font-rpg-sm p-3"
+            title="명예의 전당 — 네가 남긴 통찰들"
+          >
+            ⭐
           </button>
           <button
             onClick={() => setShowAuthModal(true)}
@@ -346,6 +375,49 @@ export default function HomePage() {
         {/* ── 테마 선택 ── */}
         {phase === "mood" && (
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
+            {/* 이어서 하기 — 미완 세션 홀딩 */}
+            {unfinishedTrail && (
+              <div
+                className="rpg-panel p-4 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-400"
+                style={{ border: "1px solid rgba(192,163,116,0.25)" }}
+              >
+                <div className="space-y-1">
+                  <p
+                    className="text-[10px] font-rpg-sm"
+                    style={{ color: "var(--fantasy-gold, rgba(192,163,116,0.85))" }}
+                  >
+                    ⌛ 지난 대화
+                  </p>
+                  <p className="text-sm font-rpg" style={{ color: "rgba(232,213,181,0.95)" }}>
+                    {unfinishedTrail.theme}에서 같이 풀던 게 있어.
+                  </p>
+                  {unfinishedTrail.lastUserMessage && (
+                    <p
+                      className="text-xs font-rpg-sm italic line-clamp-2"
+                      style={{ color: "rgba(232,213,181,0.55)" }}
+                    >
+                      &ldquo;{unfinishedTrail.lastUserMessage.slice(0, 80)}&rdquo;
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleResumeSession(unfinishedTrail)}
+                    className="rpg-button flex-1 py-2.5 text-xs font-rpg"
+                  >
+                    이어서 할게
+                  </button>
+                  <button
+                    onClick={handleDismissTrail}
+                    className="py-2.5 px-3 text-xs font-rpg-sm transition-opacity hover:opacity-80"
+                    style={{ color: "rgba(232,213,181,0.45)" }}
+                  >
+                    새로 시작
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="text-center space-y-2 pt-2">
               <h1
                 className="text-xl md:text-2xl font-bold font-rpg-lg"

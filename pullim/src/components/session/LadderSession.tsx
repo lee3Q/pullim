@@ -15,7 +15,7 @@ import { getActivePromises, checkPromise } from "@/lib/session/promise-store";
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
-import { getDemoSummary } from "@/lib/session/demo-ladder";
+import { buildContextualSummary } from "@/lib/session/demo-ladder";
 import { inferState, buildBehindContext, inferCheatAction, describeBehindInference } from "@/lib/session/behind-the-scenes";
 import type { BehindInference } from "@/lib/session/behind-the-scenes";
 import { buildLevelPrompt, buildEndDetectionPrompt } from "@/lib/session/prompt-builder";
@@ -39,6 +39,14 @@ import ChoiceLevel from "./levels/ChoiceLevel";
 import TextInputLevel from "./levels/TextInputLevel";
 import SessionSummary from "./SessionSummary";
 import Particles from "./Particles";
+import BehindFeedback from "./BehindFeedback";
+import InsightArchiveToast from "./InsightArchiveToast";
+import {
+  isInsightCandidate,
+  archiveInsight,
+  getRecentSuggestionCount,
+} from "@/lib/session/insight-archive";
+import { saveTrail, markTrailCompleted } from "@/lib/session/session-trail";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
 function stripStreamTags(text: string): string {
@@ -175,6 +183,16 @@ export default function LadderSession({
 
   // 이면사고 추론 상태 (표시용)
   const [currentInference, setCurrentInference] = useState<BehindInference | null>(null);
+
+  // 이면사고 피드백 모달
+  const [behindFeedbackOpen, setBehindFeedbackOpen] = useState(false);
+
+  // 명예의 전당 — 깊은 통찰 보관 제안
+  const [insightCandidate, setInsightCandidate] = useState<{
+    content: string;
+    level: LadderLevel;
+    context?: string;
+  } | null>(null);
 
   // 데모 모드 알림
   const [demoNotice, setDemoNotice] = useState(false);
@@ -490,9 +508,24 @@ export default function LadderSession({
           }
         }
 
+        // 세션 트레일 저장 (홀딩 환경 — 미완 세션 복귀용)
+        try {
+          const lastUser = [...store.messages].reverse().find((m) => m.role === "user");
+          saveTrail({
+            sessionId: store.sessionId || "session",
+            theme,
+            currentLevel: level,
+            turnCount: store.turnCount,
+            lastUserMessage: lastUser?.content,
+            lastAiMessage: result.text,
+            completed: false,
+          });
+        } catch {}
+
         // 세션 종료 제안 감지
         if (result.wrapSuggest && result.summary) {
           store.endSession(result.summary);
+          markTrailCompleted();
           setPhase("ad-end");
         }
       } catch (e) {
@@ -525,6 +558,23 @@ export default function LadderSession({
       // 이벤트 기록
       if (isCheat) {
         store.recordEvent({ type: "cheat", level });
+      }
+
+      // 명예의 전당 후보 감지 (level 5 자유 입력 + 통찰 마커 + 하루 3회 이하)
+      if (
+        !isCheat &&
+        !isUnknown &&
+        level >= 4 &&
+        isInsightCandidate(text) &&
+        getRecentSuggestionCount() < 3
+      ) {
+        // 직전 AI 질문 (맥락)
+        const lastAi = [...store.messages].reverse().find((m) => m.role === "assistant");
+        setInsightCandidate({
+          content: text,
+          level,
+          context: lastAi?.content?.slice(0, 160),
+        });
       }
 
       // 레벨 이동 판단
@@ -579,12 +629,15 @@ export default function LadderSession({
           level: store.currentLevel,
         });
         // localStorage의 프로필에 반영 (빈도가 성격)
+        // useUserProfile과 동일한 키/구조 사용: pullim_user_profile → { profile, ... }
         try {
-          const raw = localStorage.getItem("pullim_profile");
+          const raw = localStorage.getItem("pullim_user_profile");
           if (raw) {
-            const profile = JSON.parse(raw);
-            const updated = updateRecommendationRate(profile, accepted);
-            localStorage.setItem("pullim_profile", JSON.stringify(updated));
+            const data = JSON.parse(raw);
+            if (data?.profile) {
+              data.profile = updateRecommendationRate(data.profile, accepted);
+              localStorage.setItem("pullim_user_profile", JSON.stringify(data));
+            }
           }
         } catch {}
       }
@@ -662,6 +715,7 @@ export default function LadderSession({
         .trim();
       const finalSummary = clean || "오늘 이야기를 나눴어.";
       store.endSession(finalSummary);
+      markTrailCompleted();
       // fire-and-forget: 로그인 유저면 Supabase에도 저장
       getAuthUser().then((authUser) => {
         if (!authUser) return;
@@ -682,8 +736,14 @@ export default function LadderSession({
         }).catch(() => {});
       });
     } catch {
-      const fallbackSummary = getDemoSummary(theme);
+      const fallbackSummary = buildContextualSummary({
+        theme,
+        userMessages: userMessages,
+        cheatCount: store.cheatCount,
+        levelsVisited: store.messages.map((m) => m.level),
+      });
       store.endSession(fallbackSummary);
+      markTrailCompleted();
       // fire-and-forget: 로그인 유저면 Supabase에도 저장
       getAuthUser().then((authUser) => {
         if (!authUser) return;
@@ -1052,14 +1112,49 @@ export default function LadderSession({
         </p>
       </div>
 
-      {/* 이면사고 표시 (showBehindThoughts 설정 on 시) */}
+      {/* 이면사고 표시 (showBehindThoughts 설정 on 시) — 탭해서 교정 가능 */}
       {settings.showBehindThoughts && currentInference && describeBehindInference(currentInference) && (
         <div
-          className="px-3 pb-1 text-[10px] font-rpg-sm animate-in fade-in duration-300 relative"
-          style={{ color: "rgba(255,255,255,0.4)", zIndex: 2 }}
+          className="px-3 pb-1 animate-in fade-in duration-300 relative"
+          style={{ zIndex: 2 }}
         >
-          {describeBehindInference(currentInference)}
+          <button
+            onClick={() => setBehindFeedbackOpen(true)}
+            className="text-[10px] font-rpg-sm transition-opacity hover:opacity-80 flex items-center gap-1"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+            title="탭하면 풀림이 너를 어떻게 파악했는지 교정할 수 있어"
+          >
+            {describeBehindInference(currentInference)}
+            <span style={{ opacity: 0.5 }}>— 탭해서 교정</span>
+          </button>
         </div>
+      )}
+
+      {/* 이면사고 피드백 모달 */}
+      {behindFeedbackOpen && currentInference && (
+        <BehindFeedback
+          sessionId={store.sessionId || "session"}
+          inferenceSnapshot={describeBehindInference(currentInference) || "💭"}
+          onClose={() => setBehindFeedbackOpen(false)}
+        />
+      )}
+
+      {/* 명예의 전당 보관 제안 토스트 */}
+      {insightCandidate && (
+        <InsightArchiveToast
+          preview={insightCandidate.content}
+          onAccept={() => {
+            archiveInsight({
+              sessionId: store.sessionId || "session",
+              theme,
+              content: insightCandidate.content,
+              level: insightCandidate.level,
+              context: insightCandidate.context,
+            });
+            setInsightCandidate(null);
+          }}
+          onDismiss={() => setInsightCandidate(null)}
+        />
       )}
 
       {/* 뷰 모드 토글 + 카드 내비 */}

@@ -11,7 +11,8 @@ import { THEMES } from "@/lib/themes";
 import { useBGM } from "@/hooks/useBGM";
 import LadderSession from "./LadderSession";
 import CrisisAlert from "@/components/CrisisAlert";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { getUnfinishedTrail, trailToPromptContext } from "@/lib/session/session-trail";
 
 interface LadderSessionPageProps {
   theme: ThemeName;
@@ -32,8 +33,18 @@ export default function LadderSessionPage({
   const themeConfig = THEMES[theme];
   const { playing, trackLabel, toggle: toggleBGM, nextTrack } = useBGM(themeConfig?.assets?.bgmTracks);
 
-  // 프로필 기반 개인화 컨텍스트
-  const profileContext = profile ? buildSensoryLadderContext(profile) : undefined;
+  // 이어서 하기 (resume=1) — 미완 세션 맥락을 프롬프트에 주입
+  const isResume = searchParams.get("resume") === "1";
+
+  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락
+  const profileContext = useMemo(() => {
+    const baseContext = profile ? buildSensoryLadderContext(profile) : "";
+    if (!isResume) return baseContext || undefined;
+    const trail = getUnfinishedTrail();
+    if (!trail) return baseContext || undefined;
+    const trailContext = trailToPromptContext(trail);
+    return [baseContext, trailContext].filter(Boolean).join("\n\n") || undefined;
+  }, [profile, isResume]);
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(

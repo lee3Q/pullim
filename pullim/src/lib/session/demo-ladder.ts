@@ -1154,13 +1154,69 @@ const THEME_SUMMARY_MAP: Record<ThemeKey, string> = {
 };
 
 /**
- * 테마별 데모 세션 요약 반환
+ * 테마별 데모 세션 요약 반환 (폴백용)
  */
 export function getDemoSummary(theme?: ThemeKey): string {
   if (!theme || !(theme in THEME_SUMMARY_MAP)) {
     return THEME_SUMMARY_MAP["모험가"];
   }
   return THEME_SUMMARY_MAP[theme];
+}
+
+/**
+ * 사용자의 실제 선택/입력을 반영한 세션 요약
+ *
+ * 철학 근거:
+ * - 절대 금지 "사용자가 입력한 걸 정리만 해서 돌려주기"와 구분:
+ *   여기서는 사용자 단어 + 패턴(반복/전환)을 "발견"으로 재구성.
+ *   단순 복창이 아닌, "네가 보여준 경향"을 한 문장으로 엮는다.
+ * - API 실패 시에도 세션이 비어보이지 않도록 — "끝까지 포기하지 않는다" 원칙.
+ */
+export function buildContextualSummary(params: {
+  theme?: ThemeKey;
+  userMessages: string[];
+  cheatCount: number;
+  levelsVisited: number[];
+}): string {
+  const { theme, userMessages, cheatCount, levelsVisited } = params;
+  const base = getDemoSummary(theme);
+
+  if (userMessages.length === 0) {
+    return base;
+  }
+
+  // 사용자가 실제로 고른 것 중 마지막 2개 추출 (이모지 포함 선택지)
+  const lastChoices = userMessages
+    .slice(-3)
+    .map((m) => m.trim())
+    .filter((m) => m.length > 0 && m.length <= 40);
+
+  // 레벨 전환 횟수 (깊이로 들어갔는지)
+  const uniqueLevels = new Set(levelsVisited).size;
+
+  const fragments: string[] = [];
+
+  if (lastChoices.length > 0) {
+    // 마지막 선택을 "오늘 네가 머문 자리"로 표현
+    fragments.push(`오늘 네가 고른 것 — "${lastChoices[lastChoices.length - 1]}".`);
+  }
+
+  if (uniqueLevels >= 3) {
+    fragments.push("여러 레벨을 오가면서도 끝까지 따라왔어.");
+  } else if (uniqueLevels === 1) {
+    fragments.push("한 자리에서 조용히 머물렀어. 그것도 풀림이야.");
+  }
+
+  if (cheatCount >= 2) {
+    fragments.push("맞지 않으면 그만, 이라고 말할 줄 아는 건 사실 드문 거야.");
+  } else if (cheatCount === 0 && userMessages.length >= 3) {
+    fragments.push("다 별로야를 한 번도 안 눌렀네. 오늘은 따라와 줬어.");
+  }
+
+  // 테마 맛깔 문장으로 마무리
+  fragments.push(base.split(" — ").slice(-1)[0] || base);
+
+  return fragments.join(" ").trim();
 }
 
 /**
