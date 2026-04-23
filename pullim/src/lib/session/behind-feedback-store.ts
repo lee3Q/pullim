@@ -65,3 +65,56 @@ export function getRecentMisreadRate(windowSize: number = 10): number {
   const misreadCount = recent.filter((f) => f.kind === "misread_me" || f.kind === "wrong_info").length;
   return misreadCount / recent.length;
 }
+
+/**
+ * 피드백 이력 → 시스템 프롬프트 블록.
+ *
+ * 철학 근거:
+ * - 원칙 #3 "틀려도 고집하지 않는다 — 그게 사고의 재료"의 폐회로 완성.
+ * - 저장만 하고 쓰지 않으면 "사고의 재료"가 아니라 죽은 데이터다.
+ * - misread 비율이 높으면 AI 톤을 더 조심스럽게 조정.
+ * - 최근 사용자 교정 원문(custom)이 있으면 직접 주입.
+ */
+export function buildFeedbackContext(): string {
+  const items = load();
+  if (items.length === 0) return "";
+
+  const recent = items.slice(-10);
+  const misreadRate = getRecentMisreadRate(10);
+
+  // 사용자 직접 입력 교정 (최근 3개)
+  const customNotes = items
+    .filter((f) => f.kind === "custom" && f.note && f.note.trim().length > 0)
+    .slice(-3)
+    .map((f) => f.note!.trim());
+
+  const lines: string[] = ["[USER_FEEDBACK_HISTORY]"];
+
+  if (misreadRate >= 0.5) {
+    lines.push(
+      "- 주의: 최근 사용자가 AI 파악을 자주 교정했다.",
+      "- 추측하지 말고 물어봐라. 확정조로 말하지 마라.",
+      "- \"~한 것 같다\" 보다 \"~인지 궁금해\" 톤으로.",
+    );
+  } else if (misreadRate >= 0.3) {
+    lines.push(
+      "- 최근 파악이 몇 번 빗나갔다. 한 번 더 확인하며 나아가라.",
+    );
+  } else if (recent.length >= 3 && misreadRate < 0.2) {
+    lines.push(
+      "- 최근 파악이 대체로 맞았다. 너무 머뭇거리지 말고 자연스럽게.",
+    );
+  }
+
+  if (customNotes.length > 0) {
+    lines.push("- 사용자가 직접 말한 교정:");
+    for (const note of customNotes) {
+      lines.push(`  · "${note.slice(0, 160)}"`);
+    }
+    lines.push("- 위 교정을 무시하지 마라. 행동으로 반영.");
+  }
+
+  if (lines.length === 1) return "";
+  lines.push("[/USER_FEEDBACK_HISTORY]");
+  return lines.join("\n");
+}

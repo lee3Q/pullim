@@ -36,15 +36,35 @@ export default function LadderSessionPage({
   // 이어서 하기 (resume=1) — 미완 세션 맥락을 프롬프트에 주입
   const isResume = searchParams.get("resume") === "1";
 
-  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락
+  // 감각 진입 — 한 단어 seed. "풀리는 세계" #1 감정 풀기의 직접 진입.
+  const seedWord = searchParams.get("seed") || "";
+
+  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락 + seed word
   const profileContext = useMemo(() => {
     const baseContext = profile ? buildSensoryLadderContext(profile) : "";
-    if (!isResume) return baseContext || undefined;
-    const trail = getUnfinishedTrail();
-    if (!trail) return baseContext || undefined;
-    const trailContext = trailToPromptContext(trail);
-    return [baseContext, trailContext].filter(Boolean).join("\n\n") || undefined;
-  }, [profile, isResume]);
+    const parts: string[] = [];
+    if (baseContext) parts.push(baseContext);
+    if (isResume) {
+      const trail = getUnfinishedTrail();
+      if (trail) parts.push(trailToPromptContext(trail));
+    }
+    if (seedWord) {
+      const sanitized = seedWord.slice(0, 24).replace(/[\r\n<>]/g, "").trim();
+      if (sanitized) {
+        parts.push(
+          [
+            "[INITIAL_STATE_WORD]",
+            `사용자가 홈에서 지금 상태를 한 단어로 표현했다: "${sanitized}"`,
+            `이 단어를 진지하게 받아들여라. 첫 AI 응답에서 이 감각을 자연스럽게 반영하라.`,
+            `단, "아, ${sanitized}구나" 같은 복창은 하지 마라. 이미 표현된 걸 정리만 해주면 안 된다.`,
+            `대신 이 감각이 어디서 왔는지, 어떤 느낌에 더 가까운지 감각 선택지로 물어라.`,
+            "[/INITIAL_STATE_WORD]",
+          ].join("\n"),
+        );
+      }
+    }
+    return parts.length > 0 ? parts.join("\n\n") : undefined;
+  }, [profile, isResume, seedWord]);
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(

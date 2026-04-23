@@ -122,8 +122,9 @@ export function parseResponse(raw: string): ParsedResponse {
     result.summary = summaryMatch[1].trim();
   }
 
-  // 텍스트에서 태그 제거
+  // 텍스트에서 태그 제거 — 완전/불완전 둘 다
   result.text = raw
+    // 1. 닫힌 태그 블록 제거 (알려진 것 + 와일드카드)
     .replace(/\[OPTIONS\][\s\S]*?\[\/OPTIONS\]/g, "")
     .replace(/\[CHEAT\][\s\S]*?\[\/CHEAT\]/g, "")
     .replace(/\[ANALYSIS\][\s\S]*?\[\/ANALYSIS\]/g, "")
@@ -132,11 +133,28 @@ export function parseResponse(raw: string): ParsedResponse {
     .replace(/\[WRAP_SUGGEST\][\s\S]*?(\[\/WRAP_SUGGEST\]|$)/g, "")
     .replace(/\[LISTEN_COMPLETE\]/g, "")
     .replace(/\[SUMMARY\][\s\S]*?\[\/SUMMARY\]/g, "")
-    // HTML 태그 제거 (<option>, </option> 등 LLM이 간혹 출력)
+    // 2. behind/feedback/prior session/initial state 같은 내부 전용 블록이 출력될 경우 방어
+    .replace(/\[BEHIND_THE_SCENES\][\s\S]*?\[\/BEHIND_THE_SCENES\]/g, "")
+    .replace(/\[USER_FEEDBACK_HISTORY\][\s\S]*?\[\/USER_FEEDBACK_HISTORY\]/g, "")
+    .replace(/\[PRIOR_SESSION_CONTEXT\][\s\S]*?\[\/PRIOR_SESSION_CONTEXT\]/g, "")
+    .replace(/\[INITIAL_STATE_WORD\][\s\S]*?\[\/INITIAL_STATE_WORD\]/g, "")
+    .replace(/\[SENSORY_LADDER\][\s\S]*?\[\/SENSORY_LADDER\]/g, "")
+    .replace(/\[LADDER_LEVEL\][\s\S]*?\[\/LADDER_LEVEL\]/g, "")
+    .replace(/\[SESSION_END_DETECTION\][\s\S]*?\[\/SESSION_END_DETECTION\]/g, "")
+    // 3. 미지의 대문자 태그 블록 포괄 제거 (닫힌 것만)
+    .replace(/\[[A-Z][A-Z_]*\][\s\S]*?\[\/[A-Z][A-Z_]*\]/g, "")
+    // 4. 닫히지 않은 대문자 태그 시작 이후 전부 제거 (스트리밍 잔재)
+    .replace(/\[\/?[A-Z][A-Z_]*\]?[\s\S]*$/, "")
+    // 5. HTML 태그 제거 (<option>, </option> 등 LLM이 간혹 출력)
     .replace(/<[^>]+>/g, "")
-    // 구조화 키-값 제거 (A_emoji:, B_title: 등)
+    // 6. 구조화 키-값 제거 (A_emoji:, B_title:, technique: 등)
     .replace(/^[A-Z]_\w+:.*$/gm, "")
+    .replace(/^(technique|content):\s*.*$/gim, "")
+    // 7. 괄호만 남은 잔재 정리 ([추천], [CRYSTALS] 등 단독)
+    .replace(/\[[A-Za-z_]+\]/g, "")
+    // 8. 연속 빈 줄 정리
     .replace(/\n{3,}/g, "\n\n")
+    // 9. 양 끝 공백/줄바꿈 정리
     .trim();
 
   return result;

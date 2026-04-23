@@ -47,6 +47,7 @@ import {
   getRecentSuggestionCount,
 } from "@/lib/session/insight-archive";
 import { saveTrail, markTrailCompleted } from "@/lib/session/session-trail";
+import { buildFeedbackContext } from "@/lib/session/behind-feedback-store";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
 function stripStreamTags(text: string): string {
@@ -397,6 +398,8 @@ export default function LadderSession({
       // 레벨 프롬프트
       const levelPrompt = buildLevelPrompt(level, store.entryMode);
       const endPrompt = buildEndDetectionPrompt();
+      // 사용자 피드백 이력(내면사고 교정) — 원칙 #3 "틀려도 고집하지 않는다" 폐회로
+      const feedbackContext = buildFeedbackContext();
 
       try {
         const response = await fetch("/api/ultimate/listen", {
@@ -412,7 +415,7 @@ export default function LadderSession({
             theme,
             behaviorSignals: signals,
             personalizationContext: profileContext || undefined,
-            sensoryLadderContext: [levelPrompt, endPrompt, behindContext]
+            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext]
               .filter(Boolean)
               .join("\n\n"),
           }),

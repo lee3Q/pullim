@@ -18,6 +18,8 @@ const StoryDiscovery = dynamic(() => import("@/components/discovery/StoryDiscove
 const PersonalityResult = dynamic(() => import("@/components/discovery/PersonalityResult"));
 import CrisisAlert from "@/components/CrisisAlert";
 import AuthModal from "@/components/AuthModal";
+import HomeInventory from "@/components/HomeInventory";
+import SeedWordEntry from "@/components/SeedWordEntry";
 import { useSettings } from "@/hooks/useSettings";
 import { useBGM } from "@/hooks/useBGM";
 import { useAuth } from "@/hooks/useAuth";
@@ -191,6 +193,17 @@ export default function HomePage() {
     const sessionId = nanoid(12);
     const route = THEMES[themeName].route;
     router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=${entry}`);
+  };
+
+  const handleSeedSubmit = (word: string) => {
+    // 추천 테마 > 프로필 기본 > 모험가 순
+    const themeKey: ThemeType = recommendedTheme ?? selectedTheme ?? "adventure";
+    const themeName = THEME_TO_NAME[themeKey];
+    setIsNavigating(true);
+    const sessionId = nanoid(12);
+    const route = THEMES[themeName].route;
+    const seed = encodeURIComponent(word);
+    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=concern&seed=${seed}`);
   };
 
   const handleResumeSession = (trail: SessionTrail) => {
@@ -375,6 +388,11 @@ export default function HomePage() {
         {/* ── 테마 선택 ── */}
         {phase === "mood" && (
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
+            {/* 한 단어 진입 — 부담 최소. "풀리는 세계" 감정 풀기 직결. */}
+            <div className="flex justify-center">
+              <SeedWordEntry onSubmit={handleSeedSubmit} />
+            </div>
+
             {/* 이어서 하기 — 미완 세션 홀딩 */}
             {unfinishedTrail && (
               <div
@@ -431,6 +449,8 @@ export default function HomePage() {
               <p className="text-sm font-rpg-sm" style={{ color: "rgba(232,213,181,0.70)" }}>
                 분위기를 골라봐. 탭하면 바로 대화가 시작돼.
               </p>
+              {/* 나를 기다리는 것들 — 약속/전당. "오래 안 왔네요" 대신 긍정 프레임. */}
+              <HomeInventory />
             </div>
 
             <div className="space-y-3">
