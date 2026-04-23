@@ -2,6 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { createPromise } from "@/lib/session/promise-store";
+import { archiveInsight } from "@/lib/session/insight-archive";
+import { updateStoredProfile } from "@/lib/personalization/profile-storage";
+import { updateProfileFromBehindEvent } from "@/lib/personalization/probability-profile";
 
 interface SessionSummaryProps {
   summary: string;
@@ -54,10 +57,23 @@ export default function SessionSummary({
   );
 
   const [promiseState, setPromiseState] = useState<PromiseState>("suggest");
+  const [summaryArchived, setSummaryArchived] = useState(false);
 
   function handleAccept() {
     createPromise(example.trigger, example.action, theme);
     setPromiseState("accepted");
+  }
+
+  function handleArchiveSummary() {
+    archiveInsight({
+      sessionId: `summary_${Date.now()}`,
+      theme,
+      content: summary,
+      level: 5,
+      context: "(오늘의 정리)",
+    });
+    updateStoredProfile((p) => updateProfileFromBehindEvent(p, "insight_archived"));
+    setSummaryArchived(true);
   }
 
   function handleReject() {
@@ -72,6 +88,24 @@ export default function SessionSummary({
         <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line">
           {summary}
         </p>
+        {!summaryArchived ? (
+          <button
+            onClick={handleArchiveSummary}
+            className="text-[10px] font-rpg-sm transition-opacity hover:opacity-80 px-3 py-1.5 rounded-full"
+            style={{
+              color: "var(--fantasy-gold, rgba(192,163,116,0.85))",
+              border: "1px solid rgba(192,163,116,0.3)",
+              background: "rgba(192,163,116,0.1)",
+            }}
+            title="전당에 올려서 나중에 다시 볼 수 있어"
+          >
+            ⭐ 이 정리, 전당에 올릴게
+          </button>
+        ) : (
+          <p className="text-[10px] font-rpg-sm" style={{ color: "rgba(192,163,116,0.65)" }}>
+            ⭐ 전당에 올렸어
+          </p>
+        )}
       </div>
 
       {/* 약속 섹션 */}
