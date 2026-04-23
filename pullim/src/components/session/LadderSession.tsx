@@ -883,6 +883,7 @@ export default function LadderSession({
               <button
                 onClick={() => {
                   checkPromise(activePromise.id, "completed");
+                  updateStoredProfile((p) => updateProfileFromBehindEvent(p, "promise_completed"));
                   setPromiseFeedback("대단한데. 기억하고 지켜봤어.");
                 }}
                 className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
@@ -893,6 +894,7 @@ export default function LadderSession({
               <button
                 onClick={() => {
                   checkPromise(activePromise.id, "failed");
+                  updateStoredProfile((p) => updateProfileFromBehindEvent(p, "promise_failed"));
                   setPromiseFeedback("괜찮아, 이것도 하나의 발견이야.");
                 }}
                 className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
@@ -1169,6 +1171,7 @@ export default function LadderSession({
               level: insightCandidate.level,
               context: insightCandidate.context,
             });
+            updateStoredProfile((p) => updateProfileFromBehindEvent(p, "insight_archived"));
             setInsightCandidate(null);
           }}
           onDismiss={() => setInsightCandidate(null)}

@@ -121,6 +121,30 @@ export default function ArchivePage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <button
+                        onClick={async () => {
+                          const text = `"${insight.content}"\n\n— 풀림에서 ${new Date(insight.createdAt).toLocaleDateString("ko-KR")}`;
+                          const nav = typeof navigator !== "undefined" ? navigator : undefined;
+                          if (nav && "share" in nav && typeof nav.share === "function") {
+                            try {
+                              await nav.share({ text, title: "풀림에서 남긴 순간" });
+                            } catch {
+                              // 취소는 무시
+                            }
+                          } else if (nav?.clipboard) {
+                            try {
+                              await nav.clipboard.writeText(text);
+                              alert("복사됐어");
+                            } catch {
+                              // 무시
+                            }
+                          }
+                        }}
+                        className="px-2 py-1 text-xs text-white/40 hover:text-white/70 transition-colors"
+                        title="공유 (또는 복사)"
+                      >
+                        ↗
+                      </button>
+                      <button
                         onClick={() => setInsights(toggleStar(insight.id))}
                         className="px-2 py-1 text-xs transition-opacity hover:opacity-80"
                         title={insight.starred ? "별표 해제" : "별표"}

@@ -113,15 +113,18 @@ export function updateRecommendationRate(
 }
 
 /**
- * 치트/레벨다운 같은 부정 신호 → engagement 하향.
- * "빈도가 성격" 원칙 — 부정 신호도 관찰 데이터.
- *
- * - cheat: "답이 안 맞아" → approachStyle이 제시된 각도와 달랐다
- * - level_down: "너무 어려워" → selfAwareness 약간 하향 신호
+ * 치트/레벨다운/숨돌리기/약속이행 등 신호 → 프로필 학습.
+ * "빈도가 성격" 원칙 — 모든 신호가 관찰 데이터.
  */
 export function updateProfileFromBehindEvent(
   profile: ProbabilityProfile,
-  event: "cheat" | "level_down" | "breath_completed"
+  event:
+    | "cheat"
+    | "level_down"
+    | "breath_completed"
+    | "promise_completed"
+    | "promise_failed"
+    | "insight_archived",
 ): ProbabilityProfile {
   switch (event) {
     case "cheat":
@@ -137,10 +140,32 @@ export function updateProfileFromBehindEvent(
         totalObservations: profile.totalObservations + 1,
       };
     case "breath_completed":
-      // 세션 중 숨 돌리기 완료 → 자기돌봄 긍정 신호. engagement 회복.
       return {
         ...profile,
         engagementTrend: Math.min(1, profile.engagementTrend + 0.05),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "promise_completed":
+      // 약속 이행 = 강한 긍정. selfAwareness + engagement 모두 상승.
+      return {
+        ...profile,
+        selfAwareness: updateDimension(profile.selfAwareness, 1, 1.2),
+        engagementTrend: Math.min(1, profile.engagementTrend + 0.15),
+        totalObservations: profile.totalObservations + 2,
+      };
+    case "promise_failed":
+      // 약속 실패도 관찰 — 자책 신호 조심, engagement 소폭 하향.
+      return {
+        ...profile,
+        engagementTrend: Math.max(-1, profile.engagementTrend - 0.05),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "insight_archived":
+      // 통찰 아카이브 수락 → self-awareness 강한 긍정.
+      return {
+        ...profile,
+        selfAwareness: updateDimension(profile.selfAwareness, 1, 1.0),
+        engagementTrend: Math.min(1, profile.engagementTrend + 0.08),
         totalObservations: profile.totalObservations + 1,
       };
     default:

@@ -106,6 +106,21 @@ export function buildFeedbackContext(): string {
     );
   }
 
+  // 가장 최근 피드백이 교정(misread/wrong/custom)이면 즉각 반영 신호
+  const lastFeedback = items[items.length - 1];
+  if (lastFeedback && lastFeedback.kind !== "confirm") {
+    const ageMs = Date.now() - lastFeedback.createdAt;
+    if (ageMs < 5 * 60 * 1000) {
+      // 5분 이내 교정 → 즉시 다음 턴에 톤 조정
+      lines.push(
+        "- 바로 직전 턴에서 사용자가 파악을 교정했다. 이번 응답은:",
+        "  · \"아까 내가 엇나갔던 것 같아\" 톤으로 슬쩍 인정 (과한 사과 X)",
+        "  · 다른 각도로 한 번 더 시도하되, 더 조심스럽게",
+        "  · 같은 프레임을 반복하지 마라",
+      );
+    }
+  }
+
   if (customNotes.length > 0) {
     lines.push("- 사용자가 직접 말한 교정:");
     for (const note of customNotes) {
