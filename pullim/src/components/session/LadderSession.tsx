@@ -41,6 +41,7 @@ import SessionSummary from "./SessionSummary";
 import Particles from "./Particles";
 import BehindFeedback from "./BehindFeedback";
 import InsightArchiveToast from "./InsightArchiveToast";
+import BreathInterlude from "./BreathInterlude";
 import {
   isInsightCandidate,
   archiveInsight,
@@ -194,6 +195,9 @@ export default function LadderSession({
     level: LadderLevel;
     context?: string;
   } | null>(null);
+
+  // 잠깐 숨 돌리기 모달 — "풀다" #13 긴장 풀기
+  const [breathOpen, setBreathOpen] = useState(false);
 
   // 데모 모드 알림
   const [demoNotice, setDemoNotice] = useState(false);
@@ -533,9 +537,17 @@ export default function LadderSession({
         }
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return;
+        // 테마별 연결 끊김 메시지 — 극한의 적응형. 장애 상황도 풀림답게.
+        const offlineMessages: Record<string, string> = {
+          "모험가": "잠깐 안개가 꼈네. 다시 한번 걸어볼래?",
+          "달빛정원": "구름이 달을 가렸어. 다시 한번 얘기해줄래?",
+          "전략실": "신호가 잠깐 끊겼어. 다시 보내볼래?",
+          "천문대": "별빛이 잠시 흐려졌어. 다시 한번 볼래?",
+          "종말": "폭풍이 잠깐 지나갔어. 다시 말해줘.",
+        };
         store.addMessage({
           role: "assistant",
-          content: "잠깐 연결이 끊겼어... 다시 한번 해볼래?",
+          content: offlineMessages[theme] ?? "잠깐 연결이 끊겼어... 다시 한번 해볼래?",
           level,
         });
       } finally {
@@ -1097,6 +1109,14 @@ export default function LadderSession({
               {settings.themeMode === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
             </button>
             <button
+              onClick={() => setBreathOpen(true)}
+              className="text-[13px] transition-opacity hover:opacity-80 py-2 px-1"
+              style={{ opacity: 0.55 }}
+              title="잠깐 숨 돌리기 (3번 깊이 호흡)"
+            >
+              🌬️
+            </button>
+            <button
               onClick={generateSummary}
               disabled={isLoading}
               className="glass-btn text-[10px] font-rpg-sm transition-colors disabled:opacity-30 py-1.5 px-3"
@@ -1157,6 +1177,20 @@ export default function LadderSession({
             setInsightCandidate(null);
           }}
           onDismiss={() => setInsightCandidate(null)}
+        />
+      )}
+
+      {/* 잠깐 숨 돌리기 — "풀다" #13 긴장 풀기 */}
+      {breathOpen && (
+        <BreathInterlude
+          onClose={(completed) => {
+            setBreathOpen(false);
+            if (completed) {
+              try {
+                store.recordEvent({ type: "timeout", level: store.currentLevel, detail: "breath_completed" });
+              } catch {}
+            }
+          }}
         />
       )}
 
