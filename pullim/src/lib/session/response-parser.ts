@@ -141,6 +141,8 @@ export function parseResponse(raw: string): ParsedResponse {
     .replace(/\[SENSORY_LADDER\][\s\S]*?\[\/SENSORY_LADDER\]/g, "")
     .replace(/\[LADDER_LEVEL\][\s\S]*?\[\/LADDER_LEVEL\]/g, "")
     .replace(/\[SESSION_END_DETECTION\][\s\S]*?\[\/SESSION_END_DETECTION\]/g, "")
+    .replace(/\[POOL_MEANING_CONTEXT\][\s\S]*?\[\/POOL_MEANING_CONTEXT\]/g, "")
+    .replace(/\[LIGHT_MODE\][\s\S]*?\[\/LIGHT_MODE\]/g, "")
     // 3. 미지의 대문자 태그 블록 포괄 제거 (닫힌 것만)
     .replace(/\[[A-Z][A-Z_]*\][\s\S]*?\[\/[A-Z][A-Z_]*\]/g, "")
     // 4. 닫히지 않은 대문자 태그 시작 이후 전부 제거 (스트리밍 잔재)

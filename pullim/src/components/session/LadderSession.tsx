@@ -50,6 +50,7 @@ import {
 } from "@/lib/session/insight-archive";
 import { saveTrail, markTrailCompleted } from "@/lib/session/session-trail";
 import { buildFeedbackContext } from "@/lib/session/behind-feedback-store";
+import { buildPoolMeaningContext } from "@/lib/session/pool-meanings";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
 function stripStreamTags(text: string): string {
@@ -405,6 +406,8 @@ export default function LadderSession({
       const endPrompt = buildEndDetectionPrompt();
       // 사용자 피드백 이력(내면사고 교정) — 원칙 #3 "틀려도 고집하지 않는다" 폐회로
       const feedbackContext = buildFeedbackContext();
+      // "풀다" 13가지 뜻 × 테마 매핑 — 북극성 직접 구현
+      const poolContext = buildPoolMeaningContext(theme);
 
       try {
         const response = await fetch("/api/ultimate/listen", {
@@ -420,7 +423,7 @@ export default function LadderSession({
             theme,
             behaviorSignals: signals,
             personalizationContext: profileContext || undefined,
-            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext]
+            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext, poolContext]
               .filter(Boolean)
               .join("\n\n"),
           }),
