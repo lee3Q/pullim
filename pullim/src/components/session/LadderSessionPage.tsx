@@ -39,7 +39,10 @@ export default function LadderSessionPage({
   // 감각 진입 — 한 단어 seed. "풀리는 세계" #1 감정 풀기의 직접 진입.
   const seedWord = searchParams.get("seed") || "";
 
-  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락 + seed word
+  // 가볍게만 모드 — "피곤해? 내일 하자"
+  const isLightMode = searchParams.get("light") === "1";
+
+  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락 + seed word + light mode
   const profileContext = useMemo(() => {
     const baseContext = profile ? buildSensoryLadderContext(profile) : "";
     const parts: string[] = [];
@@ -63,8 +66,21 @@ export default function LadderSessionPage({
         );
       }
     }
+    if (isLightMode) {
+      parts.push(
+        [
+          "[LIGHT_MODE]",
+          "사용자는 오늘 가볍게만 시작했다.",
+          "- 깊이 파고들지 마라. 표면의 감각 한두 개만 건드린다.",
+          "- 3~5턴 내로 자연스럽게 마무리 신호([WRAP_SUGGEST])를 보여라.",
+          "- 분석 레벨(3)로 올라가지 마라. 감각(1~2)에서 맴돌다 마무리.",
+          "- 마무리도 거창하게 하지 말고 '오늘은 여기까지도 충분해' 톤으로.",
+          "[/LIGHT_MODE]",
+        ].join("\n"),
+      );
+    }
     return parts.length > 0 ? parts.join("\n\n") : undefined;
-  }, [profile, isResume, seedWord]);
+  }, [profile, isResume, seedWord, isLightMode]);
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(

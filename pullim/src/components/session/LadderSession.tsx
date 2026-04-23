@@ -21,7 +21,8 @@ import type { BehindInference } from "@/lib/session/behind-the-scenes";
 import { buildLevelPrompt, buildEndDetectionPrompt } from "@/lib/session/prompt-builder";
 import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/session/level-detector";
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
-import { updateRecommendationRate } from "@/lib/personalization/probability-profile";
+import { updateRecommendationRate, updateProfileFromBehindEvent } from "@/lib/personalization/probability-profile";
+import { updateStoredProfile } from "@/lib/personalization/profile-storage";
 import { useSettings } from "@/hooks/useSettings";
 import { getAuthUser } from "@/lib/supabase/client";
 import AdInterstitial from "@/components/AdInterstitial";
@@ -611,6 +612,8 @@ export default function LadderSession({
         pendingLevelUpRef.current = null;
         nextLevel = Math.max(1, level - 1) as LadderLevel;
         store.setLevel(nextLevel);
+        // 프로필 학습 — "너무 어려웠어" 신호
+        updateStoredProfile((p) => updateProfileFromBehindEvent(p, "level_down"));
       } else if (detectFreeTextIntent(text) && level === 4) {
         pendingLevelUpRef.current = null;
         nextLevel = 5;
@@ -644,17 +647,7 @@ export default function LadderSession({
           level: store.currentLevel,
         });
         // localStorage의 프로필에 반영 (빈도가 성격)
-        // useUserProfile과 동일한 키/구조 사용: pullim_user_profile → { profile, ... }
-        try {
-          const raw = localStorage.getItem("pullim_user_profile");
-          if (raw) {
-            const data = JSON.parse(raw);
-            if (data?.profile) {
-              data.profile = updateRecommendationRate(data.profile, accepted);
-              localStorage.setItem("pullim_user_profile", JSON.stringify(data));
-            }
-          }
-        } catch {}
+        updateStoredProfile((p) => updateRecommendationRate(p, accepted));
       }
 
       handleUserResponse(
@@ -800,6 +793,8 @@ export default function LadderSession({
 
     // 이벤트 기록
     store.recordEvent({ type: "cheat", level: store.currentLevel });
+    // 프로필 학습 — "빈도가 성격" 원칙: 치트도 관찰 데이터
+    updateStoredProfile((p) => updateProfileFromBehindEvent(p, "cheat"));
 
     // 분기 UI 표시
     setCheatPostAction({ show: true, action, themeSuggestion });
@@ -1189,6 +1184,8 @@ export default function LadderSession({
               try {
                 store.recordEvent({ type: "timeout", level: store.currentLevel, detail: "breath_completed" });
               } catch {}
+              // 프로필 학습 — 자기돌봄 긍정 신호
+              updateStoredProfile((p) => updateProfileFromBehindEvent(p, "breath_completed"));
             }
           }}
         />

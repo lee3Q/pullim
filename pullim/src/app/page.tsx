@@ -192,7 +192,8 @@ export default function HomePage() {
     setIsNavigating(true);
     const sessionId = nanoid(12);
     const route = THEMES[themeName].route;
-    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=${entry}`);
+    const lightParam = lightMode ? "&light=1" : "";
+    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=${entry}${lightParam}`);
   };
 
   const handleSeedSubmit = (word: string) => {
@@ -203,8 +204,12 @@ export default function HomePage() {
     const sessionId = nanoid(12);
     const route = THEMES[themeName].route;
     const seed = encodeURIComponent(word);
-    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=concern&seed=${seed}`);
+    const lightParam = lightMode ? "&light=1" : "";
+    router.push(`${route}/${sessionId}?theme=${themeName}&mode=ladder&entry=concern&seed=${seed}${lightParam}`);
   };
+
+  // 가볍게만 모드 — "피곤해? 내일 하자"
+  const [lightMode, setLightMode] = useState(false);
 
   const handleResumeSession = (trail: SessionTrail) => {
     setIsNavigating(true);
@@ -388,9 +393,23 @@ export default function HomePage() {
         {/* ── 테마 선택 ── */}
         {phase === "mood" && (
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
-            {/* 한 단어 진입 — 부담 최소. "풀리는 세계" 감정 풀기 직결. */}
-            <div className="flex justify-center">
+            {/* 한 단어 진입 + 가볍게만 토글 — "풀리는 세계" 감정 풀기 + "피곤해? 내일 하자" */}
+            <div className="flex justify-center items-center gap-2 flex-wrap">
               <SeedWordEntry onSubmit={handleSeedSubmit} />
+              <button
+                onClick={() => setLightMode((v) => !v)}
+                className="text-xs font-rpg-sm transition-all px-3 py-1.5 rounded-full"
+                style={{
+                  color: lightMode ? "var(--fantasy-gold, rgba(192,163,116,0.9))" : "rgba(232,213,181,0.55)",
+                  border: lightMode
+                    ? "1px solid rgba(192,163,116,0.45)"
+                    : "1px dashed rgba(232,213,181,0.25)",
+                  background: lightMode ? "rgba(192,163,116,0.12)" : "rgba(255,255,255,0.02)",
+                }}
+                title="짧게 3~5턴 내 마무리"
+              >
+                {lightMode ? "🌙 가볍게만 ✓" : "🌙 가볍게만"}
+              </button>
             </div>
 
             {/* 이어서 하기 — 미완 세션 홀딩 */}

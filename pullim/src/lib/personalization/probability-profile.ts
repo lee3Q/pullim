@@ -111,3 +111,39 @@ export function updateRecommendationRate(
     recommendationAcceptRate: Math.max(0, Math.min(1, newRate)),
   };
 }
+
+/**
+ * 치트/레벨다운 같은 부정 신호 → engagement 하향.
+ * "빈도가 성격" 원칙 — 부정 신호도 관찰 데이터.
+ *
+ * - cheat: "답이 안 맞아" → approachStyle이 제시된 각도와 달랐다
+ * - level_down: "너무 어려워" → selfAwareness 약간 하향 신호
+ */
+export function updateProfileFromBehindEvent(
+  profile: ProbabilityProfile,
+  event: "cheat" | "level_down" | "breath_completed"
+): ProbabilityProfile {
+  switch (event) {
+    case "cheat":
+      return {
+        ...profile,
+        engagementTrend: Math.max(-1, profile.engagementTrend - 0.08),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "level_down":
+      return {
+        ...profile,
+        selfAwareness: updateDimension(profile.selfAwareness, -1, 0.5),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "breath_completed":
+      // 세션 중 숨 돌리기 완료 → 자기돌봄 긍정 신호. engagement 회복.
+      return {
+        ...profile,
+        engagementTrend: Math.min(1, profile.engagementTrend + 0.05),
+        totalObservations: profile.totalObservations + 1,
+      };
+    default:
+      return profile;
+  }
+}
