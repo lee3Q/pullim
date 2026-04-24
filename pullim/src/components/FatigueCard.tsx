@@ -82,28 +82,19 @@ export default function FatigueCard() {
           className="text-[10px] font-rpg-sm"
           style={{ color: "rgba(180,160,200,0.85)" }}
         >
-          🌙 쉼 권고
+          🌙 관찰
         </p>
         <p className="text-sm font-rpg leading-relaxed" style={{ color: "rgba(232,213,181,0.90)" }}>
           {state.message}
         </p>
       </div>
-      <div className="flex gap-2">
-        <button
-          onClick={handleDismiss}
-          className="rpg-button-ghost flex-1 py-2 text-xs font-rpg-sm"
-          title="오늘 하루 동안 안 보이게"
-        >
-          접어둘게
-        </button>
-        <button
-          onClick={handleDismiss}
-          className="rpg-button flex-1 py-2 text-xs font-rpg-sm"
-          title="그래도 하려면 평소대로 진행"
-        >
-          알겠어, 가볍게만
-        </button>
-      </div>
+      <button
+        onClick={handleDismiss}
+        className="w-full py-2 text-xs font-rpg-sm transition-opacity hover:opacity-80"
+        style={{ color: "rgba(232,213,181,0.55)" }}
+      >
+        닫을게
+      </button>
     </div>
   );
 }
