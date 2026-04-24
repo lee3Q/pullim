@@ -3,6 +3,7 @@ import type { PullimPromise } from "./ladder-types";
 const STORAGE_KEY = "pullim_promises";
 
 function load(): PullimPromise[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as PullimPromise[]) : [];
@@ -12,6 +13,7 @@ function load(): PullimPromise[] {
 }
 
 function save(promises: PullimPromise[]): void {
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(promises));
   } catch {}
@@ -69,7 +71,7 @@ export function getPromiseHistory(): PullimPromise[] {
  * - 24시간 이내 확인된 것만 포함 (너무 오래된 것은 현재 세션에 강제 연결 안 함)
  */
 export function buildPromiseContext(): string {
-  if (typeof window === "undefined") return "";
+  // load() 내부에 이미 SSR 가드 있음. 중복 체크 제거.
   const items = load();
   if (items.length === 0) return "";
 

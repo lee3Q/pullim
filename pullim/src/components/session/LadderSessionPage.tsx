@@ -6,13 +6,12 @@ import Link from "next/link";
 import type { ThemeName } from "@/lib/types-ultimate";
 import type { EntryMode } from "@/lib/session/ladder-types";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { buildSensoryLadderContext } from "@/lib/personalization/sensory-ladder";
 import { THEMES } from "@/lib/themes";
 import { useBGM } from "@/hooks/useBGM";
 import LadderSession from "./LadderSession";
 import CrisisAlert from "@/components/CrisisAlert";
 import { useState, useCallback, useMemo } from "react";
-import { getUnfinishedTrail, trailToPromptContext, consumeTrailOnResume } from "@/lib/session/session-trail";
+import { buildEntryProfileContext } from "@/lib/session/entry-context";
 
 interface LadderSessionPageProps {
   theme: ThemeName;
@@ -42,49 +41,11 @@ export default function LadderSessionPage({
   // 가볍게만 모드 — "피곤해? 내일 하자"
   const isLightMode = searchParams.get("light") === "1";
 
-  // 프로필 기반 개인화 컨텍스트 + (이어서 하기일 때) 직전 세션 맥락 + seed word + light mode
-  const profileContext = useMemo(() => {
-    const baseContext = profile ? buildSensoryLadderContext(profile) : "";
-    const parts: string[] = [];
-    if (baseContext) parts.push(baseContext);
-    if (isResume) {
-      const trail = getUnfinishedTrail();
-      if (trail) {
-        parts.push(trailToPromptContext(trail));
-        // 이어서 하기 성공 → 기존 trail은 완료 처리. 새 세션의 saveTrail이 덮어쓴다.
-        consumeTrailOnResume();
-      }
-    }
-    if (seedWord) {
-      const sanitized = seedWord.slice(0, 24).replace(/[\r\n<>]/g, "").trim();
-      if (sanitized) {
-        parts.push(
-          [
-            "[INITIAL_STATE_WORD]",
-            `사용자가 홈에서 지금 상태를 한 단어로 표현했다: "${sanitized}"`,
-            `이 단어를 진지하게 받아들여라. 첫 AI 응답에서 이 감각을 자연스럽게 반영하라.`,
-            `단, "아, ${sanitized}구나" 같은 복창은 하지 마라. 이미 표현된 걸 정리만 해주면 안 된다.`,
-            `대신 이 감각이 어디서 왔는지, 어떤 느낌에 더 가까운지 감각 선택지로 물어라.`,
-            "[/INITIAL_STATE_WORD]",
-          ].join("\n"),
-        );
-      }
-    }
-    if (isLightMode) {
-      parts.push(
-        [
-          "[LIGHT_MODE]",
-          "사용자는 오늘 가볍게만 시작했다.",
-          "- 깊이 파고들지 마라. 표면의 감각 한두 개만 건드린다.",
-          "- 3~5턴 내로 자연스럽게 마무리 신호([WRAP_SUGGEST])를 보여라.",
-          "- 분석 레벨(3)로 올라가지 마라. 감각(1~2)에서 맴돌다 마무리.",
-          "- 마무리도 거창하게 하지 말고 '오늘은 여기까지도 충분해' 톤으로.",
-          "[/LIGHT_MODE]",
-        ].join("\n"),
-      );
-    }
-    return parts.length > 0 ? parts.join("\n\n") : undefined;
-  }, [profile, isResume, seedWord, isLightMode]);
+  // 프로필 기반 개인화 컨텍스트 (entry-context.ts로 분리)
+  const profileContext = useMemo(
+    () => buildEntryProfileContext({ profile, isResume, seedWord, isLightMode }),
+    [profile, isResume, seedWord, isLightMode],
+  );
 
   // 테마 전환 핸들러
   const handleThemeChange = useCallback(
