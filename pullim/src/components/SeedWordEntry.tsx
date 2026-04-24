@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface SeedWordEntryProps {
   onSubmit: (word: string) => void;
+  /** 진입 시 어느 테마로 갈 예정인지 표시용 레이블 (없으면 생략) */
+  themeHint?: string;
 }
 
 const PLACEHOLDER_CYCLE = [
@@ -23,12 +25,14 @@ const PLACEHOLDER_CYCLE = [
  * - 극한의 적응형 — 테마 고르는 것조차 부담스러운 사용자에게 2탭 진입.
  * - "부담스러워? 내릴게" (2026-03-30)
  */
-export default function SeedWordEntry({ onSubmit }: SeedWordEntryProps) {
+export default function SeedWordEntry({ onSubmit, themeHint }: SeedWordEntryProps) {
   const [open, setOpen] = useState(false);
   const [word, setWord] = useState("");
   const [placeholder] = useState(
     () => PLACEHOLDER_CYCLE[Math.floor(Math.random() * PLACEHOLDER_CYCLE.length)],
   );
+  // IME(한글 조합) 상태 — 조합 중 Enter는 무시
+  const composingRef = useRef(false);
 
   function handleSubmit() {
     const trimmed = word.trim();
@@ -75,8 +79,13 @@ export default function SeedWordEntry({ onSubmit }: SeedWordEntryProps) {
         type="text"
         value={word}
         onChange={(e) => setWord(e.target.value)}
+        onCompositionStart={() => { composingRef.current = true; }}
+        onCompositionEnd={() => { composingRef.current = false; }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") handleSubmit();
+          // IME 조합 중 Enter는 한글 완성 이벤트로 소비되어야 함 — 무시
+          if (e.key === "Enter" && !composingRef.current && !e.nativeEvent.isComposing) {
+            handleSubmit();
+          }
           if (e.key === "Escape") setOpen(false);
         }}
         placeholder={placeholder}
@@ -90,6 +99,14 @@ export default function SeedWordEntry({ onSubmit }: SeedWordEntryProps) {
           outline: "none",
         }}
       />
+      {themeHint && (
+        <p
+          className="text-[10px] font-rpg-sm text-center"
+          style={{ color: "rgba(232,213,181,0.45)" }}
+        >
+          입력 후 <span style={{ color: "var(--fantasy-gold, rgba(192,163,116,0.85))" }}>{themeHint}</span>로 시작해
+        </p>
+      )}
       <div className="flex gap-2">
         <button
           onClick={handleSubmit}

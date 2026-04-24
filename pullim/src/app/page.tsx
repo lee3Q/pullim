@@ -395,7 +395,14 @@ export default function HomePage() {
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
             {/* 한 단어 진입 + 가볍게만 토글 — "풀리는 세계" 감정 풀기 + "피곤해? 내일 하자" */}
             <div className="flex justify-center items-center gap-2 flex-wrap">
-              <SeedWordEntry onSubmit={handleSeedSubmit} />
+              <SeedWordEntry
+                onSubmit={handleSeedSubmit}
+                themeHint={
+                  THEME_CARDS.find(
+                    (t) => t.key === (recommendedTheme ?? selectedTheme ?? "adventure"),
+                  )?.name
+                }
+              />
               <button
                 onClick={() => setLightMode((v) => !v)}
                 className="text-xs font-rpg-sm transition-all px-3 py-1.5 rounded-full"
