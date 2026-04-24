@@ -21,10 +21,21 @@ export default function HomeInventory() {
   const [insights, setInsights] = useState<Insight[]>([]);
 
   useEffect(() => {
+    const refresh = () => {
+      setPromises(getActivePromises());
+      setInsights(listInsights());
+    };
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPromises(getActivePromises());
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setInsights(listInsights());
+    refresh();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const promiseCount = promises.length;

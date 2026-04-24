@@ -25,10 +25,21 @@ export default function ArchivePage() {
   const [tab, setTab] = useState<Tab>("insights");
 
   useEffect(() => {
+    const refresh = () => {
+      setInsights(listInsights());
+      setPromises(getPromiseHistory().sort((a, b) => b.createdAt - a.createdAt));
+    };
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setInsights(listInsights());
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPromises(getPromiseHistory().sort((a, b) => b.createdAt - a.createdAt));
+    refresh();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const shown = filter === "starred" ? insights.filter((i) => i.starred) : insights;
