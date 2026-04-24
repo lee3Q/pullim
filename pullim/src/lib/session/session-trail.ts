@@ -65,6 +65,18 @@ export function markTrailCompleted(): void {
 }
 
 /**
+ * 이어서 하기 후 기존 trail 정리.
+ * 새 세션이 시작되면 이전 trail은 더 이상 "이어서"의 대상이 아님.
+ */
+export function consumeTrailOnResume(): void {
+  const trail = readRaw();
+  if (!trail) return;
+  // 완료 플래그 세워서 "이어서" 카드 다시 뜨지 않도록.
+  // 이후 새 세션의 saveTrail이 덮어씀.
+  writeRaw({ ...trail, completed: true });
+}
+
+/**
  * 트레일 완전 삭제.
  */
 export function clearTrail(): void {

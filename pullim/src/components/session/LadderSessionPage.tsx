@@ -12,7 +12,7 @@ import { useBGM } from "@/hooks/useBGM";
 import LadderSession from "./LadderSession";
 import CrisisAlert from "@/components/CrisisAlert";
 import { useState, useCallback, useMemo } from "react";
-import { getUnfinishedTrail, trailToPromptContext } from "@/lib/session/session-trail";
+import { getUnfinishedTrail, trailToPromptContext, consumeTrailOnResume } from "@/lib/session/session-trail";
 
 interface LadderSessionPageProps {
   theme: ThemeName;
@@ -49,7 +49,11 @@ export default function LadderSessionPage({
     if (baseContext) parts.push(baseContext);
     if (isResume) {
       const trail = getUnfinishedTrail();
-      if (trail) parts.push(trailToPromptContext(trail));
+      if (trail) {
+        parts.push(trailToPromptContext(trail));
+        // 이어서 하기 성공 → 기존 trail은 완료 처리. 새 세션의 saveTrail이 덮어쓴다.
+        consumeTrailOnResume();
+      }
     }
     if (seedWord) {
       const sanitized = seedWord.slice(0, 24).replace(/[\r\n<>]/g, "").trim();

@@ -11,7 +11,7 @@ import type {
   ThemeSuggestion,
   PullimPromise,
 } from "@/lib/session/ladder-types";
-import { getActivePromises, checkPromise } from "@/lib/session/promise-store";
+import { getActivePromises, checkPromise, buildPromiseContext } from "@/lib/session/promise-store";
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
@@ -408,6 +408,8 @@ export default function LadderSession({
       const feedbackContext = buildFeedbackContext();
       // "풀다" 13가지 뜻 × 테마 매핑 — 북극성 직접 구현
       const poolContext = buildPoolMeaningContext(theme);
+      // 최근 24h 내 확인된 약속 → 다음 세션 맥락
+      const promiseContext = buildPromiseContext();
 
       try {
         const response = await fetch("/api/ultimate/listen", {
@@ -423,7 +425,7 @@ export default function LadderSession({
             theme,
             behaviorSignals: signals,
             personalizationContext: profileContext || undefined,
-            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext, poolContext]
+            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext, poolContext, promiseContext]
               .filter(Boolean)
               .join("\n\n"),
           }),
