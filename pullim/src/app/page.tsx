@@ -21,6 +21,7 @@ import AuthModal from "@/components/AuthModal";
 import HomeInventory from "@/components/HomeInventory";
 import SeedWordEntry from "@/components/SeedWordEntry";
 import FatigueCard from "@/components/FatigueCard";
+import PullimLetterCard from "@/components/PullimLetterCard";
 import { useSettings } from "@/hooks/useSettings";
 import { useBGM } from "@/hooks/useBGM";
 import { useAuth } from "@/hooks/useAuth";
@@ -406,6 +407,9 @@ export default function HomePage() {
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
             {/* 피로 임계 — 주간 자주 왔지만 부정 신호 많을 때만 표시 */}
             <FatigueCard />
+
+            {/* 풀림의 편지 — 7일마다 누적 관찰 정리 */}
+            <PullimLetterCard />
 
             {/* 한 단어 진입 + 가볍게만 토글 — "풀리는 세계" 감정 풀기 + "피곤해? 내일 하자" */}
             <div className="flex justify-center items-center gap-2 flex-wrap">

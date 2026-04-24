@@ -3,12 +3,37 @@
 import { useEffect, useState } from "react";
 import { computeFatigueWatch } from "@/lib/session/fatigue-watch";
 
+const DISMISS_KEY = "pullim_fatigue_dismissed_at";
+const DISMISS_TTL_MS = 24 * 60 * 60 * 1000;
+
+function isDismissedToday(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = localStorage.getItem(DISMISS_KEY);
+    if (!raw) return false;
+    const ts = parseInt(raw, 10);
+    if (Number.isNaN(ts)) return false;
+    return Date.now() - ts < DISMISS_TTL_MS;
+  } catch {
+    return false;
+  }
+}
+
+function markDismissed() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+  } catch {
+    // 무시
+  }
+}
+
 /**
  * 피로 임계 카드 — 홈 진입 시 일정 조건 충족 시 표시.
  *
  * 철학 근거:
  * - 극한의 적응형 "피곤해? 내일 하자"
- * - 강제 중단이 아닌 "쉼 권고" — 사용자가 닫으면 그냥 사라짐
+ * - 강제 중단이 아닌 "쉼 권고" — 사용자가 닫으면 24h 동안 안 뜸
  * - "오래 안 오셨네요" 정반대 — "자주 왔지만 힘들어 보인다"에 반응
  */
 export default function FatigueCard() {
@@ -21,6 +46,10 @@ export default function FatigueCard() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     const refresh = () => {
+      if (isDismissedToday()) {
+        setDismissed(true);
+        return;
+      }
       const s = computeFatigueWatch();
       setState({ flagged: s.flagged, message: s.gentleMessage });
     };
@@ -35,6 +64,11 @@ export default function FatigueCard() {
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
+
+  const handleDismiss = () => {
+    markDismissed();
+    setDismissed(true);
+  };
 
   if (!state.flagged || !state.message || dismissed) return null;
 
@@ -56,14 +90,14 @@ export default function FatigueCard() {
       </div>
       <div className="flex gap-2">
         <button
-          onClick={() => setDismissed(true)}
+          onClick={handleDismiss}
           className="rpg-button-ghost flex-1 py-2 text-xs font-rpg-sm"
-          title="오늘은 그냥 넘어갈게"
+          title="오늘 하루 동안 안 보이게"
         >
           접어둘게
         </button>
         <button
-          onClick={() => setDismissed(true)}
+          onClick={handleDismiss}
           className="rpg-button flex-1 py-2 text-xs font-rpg-sm"
           title="그래도 하려면 평소대로 진행"
         >
