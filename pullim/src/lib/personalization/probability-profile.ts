@@ -124,7 +124,9 @@ export function updateProfileFromBehindEvent(
     | "breath_completed"
     | "promise_completed"
     | "promise_failed"
-    | "insight_archived",
+    | "insight_archived"
+    | "feedback_confirm"
+    | "feedback_misread",
 ): ProbabilityProfile {
   switch (event) {
     case "cheat":
@@ -146,7 +148,6 @@ export function updateProfileFromBehindEvent(
         totalObservations: profile.totalObservations + 1,
       };
     case "promise_completed":
-      // 약속 이행 = 강한 긍정. selfAwareness + engagement 모두 상승.
       return {
         ...profile,
         selfAwareness: updateDimension(profile.selfAwareness, 1, 1.2),
@@ -154,18 +155,30 @@ export function updateProfileFromBehindEvent(
         totalObservations: profile.totalObservations + 2,
       };
     case "promise_failed":
-      // 약속 실패도 관찰 — 자책 신호 조심, engagement 소폭 하향.
       return {
         ...profile,
         engagementTrend: Math.max(-1, profile.engagementTrend - 0.05),
         totalObservations: profile.totalObservations + 1,
       };
     case "insight_archived":
-      // 통찰 아카이브 수락 → self-awareness 강한 긍정.
       return {
         ...profile,
         selfAwareness: updateDimension(profile.selfAwareness, 1, 1.0),
         engagementTrend: Math.min(1, profile.engagementTrend + 0.08),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "feedback_confirm":
+      // 내면사고 맞춤 → AI 파악 정확도 재입증. selfAwareness 소폭 상승.
+      return {
+        ...profile,
+        selfAwareness: updateDimension(profile.selfAwareness, 1, 0.3),
+        totalObservations: profile.totalObservations + 1,
+      };
+    case "feedback_misread":
+      // AI 파악 틀림 → approachStyle에 노이즈. 이후 미리 확인 톤 트리거(buildFeedbackContext).
+      return {
+        ...profile,
+        engagementTrend: Math.max(-1, profile.engagementTrend - 0.03),
         totalObservations: profile.totalObservations + 1,
       };
     default:

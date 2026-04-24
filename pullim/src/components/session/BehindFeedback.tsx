@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { recordBehindFeedback, type FeedbackKind } from "@/lib/session/behind-feedback-store";
+import { updateStoredProfile } from "@/lib/personalization/profile-storage";
+import { updateProfileFromBehindEvent } from "@/lib/personalization/probability-profile";
 
 interface BehindFeedbackProps {
   sessionId: string;
@@ -26,6 +28,12 @@ export default function BehindFeedback({
       kind,
       note: customNote,
     });
+    // 프로필 학습 연결
+    if (kind === "confirm") {
+      updateStoredProfile((p) => updateProfileFromBehindEvent(p, "feedback_confirm"));
+    } else if (kind === "misread_me" || kind === "wrong_info" || kind === "custom") {
+      updateStoredProfile((p) => updateProfileFromBehindEvent(p, "feedback_misread"));
+    }
     setStep("thanks");
   }
 

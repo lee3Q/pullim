@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { listInsights, toggleStar, removeInsight, type Insight } from "@/lib/session/insight-archive";
+import { getPromiseHistory } from "@/lib/session/promise-store";
+import type { PullimPromise } from "@/lib/session/ladder-types";
 
 const THEME_LABEL: Record<string, string> = {
   "모험가": "🗺️ 모험가",
@@ -13,18 +15,36 @@ const THEME_LABEL: Record<string, string> = {
   "종말": "🔥 종말",
 };
 
+type Tab = "insights" | "promises";
+
 export default function ArchivePage() {
   const router = useRouter();
   const [insights, setInsights] = useState<Insight[]>([]);
+  const [promises, setPromises] = useState<PullimPromise[]>([]);
   const [filter, setFilter] = useState<"all" | "starred">("all");
+  const [tab, setTab] = useState<Tab>("insights");
 
   useEffect(() => {
-    // localStorage는 클라이언트에서만 접근 가능 — hydration 일치를 위해 mount 후 갱신
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setInsights(listInsights());
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPromises(getPromiseHistory().sort((a, b) => b.createdAt - a.createdAt));
   }, []);
 
   const shown = filter === "starred" ? insights.filter((i) => i.starred) : insights;
+
+  const promiseStatusLabel: Record<PullimPromise["status"], string> = {
+    active: "⏳ 진행 중",
+    completed: "✓ 지킨 약속",
+    failed: "× 못 지킴",
+    skipped: "– 넘어감",
+  };
+  const promiseStatusColor: Record<PullimPromise["status"], string> = {
+    active: "rgba(192,163,116,0.85)",
+    completed: "rgba(160,200,130,0.85)",
+    failed: "rgba(220,140,140,0.75)",
+    skipped: "rgba(200,200,200,0.55)",
+  };
 
   return (
     <div className="min-h-screen flex flex-col relative">
@@ -57,10 +77,36 @@ export default function ArchivePage() {
         <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-4">
           <div className="text-center space-y-1">
             <p className="text-xs font-rpg-sm text-white/50 italic">
-              자신의 삶을 관통하는 통찰은 자신만 낼 수 있어.
+              {tab === "insights"
+                ? "자신의 삶을 관통하는 통찰은 자신만 낼 수 있어."
+                : "작은 약속, 틀려도 데이터."}
             </p>
           </div>
 
+          {/* 탭 */}
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => setTab("insights")}
+              className="glass-btn px-4 py-2 text-xs font-rpg-sm"
+              style={{
+                color: tab === "insights" ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)",
+              }}
+            >
+              ☆ 통찰 ({insights.length})
+            </button>
+            <button
+              onClick={() => setTab("promises")}
+              className="glass-btn px-4 py-2 text-xs font-rpg-sm"
+              style={{
+                color: tab === "promises" ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)",
+              }}
+            >
+              💫 약속 ({promises.length})
+            </button>
+          </div>
+
+          {tab === "insights" && (
+          <>
           <div className="flex gap-2 justify-center">
             <button
               onClick={() => setFilter("all")}
@@ -180,6 +226,67 @@ export default function ArchivePage() {
                 </div>
               ))}
             </div>
+          )}
+          </>
+          )}
+
+          {/* 약속 탭 */}
+          {tab === "promises" && (
+            promises.length === 0 ? (
+              <div className="rpg-panel px-8 py-10 text-center space-y-3">
+                <p className="text-2xl">💫</p>
+                <p className="text-sm text-white/65 font-rpg">
+                  아직 약속이 없어.
+                </p>
+                <p className="text-xs text-white/40 font-rpg-sm">
+                  세션이 끝날 때 풀림이 제안해줘.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {promises.map((p) => (
+                  <div
+                    key={p.id}
+                    className="glass-panel p-4 rounded-2xl space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-[10px] font-rpg-sm"
+                        style={{ color: promiseStatusColor[p.status] }}
+                      >
+                        {promiseStatusLabel[p.status]}
+                      </span>
+                      <span className="text-[10px] text-white/35">
+                        {new Date(p.createdAt).toLocaleDateString("ko-KR", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        {p.sessionTheme ? ` · ${p.sessionTheme}` : ""}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p
+                        className="text-xs font-rpg-sm"
+                        style={{ color: "rgba(192,167,136,0.70)" }}
+                      >
+                        <span style={{ color: "var(--fantasy-gold-bright)" }}>만약</span> {p.trigger}
+                      </p>
+                      <p
+                        className="text-sm font-rpg leading-relaxed"
+                        style={{ color: "rgba(255,255,255,0.9)" }}
+                      >
+                        → {p.action}
+                      </p>
+                      {p.reflection && (
+                        <p className="text-[11px] font-rpg-sm italic text-white/55 pt-1">
+                          “{p.reflection}”
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
           )}
         </div>
       </main>
