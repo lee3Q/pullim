@@ -92,6 +92,15 @@ export async function inferStateWithLLM(
   // JSON 파싱
   const parsed = JSON.parse(text) as BehindInference;
 
+  // breath_completed 이벤트 직접 검사 — LLM 결과 대신 규칙으로 덮어쓴다
+  // (softening은 객관적 이벤트 신호이므로 LLM 환각 허용 안 함)
+  const softening = events.some(
+    (e) =>
+      e.type === "timeout" &&
+      e.detail === "breath_completed" &&
+      Date.now() - e.timestamp < 180_000,
+  );
+
   // 필드 타입 보정 (LLM이 문자열로 줄 수 있음)
   return {
     fatigue: Boolean(parsed.fatigue),
@@ -100,6 +109,7 @@ export async function inferStateWithLLM(
     confident: Boolean(parsed.confident),
     dissatisfied: Boolean(parsed.dissatisfied),
     topicExhausted: Boolean(parsed.topicExhausted),
+    softening,
     suggestLevelDown: Boolean(parsed.suggestLevelDown),
     suggestLevelUp: Boolean(parsed.suggestLevelUp),
     toneAdjustment: parsed.toneAdjustment ?? null,

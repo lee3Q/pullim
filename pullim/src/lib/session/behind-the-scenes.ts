@@ -12,6 +12,7 @@ export interface BehindInference {
   confident: boolean;      // 확신 증가
   dissatisfied: boolean;   // 불만족 (치트 피드백)
   topicExhausted: boolean; // 치트 3회 연속 → 주제 전환 제안
+  softening: boolean;      // 최근 숨돌리기 완료 → 부드럽게 톤 조정
   // 조정 지시
   suggestLevelDown: boolean;
   suggestLevelUp: boolean;
@@ -132,6 +133,7 @@ export function inferStateSync(
     confident,
     dissatisfied,
     topicExhausted,
+    softening: recentBreath,
     suggestLevelDown,
     suggestLevelUp,
     toneAdjustment,
@@ -167,6 +169,11 @@ export async function inferState(
 export function buildBehindContext(inference: BehindInference): string {
   const lines: string[] = ["[BEHIND_THE_SCENES]"];
 
+  // softening은 LLM toneAdjustment가 null이어도 반드시 주입 (객관 이벤트)
+  if (inference.softening) {
+    lines.push("- 사용자가 방금 숨을 돌렸다. 목소리 낮추고, 짧게, 부드럽게. 긴 질문 금지.");
+  }
+
   if (inference.toneAdjustment) {
     lines.push(`- ${inference.toneAdjustment}`);
   }
@@ -196,10 +203,8 @@ export function buildBehindContext(inference: BehindInference): string {
  * 데모에서 "이 AI가 나를 어떻게 파악하는지" 시각화
  */
 export function describeBehindInference(inference: BehindInference): string | null {
-  // 숨돌리기 직후 톤 조정이 최우선이므로 toneAdjustment 기반 힌트 먼저
-  if (inference.toneAdjustment?.startsWith("방금 사용자가 숨을 돌렸다")) {
-    return "💭 [숨 돌림] 부드럽게 조정 중...";
-  }
+  // 숨돌리기 직후 톤 조정이 최우선
+  if (inference.softening) return "💭 [숨 돌림] 부드럽게 조정 중...";
   if (inference.topicExhausted) return "💭 [주제 소진] 전환 고려 중...";
   if (inference.fatigue && inference.opening) return "💭 [피로+열림] 가볍게 따라가는 중...";
   if (inference.fatigue && inference.struggling) return "💭 [피로+어려움] 최소화 중...";
