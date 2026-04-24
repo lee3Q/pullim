@@ -5,18 +5,18 @@ import { useRef, useCallback } from "react";
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 
 export interface LadderBehaviorSignalsApi {
-  /** 마지막 사용자 응답 이후 ms 단위 경과 */
+  /** 현재 시점 BehaviorSignals 스냅샷 생성 */
   getSignals: (turnCount: number, messageLength: number) => BehaviorSignals;
-  /** 선택지가 화면에 뜬 시각 기록 */
+  /** 선택지가 화면에 뜬 시각 기록 (망설임 측정용) */
   markChoiceStart: () => void;
   /** 사용자가 선택을 바꿨을 때 누적 */
   incChoiceChanges: () => void;
-  /** AI가 응답 완료한 시각 기록 */
+  /** AI 응답이 완료된 시각 기록 (다음 턴 응답시간 측정용) */
   markResponseEnd: () => void;
-  /** 사용자 메시지 길이 누적 (트렌드 계산용) */
+  /** 사용자 메시지 길이 누적 (트렌드 계산용, 최근 10개 유지) */
   pushMessageLength: (n: number) => void;
-  /** 현재 턴 끝나면 choice 카운터 리셋 */
-  resetChoiceCounters: () => void;
+  /** 새 턴 시작 시 선택 변경 카운터 리셋 */
+  resetTurnState: () => void;
 }
 
 function getLengthTrend(lengths: number[]): "shorter" | "stable" | "longer" {
@@ -54,7 +54,7 @@ export function useBehaviorSignalsLadder(): LadderBehaviorSignalsApi {
     if (messageLengths.current.length > 10) messageLengths.current.shift();
   }, []);
 
-  const resetChoiceCounters = useCallback(() => {
+  const resetTurnState = useCallback(() => {
     choiceChanges.current = 0;
   }, []);
 
@@ -81,6 +81,6 @@ export function useBehaviorSignalsLadder(): LadderBehaviorSignalsApi {
     incChoiceChanges,
     markResponseEnd,
     pushMessageLength,
-    resetChoiceCounters,
+    resetTurnState,
   };
 }

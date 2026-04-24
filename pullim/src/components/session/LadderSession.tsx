@@ -498,7 +498,7 @@ export default function LadderSession({
         }
 
         behaviorApi.markResponseEnd();
-        behaviorApi.resetChoiceCounters();
+        behaviorApi.resetTurnState();
 
         // 도구 트리거 체크
         const newTurnCount = toolStateRef.current.turnCount + 1;
