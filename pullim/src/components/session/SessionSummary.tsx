@@ -61,6 +61,10 @@ export default function SessionSummary({
   const [promiseState, setPromiseState] = useState<PromiseState>("suggest");
   const [summaryArchived, setSummaryArchived] = useState(false);
 
+  // 오늘의 한 문장 — "풀기 → 모으기" 변증법 구현체 (판단기준 #6)
+  const [oneLiner, setOneLiner] = useState("");
+  const [oneLinerSaved, setOneLinerSaved] = useState(false);
+
   function handleAccept() {
     createPromise(example.trigger, example.action, theme);
     setPromiseState("accepted");
@@ -76,6 +80,21 @@ export default function SessionSummary({
     });
     updateStoredProfile((p) => updateProfileFromBehindEvent(p, "insight_archived"));
     setSummaryArchived(true);
+  }
+
+  function handleSaveOneLiner() {
+    const trimmed = oneLiner.trim();
+    if (trimmed.length === 0) return;
+    archiveInsight({
+      sessionId: `oneline_${Date.now()}`,
+      theme,
+      content: trimmed,
+      level: 5,
+      context: "(오늘의 한 문장)",
+      starred: true,
+    });
+    updateStoredProfile((p) => updateProfileFromBehindEvent(p, "insight_archived"));
+    setOneLinerSaved(true);
   }
 
   function handleReject() {
@@ -116,6 +135,62 @@ export default function SessionSummary({
               보러 가기 →
             </button>
           </div>
+        )}
+      </div>
+
+      {/* 오늘의 한 문장 — 풀기↔모으기 변증법 */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 space-y-3">
+        <div className="space-y-1">
+          <h3
+            className="text-sm font-medium"
+            style={{ color: "var(--fantasy-gold)" }}
+          >
+            🪷 오늘의 한 문장
+          </h3>
+          <p
+            className="text-xs font-rpg-sm"
+            style={{ color: "rgba(192,167,136,0.55)" }}
+          >
+            오늘의 모든 걸 한 줄로 모으면 뭐야?
+          </p>
+        </div>
+
+        {!oneLinerSaved ? (
+          <>
+            <textarea
+              value={oneLiner}
+              onChange={(e) => setOneLiner(e.target.value)}
+              placeholder="오늘은... (선택)"
+              maxLength={120}
+              rows={2}
+              className="w-full px-3 py-2.5 rounded-xl text-sm font-rpg resize-none"
+              style={{
+                background: "rgba(0,0,0,0.35)",
+                color: "rgba(232,213,181,0.95)",
+                border: "1px solid rgba(192,163,116,0.2)",
+                outline: "none",
+              }}
+            />
+            <button
+              onClick={handleSaveOneLiner}
+              disabled={oneLiner.trim().length === 0}
+              className="w-full py-2.5 rounded-xl text-sm font-rpg transition-all active:scale-[0.97] disabled:opacity-30"
+              style={{
+                background: "rgba(192,163,116,0.15)",
+                color: "var(--fantasy-gold-bright)",
+                border: "1px solid rgba(192,163,116,0.3)",
+              }}
+            >
+              🪷 기록할게
+            </button>
+          </>
+        ) : (
+          <p
+            className="text-sm font-rpg text-center py-2"
+            style={{ color: "var(--fantasy-gold-bright)" }}
+          >
+            🪷 한 문장 전당에 모았어 (별표 자동)
+          </p>
         )}
       </div>
 
