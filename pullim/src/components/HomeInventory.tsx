@@ -8,12 +8,17 @@ import type { PullimPromise } from "@/lib/session/ladder-types";
 import type { Insight } from "@/lib/session/insight-archive";
 
 /**
- * 홈 화면 "나를 기다리는 것들" 인벤토리.
+ * 홈 "나를 기다리는 것들" 섹션.
+ *
+ * UX 감사 반영 (Agent 3, 2026-04-23):
+ * - 카운트 숫자 표시 제거 (게이미피케이션 → 자책 유발 방지)
+ * - 최근 1개 미리보기로 전환 — "저장된 내용" 자체가 CTA
+ * - 빈 상태는 그대로 숨김
  *
  * 철학 근거:
- * - "이건 거의 사랑이야" (2026-03-30) — 잊지 않고 돌아왔다는 신호
- * - holding environment — 지난 번 맥락을 지닌 채 맞이함
- * - 절대 금지 "오래 안 왔네요" — 이탈 부각 금지. 여기서는 "기다리는 것들"로 긍정 프레임.
+ * - "오래 안 오셨네요" 금지 + "빈도가 지표" 금지
+ * - 사용자에게 숫자가 쌓인 것을 자랑하거나 부족함을 지적하지 않음
+ * - 단지 "네가 남긴 것이 여기 있어" 수준의 잔잔한 표지
  */
 export default function HomeInventory() {
   const router = useRouter();
@@ -38,59 +43,59 @@ export default function HomeInventory() {
     };
   }, []);
 
-  const promiseCount = promises.length;
-  // "오늘의 한 문장"은 context "(오늘의 한 문장)"로 태그됨 — 일반 통찰과 분리
+  // 최근 것 1개씩 (시간 내림차순)
+  const latestPromise = [...promises].sort((a, b) => b.createdAt - a.createdAt)[0] ?? null;
   const oneLiners = insights.filter((i) => i.context === "(오늘의 한 문장)");
+  const latestOneLiner = [...oneLiners].sort((a, b) => b.createdAt - a.createdAt)[0] ?? null;
   const deepInsights = insights.filter((i) => i.context !== "(오늘의 한 문장)");
-  const oneLinerCount = oneLiners.length;
-  const insightCount = deepInsights.length;
-  const insightTotal = insights.length;
+  const latestInsight = [...deepInsights].sort((a, b) => b.createdAt - a.createdAt)[0] ?? null;
 
-  // 전부 비어있으면 표시하지 않음
-  if (promiseCount === 0 && insightTotal === 0) return null;
+  if (!latestPromise && !latestOneLiner && !latestInsight) return null;
+
+  const truncate = (s: string, n: number) => (s.length <= n ? s : s.slice(0, n - 1) + "…");
 
   return (
-    <div className="flex items-center gap-2 justify-center flex-wrap">
-      {promiseCount > 0 && (
+    <div className="flex flex-col items-center gap-1.5">
+      {latestOneLiner && (
         <button
           onClick={() => router.push("/archive")}
-          className="text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.03] active:scale-[0.97]"
-          style={{
-            background: "rgba(192,163,116,0.15)",
-            border: "1px solid rgba(192,163,116,0.3)",
-            color: "var(--fantasy-gold, rgba(192,163,116,0.85))",
-          }}
-          title="약속 확인은 다음 세션 진입 시 물어볼게"
-        >
-          💫 약속 {promiseCount}
-        </button>
-      )}
-      {oneLinerCount > 0 && (
-        <button
-          onClick={() => router.push("/archive")}
-          className="text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.03] active:scale-[0.97]"
+          className="text-[11px] font-rpg-sm px-3 py-1.5 rounded-full transition-all hover:opacity-90 max-w-full"
           style={{
             background: "rgba(192,163,116,0.10)",
             border: "1px solid rgba(192,163,116,0.25)",
             color: "rgba(232,213,181,0.80)",
           }}
-          title="오늘의 한 문장 모음"
+          aria-label="최근 남긴 한 문장 보기"
         >
-          🪷 한 문장 {oneLinerCount}
+          🪷 {truncate(latestOneLiner.content, 28)}
         </button>
       )}
-      {insightCount > 0 && (
+      {latestInsight && (
         <button
           onClick={() => router.push("/archive")}
-          className="text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.03] active:scale-[0.97]"
+          className="text-[11px] font-rpg-sm px-3 py-1.5 rounded-full transition-all hover:opacity-90 max-w-full"
           style={{
             background: "rgba(232,213,181,0.08)",
             border: "1px solid rgba(232,213,181,0.2)",
             color: "rgba(232,213,181,0.75)",
           }}
-          title="네가 남긴 깊은 통찰"
+          aria-label="최근 남긴 통찰 보기"
         >
-          ⭐ 전당 {insightCount}
+          ⭐ {truncate(latestInsight.content, 28)}
+        </button>
+      )}
+      {latestPromise && (
+        <button
+          onClick={() => router.push("/archive")}
+          className="text-[11px] font-rpg-sm px-3 py-1.5 rounded-full transition-all hover:opacity-90 max-w-full"
+          style={{
+            background: "rgba(180,160,200,0.08)",
+            border: "1px solid rgba(180,160,200,0.2)",
+            color: "rgba(232,213,181,0.70)",
+          }}
+          aria-label="최근 약속 보기"
+        >
+          💫 {truncate(latestPromise.action, 28)}
         </button>
       )}
     </div>
