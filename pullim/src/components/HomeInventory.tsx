@@ -39,11 +39,15 @@ export default function HomeInventory() {
   }, []);
 
   const promiseCount = promises.length;
-  const insightCount = insights.length;
-  const starredCount = insights.filter((i) => i.starred).length;
+  // "오늘의 한 문장"은 context "(오늘의 한 문장)"로 태그됨 — 일반 통찰과 분리
+  const oneLiners = insights.filter((i) => i.context === "(오늘의 한 문장)");
+  const deepInsights = insights.filter((i) => i.context !== "(오늘의 한 문장)");
+  const oneLinerCount = oneLiners.length;
+  const insightCount = deepInsights.length;
+  const insightTotal = insights.length;
 
   // 전부 비어있으면 표시하지 않음
-  if (promiseCount === 0 && insightCount === 0) return null;
+  if (promiseCount === 0 && insightTotal === 0) return null;
 
   return (
     <div className="flex items-center gap-2 justify-center flex-wrap">
@@ -61,6 +65,20 @@ export default function HomeInventory() {
           💫 약속 {promiseCount}
         </button>
       )}
+      {oneLinerCount > 0 && (
+        <button
+          onClick={() => router.push("/archive")}
+          className="text-[10px] px-3 py-1.5 rounded-full transition-all hover:scale-[1.03] active:scale-[0.97]"
+          style={{
+            background: "rgba(192,163,116,0.10)",
+            border: "1px solid rgba(192,163,116,0.25)",
+            color: "rgba(232,213,181,0.80)",
+          }}
+          title="오늘의 한 문장 모음"
+        >
+          🪷 한 문장 {oneLinerCount}
+        </button>
+      )}
       {insightCount > 0 && (
         <button
           onClick={() => router.push("/archive")}
@@ -70,9 +88,9 @@ export default function HomeInventory() {
             border: "1px solid rgba(232,213,181,0.2)",
             color: "rgba(232,213,181,0.75)",
           }}
-          title="네가 남긴 통찰"
+          title="네가 남긴 깊은 통찰"
         >
-          {starredCount > 0 ? "⭐" : "☆"} 전당 {insightCount}
+          ⭐ 전당 {insightCount}
         </button>
       )}
     </div>
