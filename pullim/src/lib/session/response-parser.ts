@@ -155,9 +155,19 @@ export function parseResponse(raw: string): ParsedResponse {
     .replace(/^(technique|content):\s*.*$/gim, "")
     // 7. 괄호만 남은 잔재 정리 ([추천], [CRYSTALS] 등 단독)
     .replace(/\[[A-Za-z_]+\]/g, "")
-    // 8. 연속 빈 줄 정리
+    // 8. Markdown 렌더 방어 — 사용자는 plain text만 봐야 함
+    //    **bold** → bold, *italic* → italic, `code` → code, ~~strike~~ → strike
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/(?<!\*)\*(?!\*)([^*\n]+?)\*(?!\*)/g, "$1")
+    .replace(/~~(.+?)~~/g, "$1")
+    .replace(/`([^`\n]+?)`/g, "$1")
+    // Markdown 제목 (# / ## / ###) 시작 라인 → 해시만 제거
+    .replace(/^#{1,6}\s+/gm, "")
+    // Markdown 리스트 마커 (- * +) — 라인 시작에서만
+    .replace(/^[\s]*[-*+]\s+/gm, "")
+    // 9. 연속 빈 줄 정리
     .replace(/\n{3,}/g, "\n\n")
-    // 9. 양 끝 공백/줄바꿈 정리
+    // 10. 양 끝 공백/줄바꿈 정리
     .trim();
 
   return result;

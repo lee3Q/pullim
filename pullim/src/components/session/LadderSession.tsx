@@ -68,7 +68,13 @@ function stripStreamTags(text: string): string {
   // 4. 구조화 키-값 제거 (A_emoji:, A_title:, B_emoji:, B_text: 등)
   result = result.replace(/^[A-Z]_\w+:.*$/gm, "");
 
-  // 5. 연속 빈 줄 정리 (3줄 이상 → 1줄 빈줄)
+  // 5. Markdown 방어 (스트리밍 중 **bold** 등이 보이지 않도록)
+  result = result.replace(/\*\*(.+?)\*\*/g, "$1");
+  result = result.replace(/(?<!\*)\*(?!\*)([^*\n]+?)\*(?!\*)/g, "$1");
+  result = result.replace(/`([^`\n]+?)`/g, "$1");
+  result = result.replace(/^#{1,6}\s+/gm, "");
+
+  // 6. 연속 빈 줄 정리 (3줄 이상 → 1줄 빈줄)
   result = result.replace(/\n{3,}/g, "\n\n");
 
   return result.trim();

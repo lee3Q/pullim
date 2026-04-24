@@ -34,6 +34,14 @@ export function inferStateSync(
     (e) => e.type === "recommendation_reject" && Date.now() - e.timestamp < 180_000
   ).length;
 
+  // 최근 숨돌리기 완료 — 이후 3분 이내엔 톤을 더 부드럽게
+  const recentBreath = events.some(
+    (e) =>
+      e.type === "timeout" &&
+      e.detail === "breath_completed" &&
+      Date.now() - e.timestamp < 180_000,
+  );
+
   const fatigue =
     (signals.turnCount >= 3 && signals.lengthTrend === "shorter") ||
     (signals.turnCount >= 5 && signals.timeTrend === "faster" && signals.messageLength <= 5);
@@ -76,8 +84,12 @@ export function inferStateSync(
   // 톤 조정 — 12종 (복합 조건 우선, 레벨별 특화, 단일 신호 순)
   let toneAdjustment: string | null = null;
 
+  // ── 숨돌리기 직후 최우선 ──
+  if (recentBreath) {
+    toneAdjustment = "방금 사용자가 숨을 돌렸다. 목소리 낮추고, 짧게, 부드럽게. 긴 질문 금지.";
+
   // ── 첫 턴 ──
-  if (signals.turnCount === 0) {
+  } else if (signals.turnCount === 0) {
     toneAdjustment = "아직 모르는 상태. 가볍게 시작하라. 판단하지 마라.";
 
   // ── 복합 조건 (3개) ──
@@ -184,6 +196,10 @@ export function buildBehindContext(inference: BehindInference): string {
  * 데모에서 "이 AI가 나를 어떻게 파악하는지" 시각화
  */
 export function describeBehindInference(inference: BehindInference): string | null {
+  // 숨돌리기 직후 톤 조정이 최우선이므로 toneAdjustment 기반 힌트 먼저
+  if (inference.toneAdjustment?.startsWith("방금 사용자가 숨을 돌렸다")) {
+    return "💭 [숨 돌림] 부드럽게 조정 중...";
+  }
   if (inference.topicExhausted) return "💭 [주제 소진] 전환 고려 중...";
   if (inference.fatigue && inference.opening) return "💭 [피로+열림] 가볍게 따라가는 중...";
   if (inference.fatigue && inference.struggling) return "💭 [피로+어려움] 최소화 중...";
