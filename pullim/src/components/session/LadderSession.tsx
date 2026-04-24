@@ -51,6 +51,7 @@ import {
 import { saveTrail, markTrailCompleted } from "@/lib/session/session-trail";
 import { buildFeedbackContext } from "@/lib/session/behind-feedback-store";
 import { buildPoolMeaningContext } from "@/lib/session/pool-meanings";
+import { buildTimeRhythmContext } from "@/lib/session/time-rhythm";
 import { useBehaviorSignalsLadder } from "@/hooks/useBehaviorSignalsLadder";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
@@ -405,6 +406,8 @@ export default function LadderSession({
       const poolContext = buildPoolMeaningContext(theme);
       // 최근 24h 내 확인된 약속 → 다음 세션 맥락
       const promiseContext = buildPromiseContext();
+      // 하루의 때 — AI 톤 리듬 (Idea 4)
+      const timeContext = buildTimeRhythmContext();
 
       try {
         const response = await fetch("/api/ultimate/listen", {
@@ -420,7 +423,7 @@ export default function LadderSession({
             theme,
             behaviorSignals: signals,
             personalizationContext: profileContext || undefined,
-            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext, poolContext, promiseContext]
+            sensoryLadderContext: [levelPrompt, endPrompt, behindContext, feedbackContext, poolContext, promiseContext, timeContext]
               .filter(Boolean)
               .join("\n\n"),
           }),
