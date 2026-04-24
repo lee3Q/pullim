@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { createPromise } from "@/lib/session/promise-store";
 import { archiveInsight } from "@/lib/session/insight-archive";
 import { updateStoredProfile } from "@/lib/personalization/profile-storage";
@@ -49,6 +50,7 @@ export default function SessionSummary({
   onClose,
   onBackToHome,
 }: SessionSummaryProps) {
+  const router = useRouter();
   const examples = PROMISE_EXAMPLES[theme] ?? PROMISE_EXAMPLES["모험가"];
   const example = useMemo(
     () => examples[Math.floor(Math.random() * examples.length)],
@@ -102,9 +104,18 @@ export default function SessionSummary({
             ⭐ 이 정리, 전당에 올릴게
           </button>
         ) : (
-          <p className="text-[10px] font-rpg-sm" style={{ color: "rgba(192,163,116,0.65)" }}>
-            ⭐ 전당에 올렸어
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] font-rpg-sm" style={{ color: "rgba(192,163,116,0.65)" }}>
+              ⭐ 전당에 올렸어
+            </p>
+            <button
+              onClick={() => router.push("/archive")}
+              className="text-[10px] font-rpg-sm underline transition-opacity hover:opacity-80"
+              style={{ color: "rgba(192,163,116,0.55)" }}
+            >
+              보러 가기 →
+            </button>
+          </div>
         )}
       </div>
 

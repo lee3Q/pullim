@@ -139,8 +139,18 @@ export default function HomePage() {
     } catch {
       // 무시
     }
-    // 미완 세션 확인
-    setUnfinishedTrail(getUnfinishedTrail());
+    // 미완 세션 확인 — 초기 마운트 + 포커스/가시성 변경 시 재검사
+    const refreshTrail = () => setUnfinishedTrail(getUnfinishedTrail());
+    refreshTrail();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") refreshTrail();
+    };
+    window.addEventListener("focus", refreshTrail);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", refreshTrail);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {
