@@ -51,6 +51,7 @@ import {
 import { saveTrail, markTrailCompleted } from "@/lib/session/session-trail";
 import { buildFeedbackContext } from "@/lib/session/behind-feedback-store";
 import { buildPoolMeaningContext } from "@/lib/session/pool-meanings";
+import { useBehaviorSignalsLadder } from "@/hooks/useBehaviorSignalsLadder";
 
 // 스트리밍 텍스트에서 구조화 태그를 실시간으로 제거하는 헬퍼
 function stripStreamTags(text: string): string {
@@ -222,11 +223,8 @@ export default function LadderSession({
     themeSuggestion?: ThemeSuggestion;
   } | null>(null);
 
-  // 행동 신호 추적
-  const lastResponseTime = useRef<number>(0);
-  const messageLengths = useRef<number[]>([]);
-  const choiceStartTime = useRef<number>(0);
-  const choiceChanges = useRef<number>(0);
+  // 행동 신호 추적 — 4개 ref + getLengthTrend를 훅으로 집약
+  const behaviorApi = useBehaviorSignalsLadder();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const pendingLevelRef = useRef<LadderLevel>(1);
@@ -369,7 +367,7 @@ export default function LadderSession({
       setIsLoading(true);
       setStreamText("");
       setCurrentResponse(null);
-      choiceStartTime.current = Date.now();
+      behaviorApi.markChoiceStart();
 
       // 이전 요청 취소
       if (abortRef.current) {
@@ -387,20 +385,11 @@ export default function LadderSession({
         chatMessages.push({ role: "user" as const, content: userText });
       }
 
-      // 행동 신호 수집
-      const signals: BehaviorSignals = {
-        responseTimeMs: lastResponseTime.current
-          ? Date.now() - lastResponseTime.current
-          : 0,
-        messageLength: userText?.length || 0,
-        lengthTrend: getLengthTrend(messageLengths.current),
-        timeTrend: "stable",
-        choiceHesitationMs: choiceStartTime.current
-          ? Date.now() - choiceStartTime.current
-          : 0,
-        choiceChanges: choiceChanges.current,
-        turnCount: store.turnCount,
-      };
+      // 행동 신호 수집 (훅으로 집약)
+      const signals: BehaviorSignals = behaviorApi.getSignals(
+        store.turnCount,
+        userText?.length || 0,
+      );
 
       // 이면 사고 추론 (LLM 기반, 실패 시 규칙 기반 폴백)
       const inference = await inferState(signals, store.behindEvents, level, history);
@@ -508,8 +497,8 @@ export default function LadderSession({
           pendingLevelUpRef.current = Math.min(5, level + 1) as LadderLevel;
         }
 
-        lastResponseTime.current = Date.now();
-        choiceChanges.current = 0;
+        behaviorApi.markResponseEnd();
+        behaviorApi.resetChoiceCounters();
 
         // 도구 트리거 체크
         const newTurnCount = toolStateRef.current.turnCount + 1;
@@ -575,8 +564,7 @@ export default function LadderSession({
       const level = store.currentLevel;
 
       // 행동 길이 추적
-      messageLengths.current.push(text.length);
-      if (messageLengths.current.length > 10) messageLengths.current.shift();
+      behaviorApi.pushMessageLength(text.length);
 
       // user 메시지 추가
       store.addMessage({ role: "user", content: text, level });
@@ -605,15 +593,7 @@ export default function LadderSession({
       }
 
       // 레벨 이동 판단
-      const signals: BehaviorSignals = {
-        responseTimeMs: lastResponseTime.current ? Date.now() - lastResponseTime.current : 0,
-        messageLength: text.length,
-        lengthTrend: getLengthTrend(messageLengths.current),
-        timeTrend: "stable",
-        choiceHesitationMs: choiceStartTime.current ? Date.now() - choiceStartTime.current : 0,
-        choiceChanges: choiceChanges.current,
-        turnCount: store.turnCount,
-      };
+      const signals: BehaviorSignals = behaviorApi.getSignals(store.turnCount, text.length);
       const inference = await inferState(signals, store.behindEvents, level, store.messages);
       setCurrentInference(inference);
 
@@ -1560,18 +1540,4 @@ export default function LadderSession({
   );
 }
 
-// 유틸: 메시지 길이 트렌드
-function getLengthTrend(
-  lengths: number[]
-): "shorter" | "stable" | "longer" {
-  if (lengths.length < 3) return "stable";
-  const recent = lengths.slice(-3);
-  const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-  const prev = lengths.slice(-6, -3);
-  if (prev.length === 0) return "stable";
-  const prevAvg = prev.reduce((a, b) => a + b, 0) / prev.length;
 
-  if (avg < prevAvg * 0.6) return "shorter";
-  if (avg > prevAvg * 1.5) return "longer";
-  return "stable";
-}
