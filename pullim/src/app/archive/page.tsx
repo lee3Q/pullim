@@ -16,12 +16,14 @@ const THEME_LABEL: Record<string, string> = {
 };
 
 type Tab = "insights" | "promises";
+type PromiseFilter = "all" | "active" | "completed" | "failed";
 
 export default function ArchivePage() {
   const router = useRouter();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [promises, setPromises] = useState<PullimPromise[]>([]);
   const [filter, setFilter] = useState<"all" | "starred">("all");
+  const [promiseFilter, setPromiseFilter] = useState<PromiseFilter>("all");
   const [tab, setTab] = useState<Tab>("insights");
 
   useEffect(() => {
@@ -254,8 +256,32 @@ export default function ArchivePage() {
                 </p>
               </div>
             ) : (
+              <>
+              {/* 약속 상태 필터 */}
+              <div className="flex gap-2 justify-center flex-wrap">
+                {([
+                  { key: "all", label: `전체 (${promises.length})` },
+                  { key: "active", label: `⏳ 진행 중 (${promises.filter((p) => p.status === "active").length})` },
+                  { key: "completed", label: `✓ 지킴 (${promises.filter((p) => p.status === "completed").length})` },
+                  { key: "failed", label: `× 못 지킴 (${promises.filter((p) => p.status === "failed").length})` },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setPromiseFilter(opt.key)}
+                    className="glass-btn px-3 py-1.5 text-[10px] font-rpg-sm"
+                    style={{
+                      color: promiseFilter === opt.key ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)",
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="space-y-3">
-                {promises.map((p) => (
+                {promises
+                  .filter((p) => promiseFilter === "all" || p.status === promiseFilter)
+                  .map((p) => (
                   <div
                     key={p.id}
                     className="glass-panel p-4 rounded-2xl space-y-2"
@@ -297,6 +323,7 @@ export default function ArchivePage() {
                   </div>
                 ))}
               </div>
+              </>
             )
           )}
         </div>
