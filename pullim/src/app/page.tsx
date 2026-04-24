@@ -405,6 +405,30 @@ export default function HomePage() {
         {/* ── 테마 선택 ── */}
         {phase === "mood" && (
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl space-y-6 animate-in fade-in duration-500">
+            {/* 선택 불가능한 사용자를 위한 탈출구 — 추천 테마로 바로 진입
+                UX 감사 반영: 홈 인지 과부하 완화, ICU 사용자 우선 (Agent 3 #1) */}
+            <button
+              onClick={() => {
+                const key: ThemeType = recommendedTheme ?? "adventure";
+                handleThemeSelect(key);
+              }}
+              className="rpg-button w-full py-4 text-sm font-rpg"
+              style={{
+                background: "linear-gradient(135deg, rgba(192,163,116,0.18), rgba(192,163,116,0.08))",
+                border: "1px solid rgba(192,163,116,0.35)",
+                color: "var(--fantasy-gold-bright, rgba(232,213,181,0.95))",
+              }}
+              aria-label="지금 바로 세션 시작"
+            >
+              🕯️ 지금 그냥 시작할래
+            </button>
+            <p
+              className="text-[10px] font-rpg-sm text-center -mt-3"
+              style={{ color: "rgba(232,213,181,0.45)" }}
+            >
+              고를 여력 없으면 이거 누르면 돼
+            </p>
+
             {/* 피로 임계 — 주간 자주 왔지만 부정 신호 많을 때만 표시 */}
             <FatigueCard />
 

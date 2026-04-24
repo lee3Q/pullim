@@ -1096,6 +1096,7 @@ export default function LadderSession({
               className="text-[13px] transition-opacity hover:opacity-80 py-2 px-1"
               style={{ opacity: 0.55 }}
               title={settings.themeMode === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+              aria-label={settings.themeMode === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
             >
               {settings.themeMode === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
             </button>
@@ -1107,6 +1108,7 @@ export default function LadderSession({
                 animation: currentInference?.fatigue || currentInference?.struggling ? "pulse 2.2s ease-in-out infinite" : undefined,
               }}
               title="잠깐 숨 돌리기 (3번 깊이 호흡)"
+              aria-label="숨 돌리기 열기"
             >
               🌬️
             </button>

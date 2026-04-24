@@ -121,6 +121,7 @@ export default function BreathInterlude({ onClose }: BreathInterludeProps) {
             <>
               <button
                 onClick={() => setPhase("inhale")}
+                aria-label="호흡 시작"
                 className="glass-btn py-2.5 px-5 text-sm font-rpg"
                 style={{ color: "rgba(255,255,255,0.85)" }}
               >
@@ -128,6 +129,7 @@ export default function BreathInterlude({ onClose }: BreathInterludeProps) {
               </button>
               <button
                 onClick={() => onClose(false)}
+                aria-label="호흡 그만두기"
                 className="py-2.5 px-4 text-xs font-rpg-sm transition-opacity hover:opacity-80"
                 style={{ color: "rgba(255,255,255,0.4)" }}
               >
@@ -138,6 +140,7 @@ export default function BreathInterlude({ onClose }: BreathInterludeProps) {
           {phase === "done" && (
             <button
               onClick={() => onClose(true)}
+              aria-label="세션으로 돌아가기"
               className="glass-btn py-2.5 px-5 text-sm font-rpg"
               style={{ color: "rgba(255,255,255,0.85)" }}
             >
@@ -147,6 +150,7 @@ export default function BreathInterlude({ onClose }: BreathInterludeProps) {
           {phase !== "intro" && phase !== "done" && (
             <button
               onClick={() => onClose(false)}
+              aria-label="호흡 중단"
               className="py-2 text-[10px] font-rpg-sm transition-opacity hover:opacity-80"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
