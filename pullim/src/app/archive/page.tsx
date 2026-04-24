@@ -6,6 +6,7 @@ import Image from "next/image";
 import { listInsights, toggleStar, removeInsight, type Insight } from "@/lib/session/insight-archive";
 import { getPromiseHistory } from "@/lib/session/promise-store";
 import type { PullimPromise } from "@/lib/session/ladder-types";
+import { downloadExport, importFromFile } from "@/lib/session/data-portability";
 
 const THEME_LABEL: Record<string, string> = {
   "모험가": "🗺️ 모험가",
@@ -326,6 +327,47 @@ export default function ArchivePage() {
               </>
             )
           )}
+
+          {/* 데이터 내보내기/불러오기 — 기기 교체 대비 */}
+          <div
+            className="mt-8 pt-6 space-y-3"
+            style={{ borderTop: "1px dashed rgba(255,255,255,0.12)" }}
+          >
+            <p className="text-[10px] font-rpg-sm text-center" style={{ color: "rgba(255,255,255,0.40)" }}>
+              이 기록들은 이 기기에만 저장돼. 백업해두면 다른 기기에서 이어받을 수 있어.
+            </p>
+            <div className="flex gap-2 justify-center flex-wrap">
+              <button
+                onClick={() => downloadExport()}
+                className="glass-btn px-3 py-1.5 text-[10px] font-rpg-sm"
+                style={{ color: "rgba(255,255,255,0.7)" }}
+              >
+                💾 파일로 내보내기
+              </button>
+              <label
+                className="glass-btn px-3 py-1.5 text-[10px] font-rpg-sm cursor-pointer"
+                style={{ color: "rgba(255,255,255,0.7)" }}
+              >
+                📂 파일에서 불러오기
+                <input
+                  type="file"
+                  accept="application/json"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    const result = await importFromFile(f);
+                    if (result.ok) {
+                      alert(`${result.importedKeys?.length ?? 0}개 항목 불러왔어. 새로고침해줘.`);
+                      window.location.reload();
+                    } else {
+                      alert(`불러오기 실패: ${result.error}`);
+                    }
+                  }}
+                />
+              </label>
+            </div>
+          </div>
         </div>
       </main>
 
