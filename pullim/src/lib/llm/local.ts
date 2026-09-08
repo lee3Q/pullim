@@ -1,3 +1,4 @@
+import "server-only";
 // 로컬 LLM (Ollama) 스트리밍 헬퍼
 
 const BASE_URL = process.env.LOCAL_LLM_BASE_URL || "http://localhost:11434";

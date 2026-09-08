@@ -1,3 +1,4 @@
+import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { LLMProvider, ChatParams, ChatResponse } from "./types";
 

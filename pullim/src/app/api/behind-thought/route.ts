@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "signals, currentLevel 필수" }, { status: 400 });
   }
 
-  // Gemini 키 없으면 → 규칙 기반 즉시 반환
-  if (!process.env.GOOGLE_AI_API_KEY) {
+  // Gemini 키 없거나 opt-in 아니면 → 규칙 기반 즉시 반환
+  if (process.env.ENABLE_BEHIND_LLM !== "true" || !process.env.GOOGLE_AI_API_KEY) {
     return NextResponse.json(inferStateSync(signals, events, currentLevel));
   }
 

@@ -1,3 +1,4 @@
+import "server-only";
 import { LLMProvider, ChatParams, ChatResponse } from "./types";
 
 // OpenAI SDK — 리서치 후 모델명 확정 예정

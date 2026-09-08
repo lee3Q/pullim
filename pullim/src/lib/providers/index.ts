@@ -1,3 +1,4 @@
+import "server-only";
 import { ModelProvider } from "@/lib/types-ultimate";
 import { LLMProvider, ChatParams, ChatResponse } from "./types";
 import { claudeProvider } from "./claude";

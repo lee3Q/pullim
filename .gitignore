@@ -8,8 +8,8 @@ out/
 
 # Environment (민감 정보)
 .env
-.env.*
-!.env.local.example
+.env.local
+.env.*.local
 *.pem
 *.key
 credentials*

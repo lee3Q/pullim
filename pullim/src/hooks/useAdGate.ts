@@ -43,7 +43,10 @@ export function useAdGate() {
     setAdState(loadAdState());
   }, []);
 
+  const adsEnabled = process.env.NEXT_PUBLIC_ENABLE_ADS === "true";
+
   const shouldShowAd = (() => {
+    if (!adsEnabled) return false;
     // 첫 세션은 광고 제외
     if (adState.sessionsCompleted === 0) return false;
     // adFreeUntil이 미래면 스킵 (유료 구독)

@@ -1,3 +1,4 @@
+import "server-only";
 import { LLMProvider, ChatParams, ChatResponse } from "./types";
 
 const BASE_URL = process.env.LOCAL_LLM_BASE_URL || "http://localhost:11434";

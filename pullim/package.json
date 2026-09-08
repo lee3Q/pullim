@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/ --max-warnings 20",
-    "test": "echo 'no tests configured'"
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -28,6 +29,7 @@
     "openai": "^6.32.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "server-only": "^0.0.1",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
@@ -39,6 +41,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.7"
   }
 }

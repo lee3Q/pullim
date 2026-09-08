@@ -1,3 +1,4 @@
+import "server-only";
 // LLM 기반 이면 사고 추론 (Gemini Flash Lite)
 // 행동 신호 + 이벤트 + 대화 컨텍스트 → BehindInference JSON
 
