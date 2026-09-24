@@ -50,9 +50,11 @@ function checkHttp(value, regression = false) {
 
 function checkClaims(text, label) {
   requireValue(!/\b(?:managed|production)\s+(?:redis|upstash|service|deployment)\b.{0,30}\b(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
+  requireValue(!/\bupstash\b.{0,40}\b(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
   requireValue(!/(?:관리형|매니지드)\s*(?:Redis|레디스|서비스|환경)?\s*(?:검증|입증|통과|확인)(?:됐다|되었다|완료|함)/i.test(text), `${label} claims unsupported managed service verification`);
   requireValue(!/(?:임상\s*안전성|clinical\s*safety).{0,30}(?:(?<!미)검증(?!하지|되지)|(?<!미)입증(?!하지|되지)|통과|확인(?!하지|되지)|(?<!not )verified|(?<!not )proven)/i.test(text), `${label} claims unsupported clinical safety verification`);
   requireValue(!/\bclinically\s+safe\b.{0,30}\b(?:deployment|production|users?)\b/i.test(text), `${label} claims unsupported clinical safety verification`);
+  requireValue(!/\bclinically\s+(?:validated|verified|proven|safe)\b/i.test(text), `${label} claims unsupported clinical safety verification`);
 }
 
 export async function verifyPolicyEvidence({
@@ -118,9 +120,10 @@ export async function verifyPolicyEvidence({
   const testLog = await readFile(path.join(evidenceDir, "npm-test.log"), "utf8");
   const testCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) tests (\d+)/)?.[1]);
   const passCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) pass (\d+)/)?.[1]);
-  requireValue(testCount >= 19 && passCount === testCount && /(?:^|\n)(?:#|ℹ) fail 0\b/.test(testLog), "Passing tests not recorded");
+  requireValue(testCount === 22 && passCount === 22 && /(?:^|\n)(?:#|ℹ) fail 0\b/.test(testLog), "22 passing tests not recorded");
   for (const label of ["REVISE CLI exits 1", "HTTP receipt before build", "tampered receipt",
-    "changed source hash", "unsupported managed-service", "unsupported clinical-safety", "missing HTTP repetition"]) {
+    "changed source hash", "unsupported managed-service", "unsupported clinical-safety", "missing HTTP repetition",
+    "Upstash affirmative wording", "clinical validation wording"]) {
     requireValue(testLog.includes(label), `Negative gate test missing: ${label}`);
   }
 

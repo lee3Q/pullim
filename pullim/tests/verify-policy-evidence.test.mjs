@@ -50,7 +50,7 @@ async function fixture(t) {
     exits.receipts.push(entry);
     return entry;
   }
-  await add("npm_test", ...commands.npm_test, "✔ REVISE CLI exits 1\n✔ HTTP receipt before build\n✔ tampered receipt\n✔ changed source hash\n✔ unsupported managed-service\n✔ unsupported clinical-safety\n✔ missing HTTP repetition\nℹ tests 20\nℹ pass 20\nℹ fail 0\n");
+  await add("npm_test", ...commands.npm_test, "✔ REVISE CLI exits 1\n✔ HTTP receipt before build\n✔ tampered receipt\n✔ changed source hash\n✔ unsupported managed-service\n✔ unsupported clinical-safety\n✔ missing HTTP repetition\n✔ Upstash affirmative wording\n✔ clinical validation wording\nℹ tests 22\nℹ pass 22\nℹ fail 0\n");
   await add("typescript", ...commands.typescript, "");
   await add("build", ...commands.build, "build passed\n");
   await add("redis_rest", ...commands.redis_rest, { result: "PASS", engine: "local redis-server", transport: "HTTPS REST",
@@ -143,5 +143,17 @@ test("unsupported managed-service claim is rejected", async t => {
 test("unsupported clinical-safety claim is rejected", async t => {
   const input = await fixture(t);
   await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinically safe for deployment.\n");
+  await assert.rejects(verifyPolicyEvidence(input), /unsupported clinical safety/);
+});
+
+test("Upstash affirmative wording is rejected", async t => {
+  const input = await fixture(t);
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Upstash Redis verified.\n");
+  await assert.rejects(verifyPolicyEvidence(input), /unsupported managed service/);
+});
+
+test("clinical validation wording is rejected", async t => {
+  const input = await fixture(t);
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinically validated for users.\n");
   await assert.rejects(verifyPolicyEvidence(input), /unsupported clinical safety/);
 });
