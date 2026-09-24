@@ -65,3 +65,22 @@ synthetic concerns. This is Stage 1 implementation evidence; it is not a
 clinical safety or decision-quality study. The cookie is a one-browser
 session control, not a cross-device event database. Future research must
 evaluate the protocol with independent human outcomes and safety review.
+
+For the local Redis REST and Next HTTP path, first install dependencies, then
+run from the repository root:
+
+```sh
+cd pullim && npm ci && cd ..
+node pullim/scripts/record-policy-evidence.mjs --out-dir /tmp/pullim-policy-evidence
+```
+
+The recorder runs tests, TypeScript, and a production build before an actual
+local `redis-server` HTTPS REST check, three independent crossed HTTP races,
+and the 24 route regressions. It retains command exit codes, timing, hashes,
+and raw receipts in the chosen directory. It requires `redis-server`, `openssl`,
+and Node.js. An independent reviewer can place a `Verdict: PASS` or
+`Verdict: REVISE` review in `independent-qa.md` and write a scoped report;
+`verify-policy-evidence.mjs --evidence-dir DIR --report FILE` checks that review,
+the raw receipts, and the report. Its default paths are the project session's
+evidence and report locations. These checks cover a synthetic local engine and
+local Next server, not a managed Redis deployment or clinical safety.
