@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -14,8 +14,8 @@ const args = process.argv.slice(2);
 while (args.length) {
   const flag = args.shift();
   const value = args.shift();
-  if (!value || !["--out-dir", "--inject-failure-at", "--inject-timeout-at", "--inject-hang-at"].includes(flag)) {
-    throw new Error("usage: node pullim/scripts/record-policy-evidence.mjs [--out-dir DIR] [--inject-failure-at NAME] [--inject-timeout-at NAME] [--inject-hang-at NAME]");
+  if (!value || !["--out-dir", "--inject-failure-at", "--inject-timeout-at", "--inject-hang-at", "--inject-dirty-at"].includes(flag)) {
+    throw new Error("usage: node pullim/scripts/record-policy-evidence.mjs [--out-dir DIR] [--inject-failure-at NAME] [--inject-timeout-at NAME] [--inject-hang-at NAME] [--inject-dirty-at final]");
   }
   options[flag] = value;
 }
@@ -110,8 +110,11 @@ try {
   const legacy = JSON.parse(legacyBytes.toString("utf8"));
   summary.policy_http_24 = { file: legacyFile, sha256: sha256(legacyBytes), status: legacy.status,
     checks: legacy.checks?.length, passed: legacy.checks?.filter((item) => item.passed).length };
+  if (options["--inject-dirty-at"] === "final") {
+    await appendFile(path.join(repo, "pullim/README.md"), "\n<!-- synthetic final-dirty probe -->\n");
+    summary.final_dirty_injection = true;
+  }
   summary.result = "PASS";
-  process.stdout.write(`${JSON.stringify(summary)}\n`);
 } catch (error) {
   summary.result = "FAIL";
   summary.error = String(error.message);
@@ -128,3 +131,4 @@ try {
   summary.finished_at = now();
   await writeFile(path.join(evidenceDir, "command-exits.json"), `${JSON.stringify(summary, null, 2)}\n`);
 }
+if (summary.result === "PASS") process.stdout.write(`${JSON.stringify(summary)}\n`);

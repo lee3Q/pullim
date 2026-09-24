@@ -50,7 +50,7 @@ async function fixture(t) {
     exits.receipts.push(entry);
     return entry;
   }
-  await add("npm_test", ...commands.npm_test, "✔ REVISE CLI exits 1\n✔ HTTP receipt before build\n✔ tampered receipt\n✔ changed source hash\n✔ unsupported managed-service\n✔ unsupported clinical-safety\n✔ missing HTTP repetition\n✔ Upstash affirmative wording\n✔ clinical validation wording\nℹ tests 22\nℹ pass 22\nℹ fail 0\n");
+  await add("npm_test", ...commands.npm_test, "✔ REVISE CLI exits 1\n✔ HTTP receipt before build\n✔ tampered receipt\n✔ changed source hash\n✔ unsupported managed-service\n✔ unsupported clinical-safety\n✔ missing HTTP repetition\n✔ Upstash affirmative wording\n✔ clinical validation wording\n✔ Upstash negative limit\n✔ clinical negative limit\nℹ tests 24\nℹ pass 24\nℹ fail 0\n");
   await add("typescript", ...commands.typescript, "");
   await add("build", ...commands.build, "build passed\n");
   await add("redis_rest", ...commands.redis_rest, { result: "PASS", engine: "local redis-server", transport: "HTTPS REST",
@@ -156,4 +156,16 @@ test("clinical validation wording is rejected", async t => {
   const input = await fixture(t);
   await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinically validated for users.\n");
   await assert.rejects(verifyPolicyEvidence(input), /unsupported clinical safety/);
+});
+
+test("Upstash negative limit is accepted", async t => {
+  const input = await fixture(t);
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Upstash Redis is not verified. Managed production is not verified.\n");
+  assert.equal((await verifyPolicyEvidence(input)).result, "PASS");
+});
+
+test("clinical negative limit is accepted", async t => {
+  const input = await fixture(t);
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. It is not clinically validated for users.\n");
+  assert.equal((await verifyPolicyEvidence(input)).result, "PASS");
 });
