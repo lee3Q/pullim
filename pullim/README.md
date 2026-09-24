@@ -57,7 +57,7 @@ node scripts/verify-policy-http.mjs --out /tmp/pullim-policy-http-receipt.json
 ```
 
 The recorded synthetic receipt is [evidence/public-policy-http.json](evidence/public-policy-http.json).
-The HTTP script checks 22 requests through the actual Next routes: ordinary
+The HTTP script checks 24 requests through the actual Next routes: ordinary
 progress, a forbidden stage jump, a demo-mode risk signal, persistent risk
 hold, explicit safety confirmation, emergency stickiness, consent refusal,
 malformed proposal rejection, and an authorized action. It uses only
