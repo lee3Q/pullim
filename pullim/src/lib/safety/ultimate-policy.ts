@@ -12,6 +12,7 @@ const COOKIE = "pullim_policy";
 const secret = process.env.PULLIM_POLICY_SECRET || (process.env.NODE_ENV === "production" ? "" : "pullim-local-development-only");
 const configured = process.env.NODE_ENV !== "production" || (secret.length >= 32 && !!process.env.PULLIM_POLICY_REDIS_URL && !!process.env.PULLIM_POLICY_REDIS_TOKEN);
 const missingConfiguration = () => Response.json({ policy: { status: "blocked", reason: "policy_configuration_unavailable" } }, { status: 503 });
+class InvalidPolicyCookie extends Error {}
 
 const initial = (sessionId: string): State => ({ sessionId, version: 0, stage: "check_in", riskState: "open", consent: "unknown", choiceHashes: [], events: [] });
 const sign = (payload: string) => createHmac("sha256", secret).update(payload).digest("base64url");
@@ -21,19 +22,25 @@ function encode(state: State): string {
   return `${payload}.${sign(payload)}`;
 }
 function decode(token: string | undefined): string | null {
-  if (!token) return null;
+  if (!token || Buffer.byteLength(token, "utf8") > 4096 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) return null;
   const [payload, signature] = token.split(".");
-  if (!payload || !signature) return null;
   const expected = Buffer.from(sign(payload));
   const given = Buffer.from(signature);
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
   try {
     const value = JSON.parse(Buffer.from(payload, "base64url").toString()) as { sessionId?: unknown };
-    return typeof value?.sessionId === "string" && value.sessionId.length > 0 && value.sessionId.length <= 128 ? value.sessionId : null;
+    return typeof value?.sessionId === "string" && value.sessionId.length > 0 && value.sessionId.length <= 128
+      && Buffer.from(payload, "base64url").toString("base64url") === payload ? value.sessionId : null;
   } catch { return null; }
 }
+function validRequestCookie(req: NextRequest): boolean {
+  const cookie = req.cookies.get(COOKIE);
+  return !cookie || decode(cookie.value) !== null;
+}
 async function resolveState(req: NextRequest, requestedId?: string): Promise<State> {
-  const cookieId = decode(req.cookies.get(COOKIE)?.value);
+  const cookie = req.cookies.get(COOKIE);
+  const cookieId = decode(cookie?.value);
+  if (cookie && !cookieId) throw new InvalidPolicyCookie();
   if (requestedId && requestedId !== cookieId) {
     if (await loadPolicyState(requestedId)) throw new StalePolicyState("existing session requires its current cookie");
     return initial(requestedId);
@@ -44,6 +51,7 @@ async function resolveState(req: NextRequest, requestedId?: string): Promise<Sta
   return stored || initial(sessionId);
 }
 function stateFailure(error: unknown): Response {
+  if (error instanceof InvalidPolicyCookie) return Response.json({ policy: { status: "blocked", reason: "invalid_policy_cookie" } }, { status: 400 });
   if (error instanceof StalePolicyState) return Response.json({ policy: { status: "blocked", reason: "stale_policy_state" } }, { status: 409 });
   return Response.json({ policy: { status: "blocked", reason: "policy_store_unavailable" } }, { status: 503 });
 }
@@ -110,6 +118,7 @@ function blocked(state: State, reason: string, message: string): Response {
 export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest): Promise<Response> => {
     if (!configured) return missingConfiguration();
+    if (!validRequestCookie(req)) return stateFailure(new InvalidPolicyCookie());
     let body: Record<string, unknown>;
     try {
       const parsed = await req.clone().json();
@@ -172,6 +181,7 @@ export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequ
 
 export async function confirmUltimateSafety(req: NextRequest): Promise<Response> {
   if (!configured) return missingConfiguration();
+  if (!validRequestCookie(req)) return stateFailure(new InvalidPolicyCookie());
   let answer: "safe" | "unsafe" | "unclear";
   try {
     const body = await req.json();
@@ -190,6 +200,7 @@ export async function confirmUltimateSafety(req: NextRequest): Promise<Response>
 
 export async function executeUltimateAction(req: NextRequest): Promise<Response> {
   if (!configured) return missingConfiguration();
+  if (!validRequestCookie(req)) return stateFailure(new InvalidPolicyCookie());
   let body: Record<string, unknown>;
   try {
     const parsed = await req.json();
