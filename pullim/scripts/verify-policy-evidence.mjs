@@ -49,9 +49,9 @@ function checkHttp(value, regression = false) {
 }
 
 function checkClaims(text, label) {
-  requireValue(!/\b(?:managed|production)\s+(?:redis|service|deployment)\s+(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
+  requireValue(!/\b(?:managed|production)\s+(?:redis|service|deployment)\b.{0,30}\b(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
   requireValue(!/(?:관리형|매니지드)\s*(?:Redis|레디스|서비스|환경)?\s*(?:검증|입증|통과|확인)(?:됐다|되었다|완료|함)/i.test(text), `${label} claims unsupported managed service verification`);
-  requireValue(!/(?:임상\s*안전성|clinical\s*safety)\s*(?:검증|입증|통과|확인|verified|proven)/i.test(text), `${label} claims unsupported clinical safety verification`);
+  requireValue(!/(?:임상\s*안전성|clinical\s*safety).{0,30}(?:(?<!미)검증(?!하지|되지)|(?<!미)입증(?!하지|되지)|통과|확인(?!하지|되지)|(?<!not )verified|(?<!not )proven)/i.test(text), `${label} claims unsupported clinical safety verification`);
 }
 
 export async function verifyPolicyEvidence({
@@ -63,6 +63,12 @@ export async function verifyPolicyEvidence({
   const exits = await readJson(path.join(evidenceDir, "command-exits.json"));
   const { stdout: head } = await exec("git", ["rev-parse", "HEAD"], { cwd: REPO });
   requireValue(exits.schema_version === 2 && exits.result === "PASS" && exits.worktree_commit === head.trim(), "Source revision or run result mismatch");
+  requireValue(exits.source_tree_clean === true && exits.source_hashes && Object.keys(exits.source_hashes).length >= 11, "Source provenance missing");
+  for (const [name, hash] of Object.entries(exits.source_hashes)) {
+    requireValue(name.startsWith("pullim/") && !name.includes(".."), "Invalid source path");
+    const bytes = await readFile(path.join(REPO, name));
+    requireValue(createHash("sha256").update(bytes).digest("hex") === hash, `Source hash mismatch: ${name}`);
+  }
   requireValue(exits.scope === "local redis-server HTTPS REST + Next HTTP synthetic verification", "Command summary scope mismatch");
   requireValue(Array.isArray(exits.receipts), "Command exit receipts missing");
   const recorded = new Map(exits.receipts.map(item => [item.name, item]));

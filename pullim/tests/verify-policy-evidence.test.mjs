@@ -22,6 +22,12 @@ const commands = {
   redis_rest: ["redis-rest.json", "node pullim/scripts/verify-redis-rest-policy.mjs"],
   http_regressions: ["regressions.json", "node pullim/scripts/verify-policy-regressions.mjs --out <policy-http-24.json>"],
 };
+const sourceFiles = ["pullim/package.json", "pullim/package-lock.json",
+  "pullim/src/lib/safety/policy-state-store.ts", "pullim/src/lib/safety/ultimate-policy.ts",
+  "pullim/src/lib/safety/ultimate-guard.ts", "pullim/scripts/verify-redis-rest-policy.mjs",
+  "pullim/scripts/verify-cookie-boundaries.mjs", "pullim/scripts/verify-policy-regressions.mjs",
+  "pullim/scripts/verify-policy-http.mjs", "pullim/scripts/record-policy-evidence.mjs",
+  "pullim/scripts/verify-policy-evidence.mjs"];
 const boundaries = ["empty", "4097_bytes", "bad_signature", "bad_format"].map(name =>
   ({ name, status: 400, reason: "invalid_policy_cookie", setCookie: false, redisCommands: 0 }));
 const http = (sessionId, regression = false) => ({ result: "PASS", engine: "local redis-server",
@@ -34,7 +40,9 @@ async function fixture(t) {
   t.after(() => rm(evidenceDir, { recursive: true, force: true }));
   const { stdout: head } = await exec("git", ["rev-parse", "HEAD"], { cwd: repo });
   const exits = { schema_version: 2, result: "PASS", worktree_commit: head.trim(),
-    scope: "local redis-server HTTPS REST + Next HTTP synthetic verification", receipts: [] };
+    scope: "local redis-server HTTPS REST + Next HTTP synthetic verification", source_tree_clean: true,
+    source_hashes: {}, receipts: [] };
+  for (const name of sourceFiles) exits.source_hashes[name] = digest(await readFile(path.join(repo, name)));
   async function add(name, filename, command, content, started_at = start) {
     const file = path.join(evidenceDir, filename);
     const bytes = Buffer.from(typeof content === "string" ? content : JSON.stringify(content));
@@ -110,8 +118,23 @@ test("tampered receipt is rejected", async t => {
   await assert.rejects(verifyPolicyEvidence(input), /SHA-256 mismatch/);
 });
 
+test("changed source hash is rejected", async t => {
+  const input = await fixture(t);
+  const file = path.join(input.evidenceDir, "command-exits.json");
+  const exits = JSON.parse(await readFile(file, "utf8"));
+  exits.source_hashes["pullim/src/lib/safety/policy-state-store.ts"] = "0".repeat(64);
+  await writeFile(file, JSON.stringify(exits));
+  await assert.rejects(verifyPolicyEvidence(input), /Source hash mismatch/);
+});
+
 test("unsupported managed-service claim is rejected", async t => {
   const input = await fixture(t);
-  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Managed Redis verified.\n");
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Managed Redis is verified.\n");
   await assert.rejects(verifyPolicyEvidence(input), /unsupported managed service/);
+});
+
+test("unsupported clinical-safety claim is rejected", async t => {
+  const input = await fixture(t);
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinical safety is proven.\n");
+  await assert.rejects(verifyPolicyEvidence(input), /unsupported clinical safety/);
 });
