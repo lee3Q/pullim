@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 
 const base = process.env.PULLIM_TEST_BASE_URL || "http://127.0.0.1:3147";
@@ -25,6 +26,15 @@ function session() {
 function check(name, observed, expectation) {
   assert.deepEqual(observed, expectation, name);
   cases.push({ name, observed, passed: true });
+}
+async function direct(route, body, cookie = "") {
+  const response = await fetch(`${base}/api/ultimate/${route}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(cookie ? { Cookie: cookie } : {}) },
+    body: JSON.stringify(body),
+  });
+  return { status: response.status, stage: response.headers.get("x-pullim-policy-stage"),
+    risk: response.headers.get("x-pullim-policy-risk"), cookie: response.headers.get("set-cookie")?.split(";")[0] || "" };
 }
 
 const normal = session();
@@ -69,13 +79,23 @@ result = await emergency("listen", { ...listen, messages: [{ role: "user", conte
 check("imminent risk escalates", [result.status, result.risk], [200, "emergency"]);
 result = await emergency("confirm-safety", { answer: "safe" });
 check("emergency remains sticky", [result.status, result.risk], [200, "emergency"]);
-result = await emergency("listen", { ...listen, sessionId: "new-synthetic-session" });
+result = await emergency("listen", { ...listen, sessionId: randomUUID() });
 check("explicit new session gets new state", [result.status, result.risk, result.stage], [200, "open", "define_problem"]);
+
+const replayId = randomUUID();
+const preRisk = await direct("listen", { ...listen, sessionId: replayId });
+const afterRisk = await direct("listen", { ...listen, sessionId: replayId,
+  messages: [{ role: "user", content: "죽고 싶어" }] }, preRisk.cookie);
+const replay = await direct("research", { concern, listenSummary: "선택 고민" }, preRisk.cookie);
+check("old valid cookie cannot roll back emergency", [preRisk.risk, afterRisk.risk, replay.status, replay.risk, replay.stage],
+  ["open", "emergency", 200, "emergency", "define_problem"]);
+const missingCookie = await direct("listen", { ...listen, sessionId: replayId });
+check("same session cannot restart by dropping cookie", [missingCookie.status, missingCookie.stage], [409, null]);
 
 const ladder = session();
 result = await ladder("/api/ladder/research", { topicSummary: concern });
 check("ladder research cannot skip listening", [result.status, result.stage], [409, "check_in"]);
-result = await ladder("listen", { ...listen, sessionId: "synthetic-ladder" });
+result = await ladder("listen", { ...listen, sessionId: randomUUID() });
 check("ladder listening records stage", [result.status, result.stage], [200, "define_problem"]);
 result = await ladder("/api/ladder/research", { topicSummary: concern });
 check("ladder research passes common policy", [result.status, result.stage], [200, "research"]);

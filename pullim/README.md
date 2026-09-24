@@ -14,19 +14,22 @@ npm run dev -- --port 3147
 
 Without an AI key the app runs in demo mode. In production, set
 `PULLIM_POLICY_SECRET` to a random server-only value (for example, generated
-with `openssl rand -hex 32`). The secret signs the policy cookie. A missing
-production secret makes policy requests fail closed with HTTP 503 rather than
-accepting unsigned session state. See `.env.local.example` for other optional
-integrations.
+with `openssl rand -hex 32`) and configure `PULLIM_POLICY_REDIS_URL` plus
+`PULLIM_POLICY_REDIS_TOKEN` for a shared Redis REST store. Requests fail closed
+with HTTP 503 if the secret or durable store is unavailable. Local development
+uses process memory for the synthetic demo; restarting that process starts fresh
+sessions. See `.env.local.example` for the configuration names.
 
 ## Decision policy
 
 All six `/api/ultimate/*` conversation routes and the ladder research,
 analysis, and behind-thought routes pass through
 `src/lib/safety/ultimate-policy.ts` before demo or model work. A signed cookie
-tracks stage, risk state, consent, offered choice hashes, and recent event
-types. Only hashes of user utterances are kept in that cookie; raw text remains
-in the request. A new session ID starts a new protocol state. The server
+identifies the session; the server-side store tracks stage, risk state, consent,
+offered choice hashes, and recent event types. It keeps only hashes of user
+utterances, not their raw text. A new session ID starts a new protocol state.
+Old signed cookies read the latest state and cannot roll back an emergency.
+Concurrent writes compare state versions and reject stale responses. The server
 rejects stage jumps, holds ambiguous risk until explicit confirmation, and
 keeps imminent risk in the emergency state for that session. Risk responses
 carry a structured policy status and the relevant help path.

@@ -143,6 +143,25 @@
       "passed": true
     },
     {
+      "name": "old valid cookie cannot roll back emergency",
+      "observed": [
+        "open",
+        "emergency",
+        200,
+        "emergency",
+        "define_problem"
+      ],
+      "passed": true
+    },
+    {
+      "name": "same session cannot restart by dropping cookie",
+      "observed": [
+        409,
+        null
+      ],
+      "passed": true
+    },
+    {
       "name": "ladder research cannot skip listening",
       "observed": [
         409,

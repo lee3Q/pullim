@@ -1,44 +1,71 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { detectCrisis } from "./crisis-detector";
-import { gateRiskAction, type RiskGateState } from "./risk-gate";
+import { gateRiskAction } from "./risk-gate";
 import { executeProposal, type DecisionStage } from "./proposal-policy";
 import { holdUltimateRequest, type UltimateRoute } from "./ultimate-guard";
+import { commitPolicyState, loadPolicyState, markPolicyEmergency, StalePolicyState, type PolicyState } from "./policy-state-store";
 
-type Consent = "unknown" | "granted" | "declined";
 type Event = { type: "user_input" | "risk_signal" | "risk_confirmation" | "stage_transition" | "consent" | "model_proposal" | "policy_decision"; value: string };
-type State = { sessionId: string | null; stage: DecisionStage; riskState: RiskGateState; consent: Consent; choiceHashes: string[]; events: Event[] };
+type State = PolicyState;
 const COOKIE = "pullim_policy";
 const secret = process.env.PULLIM_POLICY_SECRET || (process.env.NODE_ENV === "production" ? "" : "pullim-local-development-only");
-const configured = process.env.NODE_ENV !== "production" || secret.length >= 32;
-const missingSecret = () => Response.json({ policy: { status: "blocked", reason: "policy_secret_unavailable" } }, { status: 503 });
+const configured = process.env.NODE_ENV !== "production" || (secret.length >= 32 && !!process.env.PULLIM_POLICY_REDIS_URL && !!process.env.PULLIM_POLICY_REDIS_TOKEN);
+const missingConfiguration = () => Response.json({ policy: { status: "blocked", reason: "policy_configuration_unavailable" } }, { status: 503 });
 
-const initial = (): State => ({ sessionId: null, stage: "check_in", riskState: "open", consent: "unknown", choiceHashes: [], events: [] });
+const initial = (sessionId: string): State => ({ sessionId, version: 0, stage: "check_in", riskState: "open", consent: "unknown", choiceHashes: [], events: [] });
 const sign = (payload: string) => createHmac("sha256", secret).update(payload).digest("base64url");
 const choiceHash = (value: string) => createHmac("sha256", secret).update(value).digest("hex");
 function encode(state: State): string {
-  const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ sessionId: state.sessionId })).toString("base64url");
   return `${payload}.${sign(payload)}`;
 }
-function decode(token: string | undefined): State {
-  if (!token) return initial();
+function decode(token: string | undefined): string | null {
+  if (!token) return null;
   const [payload, signature] = token.split(".");
-  if (!payload || !signature) return initial();
+  if (!payload || !signature) return null;
   const expected = Buffer.from(sign(payload));
   const given = Buffer.from(signature);
-  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return initial();
+  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
   try {
-    const value = JSON.parse(Buffer.from(payload, "base64url").toString()) as State;
-    if (!value || !(value.sessionId === null || typeof value.sessionId === "string")
-      || !["check_in", "define_problem", "research", "values", "provisional_decision", "next_action"].includes(value.stage)
-      || !["open", "awaiting_confirmation", "emergency"].includes(value.riskState)
-      || !["unknown", "granted", "declined"].includes(value.consent)
-      || !Array.isArray(value.events) || !Array.isArray(value.choiceHashes)
-      || !value.choiceHashes.every((item) => typeof item === "string" && /^[0-9a-f]{64}$/.test(item))) return initial();
-    return value;
-  } catch { return initial(); }
+    const value = JSON.parse(Buffer.from(payload, "base64url").toString()) as { sessionId?: unknown };
+    return typeof value?.sessionId === "string" && value.sessionId.length > 0 && value.sessionId.length <= 128 ? value.sessionId : null;
+  } catch { return null; }
 }
-function save(response: Response, state: State): Response {
+async function resolveState(req: NextRequest, requestedId?: string): Promise<State> {
+  const cookieId = decode(req.cookies.get(COOKIE)?.value);
+  if (requestedId && requestedId !== cookieId) {
+    if (await loadPolicyState(requestedId)) throw new StalePolicyState("existing session requires its current cookie");
+    return initial(requestedId);
+  }
+  const sessionId = requestedId || cookieId || randomUUID();
+  const stored = await loadPolicyState(sessionId);
+  if (!stored && cookieId === sessionId) throw new StalePolicyState("session expired");
+  return stored || initial(sessionId);
+}
+function stateFailure(error: unknown): Response {
+  if (error instanceof StalePolicyState) return Response.json({ policy: { status: "blocked", reason: "stale_policy_state" } }, { status: 409 });
+  return Response.json({ policy: { status: "blocked", reason: "policy_store_unavailable" } }, { status: 503 });
+}
+async function save(response: Response, state: State): Promise<Response> {
+  try {
+    if (state.riskState === "emergency") await markPolicyEmergency(state.sessionId);
+    await commitPolicyState(state);
+  } catch (error) {
+    if (error instanceof StalePolicyState && state.riskState === "emergency") {
+      try {
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const latest = await loadPolicyState(state.sessionId);
+          if (!latest) break;
+          latest.riskState = "emergency";
+          append(latest, { type: "risk_signal", value: "A" });
+          try { await commitPolicyState(latest); return stateFailure(error); }
+          catch (retryError) { if (!(retryError instanceof StalePolicyState)) return stateFailure(retryError); }
+        }
+      } catch (retryError) { return stateFailure(retryError); }
+    }
+    return stateFailure(error);
+  }
   response.headers.set("Set-Cookie", `${COOKIE}=${encode(state)}; Path=/api; HttpOnly; SameSite=Lax; Max-Age=86400${process.env.NODE_ENV === "production" ? "; Secure" : ""}`);
   response.headers.set("X-Pullim-Policy-Stage", state.stage);
   response.headers.set("X-Pullim-Policy-Risk", state.riskState);
@@ -82,7 +109,7 @@ function blocked(state: State, reason: string, message: string): Response {
 /** The API, including demo mode, must pass this gate before model work. */
 export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest): Promise<Response> => {
-    if (!configured) return missingSecret();
+    if (!configured) return missingConfiguration();
     let body: Record<string, unknown>;
     try {
       const parsed = await req.clone().json();
@@ -90,11 +117,13 @@ export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequ
       body = parsed as Record<string, unknown>;
     } catch { return Response.json({ policy: { status: "blocked", reason: "invalid_request" } }, { status: 400 }); }
 
-    let state = decode(req.cookies.get(COOKIE)?.value);
-    if (route === "listen" && typeof body.sessionId === "string" && body.sessionId.trim()) {
-      if (state.sessionId !== body.sessionId) state = initial();
-      state.sessionId = body.sessionId;
-    }
+    let state: State;
+    try {
+      const requestedId = route === "listen" && typeof body.sessionId === "string" && body.sessionId.trim()
+        ? body.sessionId.trim() : undefined;
+      if (requestedId && requestedId.length > 128) return Response.json({ policy: { status: "blocked", reason: "invalid_session_id" } }, { status: 400 });
+      state = await resolveState(req, requestedId);
+    } catch (error) { return stateFailure(error); }
     const utterance = inputText(route, body);
     append(state, { type: "user_input", value: createHmac("sha256", secret).update(utterance).digest("hex") });
     const crisis = detectCrisis(utterance);
@@ -142,14 +171,16 @@ export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequ
 }
 
 export async function confirmUltimateSafety(req: NextRequest): Promise<Response> {
-  if (!configured) return missingSecret();
+  if (!configured) return missingConfiguration();
   let answer: "safe" | "unsafe" | "unclear";
   try {
     const body = await req.json();
     if (!["safe", "unsafe", "unclear"].includes(body?.answer)) throw new Error("invalid answer");
     answer = body.answer;
   } catch { return Response.json({ policy: { status: "blocked", reason: "invalid_confirmation" } }, { status: 400 }); }
-  const state = decode(req.cookies.get(COOKIE)?.value);
+  let state: State;
+  try { state = await resolveState(req); }
+  catch (error) { return stateFailure(error); }
   append(state, { type: "risk_confirmation", value: answer });
   const result = gateRiskAction(state.riskState, { type: "risk_confirmation", answer }, null);
   state.riskState = result.state;
@@ -158,14 +189,16 @@ export async function confirmUltimateSafety(req: NextRequest): Promise<Response>
 }
 
 export async function executeUltimateAction(req: NextRequest): Promise<Response> {
-  if (!configured) return missingSecret();
+  if (!configured) return missingConfiguration();
   let body: Record<string, unknown>;
   try {
     const parsed = await req.json();
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("invalid body");
     body = parsed as Record<string, unknown>;
   } catch { return Response.json({ policy: { status: "blocked", reason: "invalid_request" } }, { status: 400 }); }
-  const state = decode(req.cookies.get(COOKIE)?.value);
+  let state: State;
+  try { state = await resolveState(req); }
+  catch (error) { return stateFailure(error); }
   state.consent = body.decisionConsent === true ? "granted" : "declined";
   append(state, { type: "consent", value: state.consent });
   if (state.consent !== "granted") return save(blocked(state, "consent_required", "내가 동의하기 전에는 다음 행동을 정하지 않습니다."), state);
