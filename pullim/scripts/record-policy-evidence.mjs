@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -14,8 +14,8 @@ const args = process.argv.slice(2);
 while (args.length) {
   const flag = args.shift();
   const value = args.shift();
-  if (!value || !["--out-dir", "--inject-failure-at", "--inject-timeout-at"].includes(flag)) {
-    throw new Error("usage: node pullim/scripts/record-policy-evidence.mjs [--out-dir DIR] [--inject-failure-at NAME] [--inject-timeout-at NAME]");
+  if (!value || !["--out-dir", "--inject-failure-at", "--inject-timeout-at", "--inject-hang-at"].includes(flag)) {
+    throw new Error("usage: node pullim/scripts/record-policy-evidence.mjs [--out-dir DIR] [--inject-failure-at NAME] [--inject-timeout-at NAME] [--inject-hang-at NAME]");
   }
   options[flag] = value;
 }
@@ -24,12 +24,10 @@ const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const now = () => new Date().toISOString();
 const receipts = [];
 const httpRepeats = [];
-const SOURCE_FILES = ["pullim/package.json", "pullim/package-lock.json",
-  "pullim/src/lib/safety/policy-state-store.ts", "pullim/src/lib/safety/ultimate-policy.ts",
-  "pullim/src/lib/safety/ultimate-guard.ts", "pullim/scripts/verify-redis-rest-policy.mjs",
-  "pullim/scripts/verify-cookie-boundaries.mjs", "pullim/scripts/verify-policy-regressions.mjs",
-  "pullim/scripts/verify-policy-http.mjs", "pullim/scripts/record-policy-evidence.mjs",
-  "pullim/scripts/verify-policy-evidence.mjs"];
+async function trackedFiles() {
+  const { stdout } = await exec("git", ["ls-files", "-z", "pullim"], { cwd: repo, encoding: "buffer", maxBuffer: 4 * 1024 * 1024 });
+  return stdout.toString().split("\0").filter(Boolean).sort();
+}
 
 async function run({ name, command, file, args, cwd = repo, json = false, timeout = 180000, outputFile }) {
   const started_at = now();
@@ -41,11 +39,16 @@ async function run({ name, command, file, args, cwd = repo, json = false, timeou
     stderr = `injected ${exit_code === 124 ? "timeout" : "interruption"} at ${name}\n`;
   } else {
     try {
-      ({ stdout, stderr } = await exec(file, args, { cwd, timeout, maxBuffer: 16 * 1024 * 1024 }));
+      const hang = options["--inject-hang-at"] === name;
+      ({ stdout, stderr } = await exec(hang ? process.execPath : file,
+        hang ? ["-e", "setInterval(() => {}, 1000)"] : args,
+        { cwd, timeout: hang ? 250 : timeout, maxBuffer: 16 * 1024 * 1024 }));
     } catch (error) {
       stdout = error.stdout ?? "";
       stderr = error.stderr ?? String(error);
       exit_code = error.killed || error.signal ? 124 : Number.isInteger(error.code) ? error.code : 1;
+      if (options["--inject-hang-at"] === name && exit_code === 124)
+        stderr += `\nreal child process timed out at ${name}\n`;
     }
   }
   const finished_at = now();
@@ -53,6 +56,7 @@ async function run({ name, command, file, args, cwd = repo, json = false, timeou
   const receiptFile = path.join(evidenceDir, outputFile);
   await writeFile(receiptFile, bytes);
   const receipt = { name, command, started_at, finished_at, exit_code, file: receiptFile, sha256: sha256(bytes) };
+  if (options["--inject-hang-at"] === name) receipt.injection = "real_child_timeout";
   if (json && stderr) {
     const stderrFile = `${receiptFile}.stderr.log`;
     await writeFile(stderrFile, stderr);
@@ -68,12 +72,13 @@ async function run({ name, command, file, args, cwd = repo, json = false, timeou
 }
 
 await mkdir(evidenceDir, { recursive: true });
+await rm(path.join(evidenceDir, "verification-summary.json"), { force: true });
 const { stdout: head } = await exec("git", ["rev-parse", "HEAD"], { cwd: repo });
 const { stdout: dirty } = await exec("git", ["status", "--porcelain"], { cwd: repo });
 if (dirty.trim()) throw new Error("source worktree is dirty; commit source before recording evidence");
 const worktree_commit = head.trim();
 const source_hashes = {};
-for (const name of SOURCE_FILES) source_hashes[name] = sha256(await readFile(path.join(repo, name)));
+for (const name of await trackedFiles()) source_hashes[name] = sha256(await readFile(path.join(repo, name)));
 const summary = {
   schema_version: 2,
   observed_at: now(),
@@ -113,6 +118,13 @@ try {
   process.stderr.write(`${summary.error}\n`);
   process.exitCode = 1;
 } finally {
+  const { stdout: dirtyEnd } = await exec("git", ["status", "--porcelain"], { cwd: repo });
+  summary.source_tree_clean_end = !dirtyEnd.trim();
+  if (!summary.source_tree_clean_end) {
+    summary.result = "FAIL";
+    summary.error = "source worktree became dirty during evidence recording";
+    process.exitCode = 1;
+  }
   summary.finished_at = now();
   await writeFile(path.join(evidenceDir, "command-exits.json"), `${JSON.stringify(summary, null, 2)}\n`);
 }

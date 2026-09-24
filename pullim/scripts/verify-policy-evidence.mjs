@@ -49,9 +49,10 @@ function checkHttp(value, regression = false) {
 }
 
 function checkClaims(text, label) {
-  requireValue(!/\b(?:managed|production)\s+(?:redis|service|deployment)\b.{0,30}\b(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
+  requireValue(!/\b(?:managed|production)\s+(?:redis|upstash|service|deployment)\b.{0,30}\b(?:verified|validated|passed|proven)\b/i.test(text), `${label} claims unsupported managed service verification`);
   requireValue(!/(?:관리형|매니지드)\s*(?:Redis|레디스|서비스|환경)?\s*(?:검증|입증|통과|확인)(?:됐다|되었다|완료|함)/i.test(text), `${label} claims unsupported managed service verification`);
   requireValue(!/(?:임상\s*안전성|clinical\s*safety).{0,30}(?:(?<!미)검증(?!하지|되지)|(?<!미)입증(?!하지|되지)|통과|확인(?!하지|되지)|(?<!not )verified|(?<!not )proven)/i.test(text), `${label} claims unsupported clinical safety verification`);
+  requireValue(!/\bclinically\s+safe\b.{0,30}\b(?:deployment|production|users?)\b/i.test(text), `${label} claims unsupported clinical safety verification`);
 }
 
 export async function verifyPolicyEvidence({
@@ -63,7 +64,10 @@ export async function verifyPolicyEvidence({
   const exits = await readJson(path.join(evidenceDir, "command-exits.json"));
   const { stdout: head } = await exec("git", ["rev-parse", "HEAD"], { cwd: REPO });
   requireValue(exits.schema_version === 2 && exits.result === "PASS" && exits.worktree_commit === head.trim(), "Source revision or run result mismatch");
-  requireValue(exits.source_tree_clean === true && exits.source_hashes && Object.keys(exits.source_hashes).length >= 11, "Source provenance missing");
+  requireValue(exits.source_tree_clean === true && exits.source_tree_clean_end === true && exits.source_hashes, "Source provenance missing");
+  const { stdout: tracked } = await exec("git", ["ls-files", "-z", "pullim"], { cwd: REPO, encoding: "buffer", maxBuffer: 4 * 1024 * 1024 });
+  const trackedNames = tracked.toString().split("\0").filter(Boolean).sort();
+  requireValue(JSON.stringify(Object.keys(exits.source_hashes).sort()) === JSON.stringify(trackedNames), "Source manifest does not cover tracked Pullim files");
   for (const [name, hash] of Object.entries(exits.source_hashes)) {
     requireValue(name.startsWith("pullim/") && !name.includes(".."), "Invalid source path");
     const bytes = await readFile(path.join(REPO, name));
@@ -114,7 +118,11 @@ export async function verifyPolicyEvidence({
   const testLog = await readFile(path.join(evidenceDir, "npm-test.log"), "utf8");
   const testCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) tests (\d+)/)?.[1]);
   const passCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) pass (\d+)/)?.[1]);
-  requireValue(testCount >= 11 && passCount === testCount && /(?:^|\n)(?:#|ℹ) fail 0\b/.test(testLog), "Passing tests not recorded");
+  requireValue(testCount >= 19 && passCount === testCount && /(?:^|\n)(?:#|ℹ) fail 0\b/.test(testLog), "Passing tests not recorded");
+  for (const label of ["REVISE CLI exits 1", "HTTP receipt before build", "tampered receipt",
+    "changed source hash", "unsupported managed-service", "unsupported clinical-safety", "missing HTTP repetition"]) {
+    requireValue(testLog.includes(label), `Negative gate test missing: ${label}`);
+  }
 
   const qa = await readFile(path.join(evidenceDir, "independent-qa.md"), "utf8");
   if (/(?:^|\n)\s*(?:판정|Verdict)\s*:\s*REVISE\b/im.test(qa)) throw new Error("independent-qa.md verdict is REVISE");

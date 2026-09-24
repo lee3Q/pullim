@@ -22,12 +22,11 @@ const commands = {
   redis_rest: ["redis-rest.json", "node pullim/scripts/verify-redis-rest-policy.mjs"],
   http_regressions: ["regressions.json", "node pullim/scripts/verify-policy-regressions.mjs --out <policy-http-24.json>"],
 };
-const sourceFiles = ["pullim/package.json", "pullim/package-lock.json",
-  "pullim/src/lib/safety/policy-state-store.ts", "pullim/src/lib/safety/ultimate-policy.ts",
-  "pullim/src/lib/safety/ultimate-guard.ts", "pullim/scripts/verify-redis-rest-policy.mjs",
-  "pullim/scripts/verify-cookie-boundaries.mjs", "pullim/scripts/verify-policy-regressions.mjs",
-  "pullim/scripts/verify-policy-http.mjs", "pullim/scripts/record-policy-evidence.mjs",
-  "pullim/scripts/verify-policy-evidence.mjs"];
+const { stdout: tracked } = await exec("git", ["ls-files", "-z", "pullim"],
+  { cwd: repo, encoding: "buffer", maxBuffer: 4 * 1024 * 1024 });
+const sourceFiles = tracked.toString().split("\0").filter(Boolean);
+const sourceHashes = {};
+for (const name of sourceFiles) sourceHashes[name] = digest(await readFile(path.join(repo, name)));
 const boundaries = ["empty", "4097_bytes", "bad_signature", "bad_format"].map(name =>
   ({ name, status: 400, reason: "invalid_policy_cookie", setCookie: false, redisCommands: 0 }));
 const http = (sessionId, regression = false) => ({ result: "PASS", engine: "local redis-server",
@@ -41,8 +40,7 @@ async function fixture(t) {
   const { stdout: head } = await exec("git", ["rev-parse", "HEAD"], { cwd: repo });
   const exits = { schema_version: 2, result: "PASS", worktree_commit: head.trim(),
     scope: "local redis-server HTTPS REST + Next HTTP synthetic verification", source_tree_clean: true,
-    source_hashes: {}, receipts: [] };
-  for (const name of sourceFiles) exits.source_hashes[name] = digest(await readFile(path.join(repo, name)));
+    source_tree_clean_end: true, source_hashes: { ...sourceHashes }, receipts: [] };
   async function add(name, filename, command, content, started_at = start) {
     const file = path.join(evidenceDir, filename);
     const bytes = Buffer.from(typeof content === "string" ? content : JSON.stringify(content));
@@ -52,7 +50,7 @@ async function fixture(t) {
     exits.receipts.push(entry);
     return entry;
   }
-  await add("npm_test", ...commands.npm_test, "ℹ tests 16\nℹ pass 16\nℹ fail 0\n");
+  await add("npm_test", ...commands.npm_test, "✔ REVISE CLI exits 1\n✔ HTTP receipt before build\n✔ tampered receipt\n✔ changed source hash\n✔ unsupported managed-service\n✔ unsupported clinical-safety\n✔ missing HTTP repetition\nℹ tests 20\nℹ pass 20\nℹ fail 0\n");
   await add("typescript", ...commands.typescript, "");
   await add("build", ...commands.build, "build passed\n");
   await add("redis_rest", ...commands.redis_rest, { result: "PASS", engine: "local redis-server", transport: "HTTPS REST",
@@ -112,6 +110,15 @@ test("HTTP receipt before build is rejected", async t => {
   await assert.rejects(verifyPolicyEvidence(input), /predates build/);
 });
 
+test("missing HTTP repetition is rejected", async t => {
+  const input = await fixture(t);
+  const file = path.join(input.evidenceDir, "command-exits.json");
+  const exits = JSON.parse(await readFile(file, "utf8"));
+  exits.receipts = exits.receipts.filter(item => item.name !== "next_cookie_3");
+  await writeFile(file, JSON.stringify(exits));
+  await assert.rejects(verifyPolicyEvidence(input), /Missing HTTP repetition/);
+});
+
 test("tampered receipt is rejected", async t => {
   const input = await fixture(t);
   await writeFile(path.join(input.evidenceDir, "redis-rest.json"), '{"result":"PASS"}');
@@ -129,12 +136,12 @@ test("changed source hash is rejected", async t => {
 
 test("unsupported managed-service claim is rejected", async t => {
   const input = await fixture(t);
-  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Managed Redis is verified.\n");
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Managed Upstash is verified.\n");
   await assert.rejects(verifyPolicyEvidence(input), /unsupported managed service/);
 });
 
 test("unsupported clinical-safety claim is rejected", async t => {
   const input = await fixture(t);
-  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinical safety is proven.\n");
+  await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. Clinically safe for deployment.\n");
   await assert.rejects(verifyPolicyEvidence(input), /unsupported clinical safety/);
 });
