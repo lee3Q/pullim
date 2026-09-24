@@ -104,6 +104,7 @@ export default function StrategySessionPage() {
   const [crisis, setCrisis] = useState<{
     message: string;
     hotline: string;
+    riskState?: "awaiting_confirmation" | "emergency";
   } | null>(null);
   const [options, setOptions] = useState<string[]>([]);
   const [showFreeInput, setShowFreeInput] = useState(false);
@@ -279,6 +280,7 @@ export default function StrategySessionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages,
+          sessionId,
           userName,
           turnCount: turns,
           theme: "전략실",
@@ -314,6 +316,7 @@ export default function StrategySessionPage() {
               setCrisis({
                 message: parsed.text || parsed.hotlines?.[0]?.name || "",
                 hotline: parsed.hotlines?.[0]?.number || "109",
+                riskState: parsed.policy?.riskState,
               });
               setIsStreaming(false);
               return;
@@ -381,15 +384,13 @@ export default function StrategySessionPage() {
         body: JSON.stringify({ concern: effectiveConcern, listenSummary: summary }),
       });
       if (!response.ok) {
-        advanceScene("데이터 접근에 실패했습니다. 계속 진행합니다.");
-        setDataCards([]);
-        setStage("CRYSTAL_SELECT");
+        setScene(ERROR_MSG);
         setIsStreaming(false);
         return;
       }
       const data = await response.json();
       if (data.crisis) {
-        setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109" });
+        setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState });
         setIsStreaming(false);
         return;
       }
@@ -401,18 +402,19 @@ export default function StrategySessionPage() {
         return;
       }
       const fcResult = await callJudgeFactcheck(data.cards, effectiveConcern);
+      if (!fcResult || !fcResult.passed) {
+        setScene("리서치 검증을 완료하지 못했습니다. 다시 시도해 주세요.");
+        setIsStreaming(false);
+        return;
+      }
       setDataCards(data.cards);
       setIsStreaming(false);
-      const discuss1Text = fcResult && !fcResult.passed && fcResult.issues.length > 0
-        ? "데이터 검증 중 주의사항이 발견되었습니다.\n어떻게 판단하십니까?"
-        : "데이터 검증을 완료했습니다.\n어떻게 판단하십니까?";
+      const discuss1Text = "데이터 검증을 완료했습니다.\n어떻게 판단하십니까?";
       advanceScene(discuss1Text);
       setStage("DISCUSS_1");
       setOptions(DEFAULT_CHOICES.DISCUSS_1 || []);
     } catch {
-      advanceScene("데이터 접근에 실패했습니다.");
-      setDataCards([]);
-      setStage("CRYSTAL_SELECT");
+      setScene(ERROR_MSG);
       setIsStreaming(false);
     }
   };
@@ -447,7 +449,7 @@ export default function StrategySessionPage() {
       });
       if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
       const data = await response.json();
-      if (data.crisis) { setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109" }); setIsStreaming(false); return; }
+      if (data.crisis) { setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState }); setIsStreaming(false); return; }
       const analyses = data.analyses || [];
       setCrystalAnalyses(analyses);
       setDisagreements(data.disagreements || []);
@@ -495,6 +497,7 @@ export default function StrategySessionPage() {
       });
       if (!response.ok) { setScene(ERROR_MSG); setIsStreaming(false); return; }
       const data = await response.json();
+      if (data.crisis) { setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState }); setIsStreaming(false); return; }
       setConclusion(data.conclusion);
       setIsStreaming(false);
     } catch { setScene(ERROR_MSG); setIsStreaming(false); }
@@ -507,11 +510,12 @@ export default function StrategySessionPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode: "logic", concern, listenSummary, analyses: crystalAnalyses, disagreements, debateRounds, debateSynthesis }),
       });
-      if (!response.ok) return true;
+      if (!response.ok) return false;
       const data = await response.json();
+      if (data.crisis) { setCrisis({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState }); return false; }
       if (!data.passed && data.issues?.length > 0) advanceScene(`추가 확인 사항이 있습니다.\n${data.issues[0]}`);
-      return data.passed !== false;
-    } catch { return true; }
+      return data.passed === true;
+    } catch { return false; }
   };
 
   // ─── 사용자 입력 처리 ───
@@ -606,9 +610,25 @@ export default function StrategySessionPage() {
     if (card) setScene(`"${card.fact}"... 해당 포인트를 기록했습니다.`);
   };
 
-  const handleCommit = (commitment: ActionCommitment) => {
+  const handleCommit = async (commitment: ActionCommitment): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/ultimate/action", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decisionConsent: true, proposal: { risk: "none", action: "propose_decision", decision: commitment.action }, commitment }),
+      });
+      const result = await response.json();
+      if (!response.ok || result.policy?.status !== "executed") {
+        setScene("선택을 확정하지 못했습니다. 안전과 진행 단계를 확인한 뒤 다시 시도해 주세요.");
+        return false;
+      }
+    } catch {
+      setScene(ERROR_MSG);
+      return false;
+    }
     advanceScene(`${commitment.deadline}에 다시 만나요.\n${theme.labels.farewell}`);
     setStage("COMPLETE");
+    return true;
   };
 
   // ─── 렌더링 ───
@@ -619,6 +639,7 @@ export default function StrategySessionPage() {
         <CrisisAlert
           message={crisis.message}
           hotline={crisis.hotline}
+          riskState={crisis.riskState}
           onClose={() => setCrisis(null)}
         />
       )}

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { DataCard, CrisisLevel } from "@/lib/types-ultimate";
 import { isDemoMode, DEMO_RESEARCH_CARDS } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
 interface ResearchRequest {
   concern: string;
@@ -76,8 +78,10 @@ function parseJSON<T>(text: string, fallback: T): T {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as ResearchRequest;
+  const policyResponse = guardUltimateRequest("research", body);
+  if (policyResponse) return policyResponse;
   const { concern, listenSummary } = body;
 
   if (!concern || !listenSummary) {
@@ -154,10 +158,14 @@ export async function POST(req: NextRequest) {
     const data = await response.json();
     const rawText = data.choices?.[0]?.message?.content ?? "";
 
-    const cards = parseJSON<DataCard[]>(rawText, []);
+    const cards = parseJSON<DataCard[] | null>(rawText, null);
+    if (!Array.isArray(cards) || cards.some((card) => !card || typeof card.title !== "string" || !card.title.trim()
+      || typeof card.fact !== "string" || !card.fact.trim())) {
+      return NextResponse.json({ policy: { status: "blocked", reason: "invalid_model_proposal" } }, { status: 502 });
+    }
 
     // 유효성 검증: DataCard 형태인지 확인
-    const validCards = (Array.isArray(cards) ? cards : [])
+    const validCards = cards
       .filter(
         (c) =>
           c &&
@@ -190,3 +198,5 @@ export async function POST(req: NextRequest) {
     } satisfies ResearchResponse);
   }
 }
+
+export const POST = withUltimatePolicy("research", handlePOST);

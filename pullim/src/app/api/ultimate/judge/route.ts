@@ -3,6 +3,8 @@ import { getClient, ROUTING_MODEL } from "@/lib/llm/claude";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { DataCard, CrystalAnalysis, Disagreement, DebateRound } from "@/lib/types-ultimate";
 import { isDemoMode, DEMO_JUDGE_RESPONSE } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
 type JudgeMode = "factcheck" | "logic";
 
@@ -122,8 +124,10 @@ function parseJSON<T>(text: string, fallback: T): T {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as JudgeRequest;
+  const policyResponse = guardUltimateRequest("judge", body);
+  if (policyResponse) return policyResponse;
 
   if (!body.mode) {
     return NextResponse.json(
@@ -158,7 +162,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       confidence: "low" as const,
       issues: ["검증 서비스 일시 장애"],
-      passed: true, // 실패 시에도 통과시켜서 세션 중단 방지
+      passed: false,
     } satisfies JudgeResponse);
   }
 
@@ -170,7 +174,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           confidence: "high" as const,
           issues: [],
-          passed: true,
+          passed: false,
         } satisfies JudgeResponse);
       }
       prompt = buildFactcheckPrompt(body.cards, body.concern);
@@ -179,7 +183,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
           confidence: "high" as const,
           issues: [],
-          passed: true,
+          passed: false,
         } satisfies JudgeResponse);
       }
       prompt = buildLogicPrompt(body);
@@ -197,7 +201,7 @@ export async function POST(req: NextRequest) {
     const result = parseJSON<JudgeResponse>(rawText, {
       confidence: "medium",
       issues: [],
-      passed: true,
+      passed: false,
     });
 
     // 유효성 보정
@@ -208,7 +212,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       confidence: confidence as "high" | "medium" | "low",
       issues: Array.isArray(result.issues) ? result.issues : [],
-      passed: typeof result.passed === "boolean" ? result.passed : true,
+      passed: typeof result.passed === "boolean" ? result.passed : false,
     } satisfies JudgeResponse);
   } catch (error) {
     console.error("Judge error:", error);
@@ -216,7 +220,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       confidence: "low" as const,
       issues: ["검증 중 오류 발생"],
-      passed: true,
+      passed: false,
     } satisfies JudgeResponse);
   }
 }
+
+export const POST = withUltimatePolicy("judge", handlePOST);

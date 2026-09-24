@@ -8,6 +8,8 @@ import {
   ConclusionData,
 } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoConclusion } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
 interface ConcludeRequest {
   concern: string;
@@ -108,8 +110,10 @@ function parseJSON<T>(text: string, fallback: T): T {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as ConcludeRequest;
+  const policyResponse = guardUltimateRequest("conclude", body);
+  if (policyResponse) return policyResponse;
   const { concern, listenSummary, analyses, debateRounds, debateSynthesis } = body;
 
   if (!concern || !listenSummary || !analyses || analyses.length === 0) {
@@ -155,15 +159,16 @@ export async function POST(req: NextRequest) {
     const rawText =
       response.content[0].type === "text" ? response.content[0].text : "";
 
-    const conclusion = parseJSON<ConclusionData>(rawText, {
-      situationSummary: rawText.slice(0, 500),
-      options: [
-        { direction: "현 상태 유지", risk: "변화 없음", reward: "안정" },
-        { direction: "새로운 시도", risk: "불확실성", reward: "성장 가능성" },
-      ],
-      keyCrossroad: "핵심 갈림길을 정리하지 못했습니다.",
-      userTendency: "",
-    });
+    const conclusion = parseJSON<ConclusionData | null>(rawText, null);
+    if (!conclusion || typeof conclusion.situationSummary !== "string"
+      || !Array.isArray(conclusion.options) || conclusion.options.length < 2
+      || conclusion.options.length > 3
+      || conclusion.options.some((option) => !option || !["direction", "risk", "reward"].every(
+        (key) => typeof option[key as keyof typeof option] === "string" && option[key as keyof typeof option].trim().length > 0
+      ))
+      || typeof conclusion.keyCrossroad !== "string" || typeof conclusion.userTendency !== "string") {
+      return NextResponse.json({ policy: { status: "blocked", reason: "invalid_model_proposal" } }, { status: 502 });
+    }
 
     return NextResponse.json({ conclusion });
   } catch (error) {
@@ -174,3 +179,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const POST = withUltimatePolicy("conclude", handlePOST);

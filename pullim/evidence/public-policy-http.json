@@ -1,0 +1,187 @@
+{
+  "status": "PASS",
+  "base": "http://127.0.0.1:3147",
+  "checks": [
+    {
+      "name": "forbidden research jump",
+      "observed": [
+        409,
+        "check_in"
+      ],
+      "passed": true
+    },
+    {
+      "name": "listen opens problem definition",
+      "observed": [
+        200,
+        "define_problem",
+        true
+      ],
+      "passed": true
+    },
+    {
+      "name": "research advances",
+      "observed": [
+        200,
+        "research"
+      ],
+      "passed": true
+    },
+    {
+      "name": "forbidden conclusion jump",
+      "observed": [
+        409,
+        "research"
+      ],
+      "passed": true
+    },
+    {
+      "name": "analysis advances to values",
+      "observed": [
+        200,
+        "values"
+      ],
+      "passed": true
+    },
+    {
+      "name": "conclusion stays provisional",
+      "observed": [
+        200,
+        "provisional_decision"
+      ],
+      "passed": true
+    },
+    {
+      "name": "declined consent blocks action",
+      "observed": [
+        409,
+        "consent_required"
+      ],
+      "passed": true
+    },
+    {
+      "name": "malformed proposal blocks action",
+      "observed": [
+        409,
+        "invalid_proposal"
+      ],
+      "passed": true
+    },
+    {
+      "name": "unoffered action is blocked",
+      "observed": [
+        409,
+        "unoffered_action"
+      ],
+      "passed": true
+    },
+    {
+      "name": "consented valid action executes",
+      "observed": [
+        200,
+        "next_action",
+        "3개월 사이드 프로젝트로 검증 후 결정"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ambiguous input holds before demo",
+      "observed": [
+        200,
+        "awaiting_confirmation",
+        false
+      ],
+      "passed": true
+    },
+    {
+      "name": "risk hold persists",
+      "observed": [
+        200,
+        "awaiting_confirmation"
+      ],
+      "passed": true
+    },
+    {
+      "name": "explicit confirmation clears hold",
+      "observed": [
+        200,
+        "open"
+      ],
+      "passed": true
+    },
+    {
+      "name": "new turn resumes",
+      "observed": [
+        200,
+        "define_problem"
+      ],
+      "passed": true
+    },
+    {
+      "name": "imminent risk escalates",
+      "observed": [
+        200,
+        "emergency"
+      ],
+      "passed": true
+    },
+    {
+      "name": "emergency remains sticky",
+      "observed": [
+        200,
+        "emergency"
+      ],
+      "passed": true
+    },
+    {
+      "name": "explicit new session gets new state",
+      "observed": [
+        200,
+        "open",
+        "define_problem"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ladder research cannot skip listening",
+      "observed": [
+        409,
+        "check_in"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ladder listening records stage",
+      "observed": [
+        200,
+        "define_problem"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ladder research passes common policy",
+      "observed": [
+        200,
+        "research"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ladder analysis passes common policy",
+      "observed": [
+        200,
+        "values"
+      ],
+      "passed": true
+    },
+    {
+      "name": "ladder demo checks imminent risk first",
+      "observed": [
+        200,
+        "emergency",
+        true
+      ],
+      "passed": true
+    }
+  ]
+}

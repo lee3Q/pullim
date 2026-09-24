@@ -1,3 +1,4 @@
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { CrisisLevel } from "@/lib/types-ultimate";
@@ -103,7 +104,7 @@ function detectDisagreement(perspectives: LadderPerspective[]): string | null {
   return null;
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   console.log('[mode]', isDemoMode() ? 'demo' : 'glm');
   const body = (await req.json()) as LadderAnalyzeRequest;
   const { topicSummary } = body;
@@ -172,21 +173,20 @@ export async function POST(req: NextRequest) {
       const name = PERSPECTIVE_NAMES[i];
 
       if (result instanceof Error) {
-        // 실패한 관점은 데모 데이터로 대체
-        perspectives.push({ ...DEMO_PERSPECTIVES[i] });
-        continue;
+        return NextResponse.json({ policy: { status: "blocked", reason: "analysis_unavailable" } }, { status: 502 });
       }
 
-      const parsed = parseJSON<{ observation: string; question: string }>(
-        result.text,
-        { observation: DEMO_PERSPECTIVES[i].observation, question: DEMO_PERSPECTIVES[i].question }
-      );
+      const parsed = parseJSON<{ observation: string; question: string } | null>(result.text, null);
+      if (!parsed || typeof parsed.observation !== "string" || !parsed.observation.trim()
+        || typeof parsed.question !== "string" || !parsed.question.trim()) {
+        return NextResponse.json({ policy: { status: "blocked", reason: "invalid_model_proposal" } }, { status: 502 });
+      }
 
       perspectives.push({
         name,
         model: provider,
-        observation: parsed.observation || DEMO_PERSPECTIVES[i].observation,
-        question: parsed.question || DEMO_PERSPECTIVES[i].question,
+        observation: parsed.observation,
+        question: parsed.question,
       });
     }
 
@@ -199,10 +199,8 @@ export async function POST(req: NextRequest) {
     } satisfies LadderAnalyzeResponse);
   } catch (error) {
     console.error("Ladder analyze error:", error);
-    return NextResponse.json({
-      perspectives: DEMO_PERSPECTIVES,
-      disagreement: DEMO_DISAGREEMENT,
-      demoMode: true,
-    } satisfies LadderAnalyzeResponse);
+    return NextResponse.json({ policy: { status: "blocked", reason: "analysis_unavailable" } }, { status: 502 });
   }
 }
+
+export const POST = withUltimatePolicy("ladder_analyze", handlePOST);

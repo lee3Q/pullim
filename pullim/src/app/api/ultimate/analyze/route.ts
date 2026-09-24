@@ -14,6 +14,8 @@ import {
   parallelChat,
 } from "@/lib/providers";
 import { isDemoMode, getDemoAnalyses, DEMO_DISAGREEMENTS } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
 interface AnalyzeRequest {
   sessionId: string;
@@ -141,8 +143,10 @@ function parseJSON<T>(text: string, fallback: T): T {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as AnalyzeRequest;
+  const policyResponse = guardUltimateRequest("analyze", body);
+  if (policyResponse) return policyResponse;
   const { sessionId, selectedCrystals, listenSummary, concern } = body;
 
   if (!sessionId || !selectedCrystals || selectedCrystals.length === 0 || !listenSummary || !concern) {
@@ -227,12 +231,13 @@ export async function POST(req: NextRequest) {
         insight: string;
         risk: string;
         question: string;
-      }>(result.text, {
-        observation: result.text.slice(0, 200),
-        insight: "",
-        risk: "",
-        question: "",
-      });
+      } | null>(result.text, null);
+      if (!parsed || !["observation", "insight", "risk", "question"].every(
+        (key) => typeof parsed[key as keyof typeof parsed] === "string" && parsed[key as keyof typeof parsed].trim()
+      )) {
+        failedCrystals.push({ crystal, error: "invalid_model_proposal" });
+        continue;
+      }
 
       analyses.push({
         crystal,
@@ -269,12 +274,10 @@ export async function POST(req: NextRequest) {
             insight: string;
             risk: string;
             question: string;
-          }>(fallbackResult.text, {
-            observation: fallbackResult.text.slice(0, 200),
-            insight: "",
-            risk: "",
-            question: "",
-          });
+          } | null>(fallbackResult.text, null);
+          if (!parsed || !["observation", "insight", "risk", "question"].every(
+            (key) => typeof parsed[key as keyof typeof parsed] === "string" && parsed[key as keyof typeof parsed].trim()
+          )) throw new Error("invalid_model_proposal");
 
           analyses.push({
             crystal,
@@ -319,12 +322,11 @@ export async function POST(req: NextRequest) {
           temperature: 0.3,
         });
 
-        const parsed = parseJSON<Disagreement[]>(disagreementResult.text, []);
-        if (Array.isArray(parsed)) {
-          disagreements = parsed;
-        }
+        const parsed = parseJSON<Disagreement[] | null>(disagreementResult.text, null);
+        if (!Array.isArray(parsed)) throw new Error("invalid_model_proposal");
+        disagreements = parsed;
       } catch {
-        // 불일치 감지 실패해도 진행
+        return NextResponse.json({ policy: { status: "blocked", reason: "invalid_model_proposal" } }, { status: 502 });
       }
     }
 
@@ -344,3 +346,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const POST = withUltimatePolicy("analyze", handlePOST);

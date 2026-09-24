@@ -1,10 +1,11 @@
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { inferStateWithLLM } from "@/lib/session/behind-llm";
 import { inferStateSync } from "@/lib/session/behind-the-scenes";
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import type { BehindEvent, LadderMessage, LadderLevel } from "@/lib/session/ladder-types";
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   let body: {
     signals: BehaviorSignals;
     events: BehindEvent[];
@@ -36,3 +37,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(inferStateSync(signals, events, currentLevel));
   }
 }
+
+export const POST = withUltimatePolicy("behind_thought", handlePOST);

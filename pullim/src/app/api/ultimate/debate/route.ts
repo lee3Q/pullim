@@ -9,6 +9,8 @@ import {
 } from "@/lib/types-ultimate";
 import { getProvider, getAvailableProviders } from "@/lib/providers";
 import { isDemoMode, getDemoDebate } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
 interface DebateRequest {
   analyses: CrystalAnalysis[];
@@ -97,8 +99,10 @@ ${r1}
 ${round2Result.crystal}: ${round2Result.content}`;
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as DebateRequest;
+  const policyResponse = guardUltimateRequest("debate", body);
+  if (policyResponse) return policyResponse;
   const { analyses, disagreements, selectedCrystal, listenSummary, crystalModelMap } = body;
 
   if (!analyses || analyses.length < 2 || !selectedCrystal || !listenSummary) {
@@ -244,3 +248,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const POST = withUltimatePolicy("debate", handlePOST);

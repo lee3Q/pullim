@@ -5,6 +5,8 @@ import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { readBehavior, type BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { CRYSTALS, CrystalName, type ThemeName } from "@/lib/types-ultimate";
 import { isDemoMode, getDemoListenResponse } from "@/lib/demo";
+import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 import { getDemoLadderResponse, type ThemeKey } from "@/lib/session/demo-ladder";
 
 // 한국 정서 맥락 — 프롬프트 레벨에서만 처리, 글로벌 확장 시 이 블록만 교체
@@ -454,7 +456,7 @@ function resolveTheme(theme?: string): ThemeName {
   return "모험가";
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const { messages, userName, turnCount, theme, behaviorSignals, personalizationContext, sensoryLadderContext } = (await req.json()) as {
     messages: { role: string; content: string }[];
     userName: string | null;
@@ -479,6 +481,9 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache" },
     });
   }
+
+  const policyResponse = guardUltimateRequest("listen", { messages });
+  if (policyResponse) return policyResponse;
 
   const resolvedTheme = resolveTheme(theme);
   const persona = getPersona(resolvedTheme);
@@ -855,3 +860,5 @@ export async function POST(req: NextRequest) {
     },
   });
 }
+
+export const POST = withUltimatePolicy("listen", handlePOST);

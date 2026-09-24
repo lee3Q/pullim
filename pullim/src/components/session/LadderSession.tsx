@@ -66,7 +66,7 @@ interface LadderSessionProps {
   theme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말";
   entryMode: EntryMode;
   profileContext?: string; // ProbabilityProfile 기반 프롬프트 (있으면)
-  onCrisis?: (crisis: { message: string; hotline: string }) => void;
+  onCrisis?: (crisis: { message: string; hotline: string; riskState?: "awaiting_confirmation" | "emergency" }) => void;
   onThemeChange?: (theme: "모험가" | "전략실" | "달빛정원" | "천문대" | "종말") => void;
 }
 
@@ -234,6 +234,11 @@ export default function LadderSession({
           body: JSON.stringify({ topicSummary, theme, currentLevel: store.currentLevel }),
         });
         const data = await res.json();
+        if (data.crisis) {
+          onCrisis?.({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState });
+          return;
+        }
+        if (!res.ok) throw new Error("Research blocked by policy");
         setResearchCards(data.cards);
         setToolDemoMode(data.demoMode);
         toolStateRef.current = { ...toolStateRef.current, researchTriggered: true };
@@ -246,6 +251,11 @@ export default function LadderSession({
           body: JSON.stringify({ topicSummary, messages: recentMessages, theme }),
         });
         const data = await res.json();
+        if (data.crisis) {
+          onCrisis?.({ message: data.message, hotline: data.hotlines?.[0]?.number || "109", riskState: data.policy?.riskState });
+          return;
+        }
+        if (!res.ok) throw new Error("Analysis blocked by policy");
         setAnalysisPerspectives(data.perspectives);
         setAnalysisDisagreement(data.disagreement);
         setToolDemoMode(data.demoMode);
@@ -254,8 +264,9 @@ export default function LadderSession({
       }
     } catch (e) {
       console.error("Tool trigger failed:", e);
+    } finally {
+      setToolLoading(false);
     }
-    setToolLoading(false);
   }, [theme, store]);
 
   // 턴 그룹화: assistant + user 쌍
@@ -390,6 +401,7 @@ export default function LadderSession({
               ? chatMessages
               : [{ role: "user", content: "시작" }],
             userName: null,
+            sessionId: store.sessionId,
             turnCount: store.turnCount,
             theme,
             behaviorSignals: signals,
@@ -430,12 +442,12 @@ export default function LadderSession({
                 setDemoNotice(true);
               }
 
-              // Tier A 위기 감지: 즉시 중단 + 모달
-              if (parsed.crisis && parsed.tier === "A") {
+              // 정책이 보류 또는 긴급 상태로 전환하면 대화를 멈춘다.
+              if (parsed.crisis) {
                 const hotlineText = parsed.hotlines
-                  ?.map((h: { name: string; number: string; description: string }) => `${h.name}: ${h.number} (${h.description})`)
+                  ?.map((h: { name: string; number: string; description?: string }) => `${h.name}: ${h.number}${h.description ? ` (${h.description})` : ""}`)
                   .join("\n") || "자살예방상담전화: 109";
-                onCrisis?.({ message: parsed.text, hotline: hotlineText });
+                onCrisis?.({ message: parsed.text, hotline: hotlineText, riskState: parsed.policy?.riskState });
                 setIsLoading(false);
                 return;
               }
@@ -627,6 +639,7 @@ export default function LadderSession({
             { role: "user", content: `지금까지 대화 요약:\n사용자: ${userMessages.join(" / ")}\nAI: ${assistantMessages.join(" / ")}` },
           ],
           userName: null,
+          sessionId: store.sessionId,
           turnCount: 0,
           theme,
           sensoryLadderContext: [
@@ -652,7 +665,14 @@ export default function LadderSession({
           if (!line.startsWith("data: ")) continue;
           const d = line.slice(6);
           if (d === "[DONE]") continue;
-          try { text += JSON.parse(d).text || ""; } catch {}
+          try {
+            const parsed = JSON.parse(d);
+            if (parsed.crisis) {
+              onCrisis?.({ message: parsed.message || parsed.text, hotline: "109", riskState: parsed.policy?.riskState });
+              return;
+            }
+            text += parsed.text || "";
+          } catch {}
         }
       }
       // 태그 제거

@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pullim
 
-## Getting Started
+Pullim helps a person move from a vague concern through listening, problem
+definition, research, value exploration, a provisional decision, and a next
+action. The person chooses and confirms the action. Model text does not own
+the right to advance the protocol.
 
-First, run the development server:
+## Run locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+npm ci
+npm run dev -- --port 3147
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without an AI key the app runs in demo mode. In production, set
+`PULLIM_POLICY_SECRET` to a random server-only value (for example, generated
+with `openssl rand -hex 32`). The secret signs the policy cookie. A missing
+production secret fails startup rather than silently accepting unsigned
+session state. See `.env.local.example` for other optional integrations.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Decision policy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All six `/api/ultimate/*` conversation routes and the ladder research,
+analysis, and behind-thought routes pass through
+`src/lib/safety/ultimate-policy.ts` before demo or model work. A signed cookie
+tracks stage, risk state, consent, offered choice hashes, and recent event
+types. Only hashes of user utterances are kept in that cookie; raw text remains
+in the request. A new session ID starts a new protocol state. The server
+rejects stage jumps, holds ambiguous risk until explicit confirmation, and
+keeps imminent risk in the emergency state for that session. Risk responses
+carry a structured policy status and the relevant help path.
 
-## Learn More
+The conclusion route validates model JSON and offers provisional options.
+Clicking an option and deadline sends explicit consent to
+`/api/ultimate/action`. The action route accepts only an option whose hash was
+recorded from the server's conclusion response, checks the proposal schema,
+and uses `executeProposal` to authorize the transition to `next_action`.
+Malformed output, mismatched risk, denied consent, and forbidden transitions
+do not execute an action. The user can dismiss the provisional conclusion
+without committing. The five theme screens and the ladder screen show risk
+holds before continuing; the theme screens stop when research or judge
+validation fails.
 
-To learn more about Next.js, take a look at the following resources:
+## Public verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+In one terminal, run `npm run dev -- --port 3147` with no model API key. In
+another, run:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```sh
+npm test
+npx tsc --noEmit
+node scripts/verify-policy-http.mjs --out /tmp/pullim-policy-http-receipt.json
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The recorded synthetic receipt is [evidence/public-policy-http.json](evidence/public-policy-http.json).
+The HTTP script checks 22 requests through the actual Next routes: ordinary
+progress, a forbidden stage jump, a demo-mode risk signal, persistent risk
+hold, explicit safety confirmation, emergency stickiness, consent refusal,
+malformed proposal rejection, and an authorized action. It uses only
+synthetic concerns. This is Stage 1 implementation evidence; it is not a
+clinical safety or decision-quality study. The cookie is a one-browser
+session control, not a cross-device event database. Future research must
+evaluate the protocol with independent human outcomes and safety review.

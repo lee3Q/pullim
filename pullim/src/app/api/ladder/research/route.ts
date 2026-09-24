@@ -1,3 +1,4 @@
+import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 import { NextRequest, NextResponse } from "next/server";
 import { detectCrisis } from "@/lib/safety/crisis-detector";
 import { DataCard, CrisisLevel } from "@/lib/types-ultimate";
@@ -73,7 +74,7 @@ function parseJSON<T>(text: string, fallback: T): T {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as LadderResearchRequest;
   const { topicSummary } = body;
 
@@ -142,19 +143,19 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       console.error("Perplexity API error:", response.status);
-      return NextResponse.json({
-        cards: DEMO_RESEARCH_CARDS,
-        skipped: false,
-        demoMode: true,
-      } satisfies LadderResearchResponse);
+      return NextResponse.json({ policy: { status: "blocked", reason: "research_unavailable" } }, { status: 502 });
     }
 
     const data = await response.json();
     const rawText = data.choices?.[0]?.message?.content ?? "";
 
-    const cards = parseJSON<DataCard[]>(rawText, []);
+    const cards = parseJSON<DataCard[] | null>(rawText, null);
+    if (!Array.isArray(cards) || cards.some((card) => !card || typeof card.title !== "string" || !card.title.trim()
+      || typeof card.fact !== "string" || !card.fact.trim())) {
+      return NextResponse.json({ policy: { status: "blocked", reason: "invalid_model_proposal" } }, { status: 502 });
+    }
 
-    const validCards = (Array.isArray(cards) ? cards : [])
+    const validCards = cards
       .filter(
         (c) =>
           c &&
@@ -176,16 +177,14 @@ export async function POST(req: NextRequest) {
       }));
 
     return NextResponse.json({
-      cards: validCards.length > 0 ? validCards : DEMO_RESEARCH_CARDS,
+      cards: validCards,
       skipped: false,
-      demoMode: validCards.length === 0,
+      demoMode: false,
     } satisfies LadderResearchResponse);
   } catch (error) {
     console.error("Ladder research error:", error);
-    return NextResponse.json({
-      cards: DEMO_RESEARCH_CARDS,
-      skipped: false,
-      demoMode: true,
-    } satisfies LadderResearchResponse);
+    return NextResponse.json({ policy: { status: "blocked", reason: "research_unavailable" } }, { status: 502 });
   }
 }
+
+export const POST = withUltimatePolicy("ladder_research", handlePOST);

@@ -9,7 +9,7 @@ interface Props {
   tagline: string;
   farewell: string;
   primaryColor: string;
-  onCommit: (commitment: ActionCommitment) => void;
+  onCommit: (commitment: ActionCommitment) => Promise<boolean>;
 }
 
 const DEADLINE_OPTIONS = [
@@ -35,18 +35,18 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
     setPhase("deadline");
   };
 
-  const handleSelectDeadline = (days: number) => {
+  const handleSelectDeadline = async (days: number) => {
     const deadline = new Date();
     deadline.setDate(deadline.getDate() + days);
     const deadlineStr = deadline.toISOString().split("T")[0];
 
-    onCommit({
+    const accepted = await onCommit({
       action: conclusion.options[selectedOption!]?.direction ?? "",
       deadline: deadlineStr,
       nextSessionDate: deadlineStr,
     });
 
-    setPhase("done");
+    if (accepted) setPhase("done");
   };
 
   return (

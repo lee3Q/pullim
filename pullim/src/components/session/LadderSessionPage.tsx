@@ -26,7 +26,7 @@ export default function LadderSessionPage({
   const searchParams = useSearchParams();
   const entryMode = (searchParams.get("entry") as EntryMode) || "concern";
   const { profile } = useUserProfile();
-  const [crisis, setCrisis] = useState<{ message: string; hotline: string } | null>(null);
+  const [crisis, setCrisis] = useState<{ message: string; hotline: string; riskState?: "awaiting_confirmation" | "emergency" } | null>(null);
 
   // BGM
   const themeConfig = THEMES[theme];
@@ -57,6 +57,7 @@ export default function LadderSessionPage({
         <CrisisAlert
           message={crisis.message}
           hotline={crisis.hotline}
+          riskState={crisis.riskState}
           onClose={() => setCrisis(null)}
         />
       )}
