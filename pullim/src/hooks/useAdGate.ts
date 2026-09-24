@@ -40,7 +40,8 @@ export function useAdGate() {
   const [adState, setAdState] = useState<AdState>(DEFAULT_STATE);
 
   useEffect(() => {
-    setAdState(loadAdState());
+    const timer = window.setTimeout(() => setAdState(loadAdState()), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const shouldShowAd = (() => {

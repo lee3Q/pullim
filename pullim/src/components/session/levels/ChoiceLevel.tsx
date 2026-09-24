@@ -14,7 +14,6 @@ interface ChoiceLevelProps {
 }
 
 export default function ChoiceLevel({
-  text,
   options,
   cheatText,
   showRecommendations,

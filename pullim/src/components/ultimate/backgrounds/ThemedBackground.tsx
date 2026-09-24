@@ -10,40 +10,6 @@ interface Props {
   currentStage?: StageName;
 }
 
-function CampfireParticles({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const particles: HTMLDivElement[] = [];
-    for (let i = 0; i < 12; i++) {
-      const p = document.createElement("div");
-      const size = 1.5 + Math.random() * 3;
-      p.style.cssText = `
-        position: absolute;
-        bottom: 25%;
-        left: ${44 + Math.random() * 12}%;
-        width: ${size}px;
-        height: ${size}px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,180,80,0.8), rgba(255,140,50,0.4), transparent);
-        opacity: 0;
-        animation: campfire-float ${2.5 + Math.random() * 2}s ease-out infinite;
-        animation-delay: ${Math.random() * 4}s;
-        pointer-events: none;
-      `;
-      container.appendChild(p);
-      particles.push(p);
-    }
-
-    return () => {
-      particles.forEach((p) => p.remove());
-    };
-  }, [containerRef]);
-
-  return null;
-}
-
 function StarParticles({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
   useEffect(() => {
     const container = containerRef.current;

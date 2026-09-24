@@ -15,8 +15,9 @@ npm run dev -- --port 3147
 Without an AI key the app runs in demo mode. In production, set
 `PULLIM_POLICY_SECRET` to a random server-only value (for example, generated
 with `openssl rand -hex 32`). The secret signs the policy cookie. A missing
-production secret fails startup rather than silently accepting unsigned
-session state. See `.env.local.example` for other optional integrations.
+production secret makes policy requests fail closed with HTTP 503 rather than
+accepting unsigned session state. See `.env.local.example` for other optional
+integrations.
 
 ## Decision policy
 

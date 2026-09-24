@@ -114,7 +114,7 @@ async function handlePOST(req: NextRequest) {
   const body = (await req.json()) as ConcludeRequest;
   const policyResponse = guardUltimateRequest("conclude", body);
   if (policyResponse) return policyResponse;
-  const { concern, listenSummary, analyses, debateRounds, debateSynthesis } = body;
+  const { concern, listenSummary, analyses } = body;
 
   if (!concern || !listenSummary || !analyses || analyses.length === 0) {
     return NextResponse.json(

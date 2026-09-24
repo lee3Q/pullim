@@ -10,9 +10,8 @@ type Event = { type: "user_input" | "risk_signal" | "risk_confirmation" | "stage
 type State = { sessionId: string | null; stage: DecisionStage; riskState: RiskGateState; consent: Consent; choiceHashes: string[]; events: Event[] };
 const COOKIE = "pullim_policy";
 const secret = process.env.PULLIM_POLICY_SECRET || (process.env.NODE_ENV === "production" ? "" : "pullim-local-development-only");
-if (process.env.NODE_ENV === "production" && secret.length < 32) {
-  throw new Error("PULLIM_POLICY_SECRET must be a random server secret of at least 32 characters");
-}
+const configured = process.env.NODE_ENV !== "production" || secret.length >= 32;
+const missingSecret = () => Response.json({ policy: { status: "blocked", reason: "policy_secret_unavailable" } }, { status: 503 });
 
 const initial = (): State => ({ sessionId: null, stage: "check_in", riskState: "open", consent: "unknown", choiceHashes: [], events: [] });
 const sign = (payload: string) => createHmac("sha256", secret).update(payload).digest("base64url");
@@ -83,6 +82,7 @@ function blocked(state: State, reason: string, message: string): Response {
 /** The API, including demo mode, must pass this gate before model work. */
 export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequest) => Promise<Response>) {
   return async (req: NextRequest): Promise<Response> => {
+    if (!configured) return missingSecret();
     let body: Record<string, unknown>;
     try {
       const parsed = await req.clone().json();
@@ -142,6 +142,7 @@ export function withUltimatePolicy(route: UltimateRoute, handler: (req: NextRequ
 }
 
 export async function confirmUltimateSafety(req: NextRequest): Promise<Response> {
+  if (!configured) return missingSecret();
   let answer: "safe" | "unsafe" | "unclear";
   try {
     const body = await req.json();
@@ -157,6 +158,7 @@ export async function confirmUltimateSafety(req: NextRequest): Promise<Response>
 }
 
 export async function executeUltimateAction(req: NextRequest): Promise<Response> {
+  if (!configured) return missingSecret();
   let body: Record<string, unknown>;
   try {
     const parsed = await req.json();

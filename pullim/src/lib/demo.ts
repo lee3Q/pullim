@@ -10,7 +10,6 @@ import {
   DataCard,
   ModelProvider,
   ThemeName,
-  CRYSTALS,
 } from "./types-ultimate";
 
 export function isDemoMode(): boolean {

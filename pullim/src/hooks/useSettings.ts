@@ -34,17 +34,19 @@ export function useSettings() {
   const [settings, setSettings] = useState<PullimSettings>(DEFAULTS);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = { ...DEFAULTS, ...JSON.parse(stored) };
-        setSettings(parsed);
-        // 저장된 테마 즉시 적용
-        applyTheme(parsed.themeMode);
+    const timer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = { ...DEFAULTS, ...JSON.parse(stored) };
+          setSettings(parsed);
+          applyTheme(parsed.themeMode);
+        }
+      } catch {
+        // localStorage 실패 무시
       }
-    } catch {
-      // localStorage 실패 무시
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const update = useCallback(

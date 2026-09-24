@@ -30,7 +30,7 @@ export default function LadderSessionPage({
 
   // BGM
   const themeConfig = THEMES[theme];
-  const { playing, trackLabel, toggle: toggleBGM, nextTrack } = useBGM(themeConfig?.assets?.bgmTracks);
+  const { playing, toggle: toggleBGM, nextTrack } = useBGM(themeConfig?.assets?.bgmTracks);
 
   // 프로필 기반 개인화 컨텍스트
   const profileContext = profile ? buildSensoryLadderContext(profile) : undefined;

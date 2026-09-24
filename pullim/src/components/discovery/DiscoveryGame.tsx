@@ -20,7 +20,7 @@ export default function DiscoveryGame({ onComplete, primaryColor }: Props) {
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
   const [fadeOut, setFadeOut] = useState(false);
   const selections = useRef<SelectionRecord[]>([]);
-  const questionShownAt = useRef<number>(Date.now());
+  const questionShownAt = useRef<number>(0);
 
   const questions = ADVENTURE_QUESTIONS;
   const currentQuestion: DiscoveryQuestion | undefined = questions[currentIndex];

@@ -28,16 +28,13 @@ export default function GameInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const submittingRef = useRef(false);
 
-  // forceExpanded가 바뀌면 expanded 동기화
-  useEffect(() => {
-    if (forceExpanded) setExpanded(true);
-  }, [forceExpanded]);
+  const visibleExpanded = forceExpanded || expanded;
 
   useEffect(() => {
-    if (expanded && textareaRef.current) {
+    if (visibleExpanded && textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [expanded]);
+  }, [visibleExpanded]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -82,7 +79,7 @@ export default function GameInput({
   return (
     <div className="px-4 py-3">
       <div className="max-w-lg md:max-w-2xl lg:max-w-3xl mx-auto">
-        {!expanded ? (
+        {!visibleExpanded ? (
           <button
             onClick={() => setExpanded(true)}
             disabled={disabled}

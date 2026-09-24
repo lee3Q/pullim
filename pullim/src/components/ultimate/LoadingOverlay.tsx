@@ -60,7 +60,7 @@ const STAGE_CONFIG = {
   },
 };
 
-export default function LoadingOverlay({ stage, primaryColor, crystalLabel, character = "현자" }: Props) {
+export default function LoadingOverlay({ stage, primaryColor, character = "현자" }: Props) {
   const config = STAGE_CONFIG[stage];
   const displayText = config.text[character];
 

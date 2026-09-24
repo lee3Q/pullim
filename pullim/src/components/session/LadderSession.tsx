@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import type {
   LadderLevel,
   EntryMode,
   LadderMessage,
-  LadderOption,
   CheatAction,
   ThemeSuggestion,
   PullimPromise,
@@ -267,7 +267,7 @@ export default function LadderSession({
     } finally {
       setToolLoading(false);
     }
-  }, [theme, store]);
+  }, [theme, store, onCrisis]);
 
   // 턴 그룹화: assistant + user 쌍
   const turns = useMemo(() => {
@@ -518,7 +518,7 @@ export default function LadderSession({
         setIsLoading(false);
       }
     },
-    [theme, profileContext, store, triggerTool]
+    [theme, profileContext, store, triggerTool, onCrisis]
   );
 
   // ── 사용자 응답 처리 ──
@@ -726,7 +726,7 @@ export default function LadderSession({
     }
     setIsLoading(false);
     setPhase("ad-end");
-  }, [store, theme, entryMode]);
+  }, [store, theme, entryMode, onCrisis]);
 
   // ── 치트 선택지 ──
   const handleCheat = useCallback(() => {
@@ -1001,10 +1001,12 @@ export default function LadderSession({
             transition: "opacity 400ms ease",
           }}
         >
-          <img
+          <Image
             src={bgImage}
             alt=""
-            className="w-full h-full object-cover animate-slow-zoom"
+            fill
+            sizes="100vw"
+            className="object-cover animate-slow-zoom"
             style={{ filter: "brightness(0.5)" }}
           />
           {/* 하단 그라데이션 overlay — 텍스트 가독성 */}

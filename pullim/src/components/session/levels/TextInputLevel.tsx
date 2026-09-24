@@ -10,7 +10,6 @@ interface TextInputLevelProps {
 }
 
 export default function TextInputLevel({
-  text,
   onSend,
   onSwitchToChoices,
   isLoading,

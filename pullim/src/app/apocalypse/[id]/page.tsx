@@ -99,6 +99,7 @@ export default function ApocalypseSessionPage() {
   // ─── 행동 기반 개인화 ───
   const behavior = useBehaviorSignals();
   const userProfile = useUserProfile();
+  const [userName, setUserName] = useState<string | null>(null);
   const [discoveryDone, setDiscoveryDone] = useState(false);
   const [showSatisfaction, setShowSatisfaction] = useState(false);
 
@@ -123,7 +124,8 @@ export default function ApocalypseSessionPage() {
 
       // 재방문 시 저장된 이름 사용
       if (userProfile.profile.userName) {
-        setUserName(userProfile.profile.userName);
+        const name = userProfile.profile.userName;
+        window.setTimeout(() => setUserName(name), 0);
       }
     }
   }, [userProfile.profile, userProfile.isNewUser, userProfile.sessionCount, userProfile.lastSatisfaction, userProfile.completedSessions]);
@@ -148,7 +150,6 @@ export default function ApocalypseSessionPage() {
 
   // ─── 씬 상태 ───
   const [stage, setStage] = useState<StageName>("ENTER");
-  const [userName, setUserName] = useState<string | null>(null);
   const [currentScene, setCurrentScene] = useState<CurrentScene>({
     characterText: "",
   });
@@ -189,7 +190,7 @@ export default function ApocalypseSessionPage() {
   const [crystalModelMap, setCrystalModelMap] = useState<
     Partial<Record<CrystalName, ModelProvider>>
   >({});
-  const [selectedCrystals, setSelectedCrystals] = useState<CrystalName[]>([]);
+  const [, setSelectedCrystals] = useState<CrystalName[]>([]);
   const [conclusion, setConclusion] = useState<ConclusionData | null>(null);
 
   // ─── 씬 전환 헬퍼 ───

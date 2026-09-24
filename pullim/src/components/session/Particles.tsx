@@ -19,7 +19,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 20,
         className: "particle-firefly",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
           width: `${2 + Math.random() * 3}px`,
@@ -33,7 +33,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 8,
         className: "particle-fog",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 120 - 10}%`,
           top: `${Math.random() * 100}%`,
           width: `${80 + Math.random() * 120}px`,
@@ -47,7 +47,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 18,
         className: "particle-petal",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 100}%`,
           top: `${-10 - Math.random() * 20}%`,
           width: `${4 + Math.random() * 4}px`,
@@ -61,7 +61,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 15,
         className: "particle-star",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 60}%`,
           width: `${1.5 + Math.random() * 2}px`,
@@ -75,7 +75,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 22,
         className: "particle-ash",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 100}%`,
           bottom: `${-5 - Math.random() * 10}%`,
           width: `${2 + Math.random() * 3}px`,
@@ -88,7 +88,7 @@ function getParticleConfig(theme: string): ParticleConfig {
       return {
         count: 15,
         className: "particle-firefly",
-        style: (i) => ({
+        style: () => ({
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
           width: "3px",

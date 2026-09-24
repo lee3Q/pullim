@@ -30,20 +30,19 @@ interface UseAuthReturn {
 }
 
 export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
   const isSupabaseReady = isSupabaseAvailable();
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(isSupabaseReady);
 
   useEffect(() => {
     if (!isSupabaseReady) {
-      setLoading(false);
       return;
     }
 
     const client = getSupabase();
     if (!client) {
-      setLoading(false);
-      return;
+      const timer = window.setTimeout(() => setLoading(false), 0);
+      return () => window.clearTimeout(timer);
     }
 
     // 초기 세션 확인

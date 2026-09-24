@@ -6,7 +6,6 @@ import {
   ProbabilityProfile,
   createEmptyProfile,
   updateDimension,
-  createEmptyDimension,
   type DimensionKey,
 } from "./probability-profile";
 
@@ -113,7 +112,6 @@ export interface SelectionRecord {
 }
 
 const FAST_THRESHOLD_MS = 5000;
-const HESITATION_THRESHOLD_MS = 15000;
 
 /**
  * 일관성 계산 (같은 축 2회+ 측정의 일치율)
@@ -220,7 +218,7 @@ export function buildProbabilityProfile(
 // 스토리형 파악 (story-scenes.ts 기반)
 // ═══════════════════════════════════════════
 
-import type { StoryChoice, ThemeType, Signal } from "./story-scenes";
+import type { ThemeType, Signal } from "./story-scenes";
 
 export interface StorySelectionRecord {
   sceneId: string;

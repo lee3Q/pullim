@@ -125,16 +125,19 @@ export default function HomePage() {
   const [recommendedTheme, setRecommendedTheme] = useState<ThemeType | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("pullim_user_profile");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const profile: ProbabilityProfile = parsed.profile ?? parsed;
-        setRecommendedTheme(getRecommendedTheme(profile));
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem("pullim_user_profile");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const profile: ProbabilityProfile = parsed.profile ?? parsed;
+          setRecommendedTheme(getRecommendedTheme(profile));
+        }
+      } catch {
+        // 무시
       }
-    } catch {
-      // 무시
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const handleThemeSelect = (themeKey: ThemeType, discover?: boolean) => {

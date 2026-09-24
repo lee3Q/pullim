@@ -6,7 +6,6 @@ import { isDemoMode, DEMO_JUDGE_RESPONSE } from "@/lib/demo";
 import { guardUltimateRequest } from "@/lib/safety/ultimate-guard";
 import { withUltimatePolicy } from "@/lib/safety/ultimate-policy";
 
-type JudgeMode = "factcheck" | "logic";
 
 interface JudgeFactcheckRequest {
   mode: "factcheck";

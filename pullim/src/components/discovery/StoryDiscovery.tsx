@@ -34,7 +34,7 @@ export default function StoryDiscovery({
   const [sceneIndex, setSceneIndex] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
   const selections = useRef<StorySelectionRecord[]>([]);
-  const sceneStartTime = useRef(Date.now());
+  const sceneStartTime = useRef(0);
   const outroCompleter = useRef<(() => void) | null>(null);
   const isTransitioning = useRef(false);
 
@@ -326,7 +326,6 @@ export default function StoryDiscovery({
 // ─── 장면 카드 래퍼 ───
 function SceneCard({
   children,
-  primaryColor,
   bgImage,
 }: {
   children: React.ReactNode;

@@ -11,7 +11,6 @@ interface SensoryLevelProps {
 }
 
 export default function SensoryLevel({
-  question,
   cards,
   onSelect,
   onCheat,

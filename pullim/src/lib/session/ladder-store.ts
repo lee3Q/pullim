@@ -6,7 +6,6 @@ import type {
   LadderLevel,
   EntryMode,
   LadderMessage,
-  LadderOption,
   BehindEvent,
   LadderSessionState,
 } from "./ladder-types";
