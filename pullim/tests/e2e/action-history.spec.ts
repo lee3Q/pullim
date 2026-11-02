@@ -28,3 +28,22 @@ test('corrupt storage displays error rather than false empty state', async ({ pa
   await expect(page.getByText('아직 기록이 없습니다.')).toBeHidden();
   await page.screenshot({ path: testInfo.outputPath('history-corrupt.png'), fullPage: true });
 });
+
+test('open history follows another tab updates and browser-data clearing', async ({ page, context }, testInfo) => {
+  await page.goto('/history');
+  await expect(page.getByText('아직 기록이 없습니다.')).toBeVisible();
+  const other = await context.newPage();
+  await other.goto('/history');
+  await other.evaluate(value => localStorage.setItem('pullim_action_history_v1', JSON.stringify([value])), record);
+  await expect(page.getByText(record.action)).toBeVisible({ timeout: 5000 });
+  await other.evaluate(() => {
+    const records = JSON.parse(localStorage.getItem('pullim_action_history_v1')!);
+    records[0].status = 'completed';
+    localStorage.setItem('pullim_action_history_v1', JSON.stringify(records));
+  });
+  await expect(page.getByText('상태: 완료')).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('synced-history.png'), fullPage: true });
+  await other.evaluate(() => localStorage.clear());
+  await expect(page.getByText('아직 기록이 없습니다.')).toBeVisible();
+  await expect(page.getByText(record.action)).toHaveCount(0);
+});
