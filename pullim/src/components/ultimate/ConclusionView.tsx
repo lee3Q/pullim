@@ -20,6 +20,8 @@ const DEADLINE_OPTIONS = [
 
 export default function ConclusionView({ conclusion, tagline, farewell, primaryColor, onCommit }: Props) {
   const [phase, setPhase] = useState<"summary" | "decide" | "action" | "deadline" | "done">("summary");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   const handleDecide = (knows: boolean) => {
@@ -36,9 +38,12 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
   };
 
   const handleSelectDeadline = async (days: number) => {
+    if (saving || selectedOption === null) return;
+    setSaving(true);
+    setSaveError(null);
     const deadline = new Date();
     deadline.setDate(deadline.getDate() + days);
-    const deadlineStr = deadline.toISOString().split("T")[0];
+    const deadlineStr = [deadline.getFullYear(), String(deadline.getMonth() + 1).padStart(2, "0"), String(deadline.getDate()).padStart(2, "0")].join("-");
 
     const accepted = await onCommit({
       action: conclusion.options[selectedOption!]?.direction ?? "",
@@ -46,7 +51,9 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
       nextSessionDate: deadlineStr,
     });
 
+    setSaving(false);
     if (accepted) setPhase("done");
+    else setSaveError("선택을 확정·저장하지 못했습니다. 입력은 유지됩니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요.");
   };
 
   return (
@@ -122,10 +129,13 @@ export default function ConclusionView({ conclusion, tagline, farewell, primaryC
       {phase === "deadline" && (
         <div className="flex flex-col gap-2">
           <p className="text-xs text-white/55 mb-1 font-rpg-sm">언제까지 해보시겠어요?</p>
+          {saveError && <p role="alert" className="text-sm text-red-200">{saveError}</p>}
+          {saving && <p role="status" className="text-sm text-white/70">저장 중...</p>}
           <div className="flex gap-2">
             {DEADLINE_OPTIONS.map((opt) => (
               <button
                 key={opt.days}
+                disabled={saving}
                 onClick={() => handleSelectDeadline(opt.days)}
                 className="flex-1 rpg-button-ghost px-3 py-2 text-xs"
               >
