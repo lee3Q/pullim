@@ -47,7 +47,7 @@ npx playwright install chromium
 npx playwright test tests/e2e/action-history.spec.ts tests/e2e/ultimate-action.spec.ts
 ```
 
-Screenshots go to `.playwright-results/` under the app directory, separate from
+Screenshots and the JSON run report go to `.playwright-results/` under the app directory, separate from
 tracked historical `test-results/` evidence. No external working
 directory is required. The checks cover history writes, denied policy, local
 storage failure and retry, and five theme flows. They do not verify live model

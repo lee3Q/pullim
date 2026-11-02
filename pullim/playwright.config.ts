@@ -21,6 +21,6 @@ export default defineConfig({
   },
   reporter: [
     ["list"],
-    ["json", { outputFile: "../tests/glm-test-result.json" }],
+    ["json", { outputFile: "./.playwright-results/report.json" }],
   ],
 });
