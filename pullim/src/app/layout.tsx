@@ -19,8 +19,8 @@ const notoSerifKR = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "풀림 — 3분이면 나를 알 수 있어요",
-  description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+  title: "풀림 - 고민 정리와 작은 행동",
+  description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://pullim.vercel.app"),
   openGraph: {
-    title: "풀림 — 3분이면 나를 알 수 있어요",
-    description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+    title: "풀림 - 고민 정리와 작은 행동",
+    description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
     images: [{ url: "/images/og/og_main.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "풀림 — 3분이면 나를 알 수 있어요",
-    description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+    title: "풀림 - 고민 정리와 작은 행동",
+    description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
     images: ["/images/og/og_main.png"],
   },
 };
@@ -44,8 +44,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#12101a",
 };
 
