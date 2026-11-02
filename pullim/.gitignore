@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# Generated Playwright runs (historical test-results is tracked evidence)
+/.playwright-results/
