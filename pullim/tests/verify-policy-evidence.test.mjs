@@ -169,3 +169,52 @@ test("clinical negative limit is accepted", async t => {
   await writeFile(input.reportFile, "Local Redis HTTPS REST and Next HTTP. Managed production is not verified. It is not clinically validated for users.\n");
   assert.equal((await verifyPolicyEvidence(input)).result, "PASS");
 });
+
+async function replaceTestSummary(input, summary) {
+  const file = path.join(input.evidenceDir, "npm-test.log");
+  const original = await readFile(file, "utf8");
+  const next = original.replace(/ℹ tests 24\nℹ pass 24\nℹ fail 0\n/, summary);
+  await writeFile(file, next);
+  const exitsFile = path.join(input.evidenceDir, "command-exits.json");
+  const exits = JSON.parse(await readFile(exitsFile, "utf8"));
+  exits.receipts.find(item => item.name === "npm_test").sha256 = digest(Buffer.from(next));
+  await writeFile(exitsFile, JSON.stringify(exits));
+}
+
+test("expanded complete suite is accepted without changing HTTP case count", async t => {
+  const input = await fixture(t);
+  await replaceTestSummary(input, "ℹ tests 31\nℹ pass 31\nℹ fail 0\nℹ skipped 0\nℹ todo 0\nℹ cancelled 0\n");
+  const summary = await verifyPolicyEvidence(input);
+  assert.equal(summary.result, "PASS");
+  assert.equal(summary.policy_http_24.checks, 24);
+});
+
+for (const [label, summary] of [
+  ["duplicate summary", "ℹ tests 31\nℹ tests 31\nℹ pass 31\nℹ fail 0\n"],
+  ["contradictory failure summaries", "ℹ tests 31\nℹ pass 31\nℹ fail 0\nℹ fail 1\n"],
+  ["missing failure summary", "ℹ tests 31\nℹ pass 31\n"],
+  ["malformed optional summary", "ℹ tests 31\nℹ pass 31\nℹ fail 0\nℹ skipped unknown\n"],
+  ["fractional count", "ℹ tests 31.5\nℹ pass 31.5\nℹ fail 0\n"],
+  ["below original test floor", "ℹ tests 23\nℹ pass 23\nℹ fail 0\n"],
+  ["mismatched pass count", "ℹ tests 31\nℹ pass 30\nℹ fail 0\n"],
+  ["failing tests", "ℹ tests 31\nℹ pass 31\nℹ fail 1\n"],
+  ...["skipped", "todo", "cancelled"].map(label => [label, `ℹ tests 31\nℹ pass 31\nℹ fail 0\nℹ ${label} 1\n`]),
+]) {
+  test(`${label} cannot produce a PASS summary`, async t => {
+    const input = await fixture(t);
+    await replaceTestSummary(input, summary);
+    await assert.rejects(verifyPolicyEvidence(input), /Complete passing test suite/);
+    await assert.rejects(readFile(path.join(input.evidenceDir, "verification-summary.json")), { code: "ENOENT" });
+  });
+}
+
+for (const [label, summary] of [
+  ["Node TAP", "# tests 43\n# pass 43\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n"],
+  ["CRLF", "# tests 43\r\n# pass 43\r\n# fail 0\r\n# cancelled 0\r\n# skipped 0\r\n# todo 0\r\n"],
+]) {
+  test(`${label} complete summary is accepted`, async t => {
+    const input = await fixture(t);
+    await replaceTestSummary(input, summary);
+    assert.equal((await verifyPolicyEvidence(input)).result, "PASS");
+  });
+}

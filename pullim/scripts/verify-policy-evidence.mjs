@@ -127,9 +127,23 @@ export async function verifyPolicyEvidence({
   requireValue(legacyData.status === "PASS" && legacyData.checks?.length === 24 && legacyData.checks.every(item => item.passed === true), "Legacy HTTP cases failed");
   requireValue(legacyData.checks.some(item => item.name === "old valid cookie cannot roll back emergency"), "Cookie replay case missing");
   const testLog = await readFile(path.join(evidenceDir, "npm-test.log"), "utf8");
-  const testCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) tests (\d+)/)?.[1]);
-  const passCount = Number(testLog.match(/(?:^|\n)(?:#|ℹ) pass (\d+)/)?.[1]);
-  requireValue(testCount === 24 && passCount === 24 && /(?:^|\n)(?:#|ℹ) fail 0\b/.test(testLog), "24 passing tests not recorded");
+  // Read one exact summary value per label, not a convenient matching prefix.
+  // Older supported receipts omit the optional zero-result labels.
+  function count(label, optional = false) {
+    const lines = [...testLog.matchAll(new RegExp(`(?:^|\\n)(?:#|ℹ) ${label} ([^\\n]*)`, "g"))];
+    if (lines.length === 0 && optional) return 0;
+    if (lines.length !== 1) return NaN;
+    const raw = lines[0][1].replace(/\r$/, "");
+    if (!/^\d+$/.test(raw)) return NaN;
+    const value = Number(raw);
+    return Number.isSafeInteger(value) ? value : NaN;
+  }
+  const testCount = count("tests");
+  // Keep the original 24-test floor and the named negative gates below, while
+  // allowing new regression tests without invalidating complete passing runs.
+  requireValue(testCount >= 24 && count("pass") === testCount && count("fail") === 0 &&
+    ["cancelled", "skipped", "todo"].every(label => count(label, true) === 0),
+    "Complete passing test suite (at least 24 tests) not recorded");
   for (const label of ["REVISE CLI exits 1", "HTTP receipt before build", "tampered receipt",
     "changed source hash", "unsupported managed-service", "unsupported clinical-safety", "missing HTTP repetition",
     "Upstash affirmative wording", "clinical validation wording", "Upstash negative limit",
