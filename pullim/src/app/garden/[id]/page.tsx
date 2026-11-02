@@ -28,6 +28,7 @@ import GameDialogue from "@/components/game/GameDialogue";
 import GameChoices from "@/components/game/GameChoices";
 import GameInput from "@/components/game/GameInput";
 import Link from "next/link";
+import { loadActions, saveAction } from "@/lib/session/action-history";
 import LadderSessionPage from "@/components/session/LadderSessionPage";
 
 const theme = getTheme("달빛정원");
@@ -132,6 +133,7 @@ export default function GardenSessionPage() {
     Partial<Record<CrystalName, ModelProvider>>
   >({});
   const [, setSelectedCrystals] = useState<CrystalName[]>([]);
+  const approvedCommitment = useRef<string | null>(null);
   const [conclusion, setConclusion] = useState<ConclusionData | null>(null);
 
   // ─── 씬 전환 헬퍼 ───
@@ -190,7 +192,7 @@ export default function GardenSessionPage() {
   const showCrystalAnalysis =
     !isViewingPast && stage === "DISCUSS_2" && crystalAnalyses.length > 0;
   const showCrystals = !isViewingPast && stage === "CRYSTAL_SELECT";
-  const showConclusion = !isViewingPast && stage === "CONCLUDE" && conclusion;
+  const showConclusion = !isViewingPast && (stage === "CONCLUDE" || stage === "COMPLETE") && conclusion;
   const choicesVisible =
     !isViewingPast && !isStreaming && options.length > 0 && !showFreeInput;
 
@@ -611,7 +613,10 @@ export default function GardenSessionPage() {
   };
 
   const handleCommit = async (commitment: ActionCommitment): Promise<boolean> => {
+    const signature = JSON.stringify(commitment);
     try {
+      loadActions(localStorage);
+      if (approvedCommitment.current !== signature) {
       const response = await fetch("/api/ultimate/action", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -622,8 +627,12 @@ export default function GardenSessionPage() {
         setScene("선택을 확정하지 못했습니다. 안전과 진행 단계를 확인한 뒤 다시 시도해 주세요.");
         return false;
       }
+      approvedCommitment.current = signature;
+      }
+      saveAction(localStorage, { sessionId, action: commitment.action,
+        deadline: commitment.deadline || null, createdAt: new Date().toISOString(), status: "pending" });
     } catch {
-      setScene(ERROR_MSG);
+      setScene("기록을 저장하지 못했습니다. 입력은 유지됩니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요.");
       return false;
     }
     advanceScene(`${commitment.deadline}에 다시 만나요.\n${theme.labels.farewell}`);
