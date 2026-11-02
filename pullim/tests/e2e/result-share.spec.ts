@@ -22,3 +22,30 @@ test('web sharing uses bounded wording and normalized result URL', async ({ page
   expect(url.searchParams.get('type')).toBe('quiet-strategist');
   expect(errors).toEqual([]);
 });
+
+for (const mode of ['denied', 'missing']) {
+  test(`copy failure is visible and a successful retry clears it: ${mode}`, async ({ page }, testInfo) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.addInitScript(mode => {
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, value: mode === 'missing' ? undefined : {
+        writeText: async () => { throw new Error('synthetic permission denied'); },
+      } });
+    }, mode);
+    await page.goto('/result?theme=garden&type=quiet-strategist');
+    await page.getByRole('button', { name: '링크 복사' }).click();
+    await expect(page.locator('p[role=alert]')).toContainText('링크를 복사하지 못했습니다.');
+    await expect(page.getByRole('button', { name: '복사됨!' })).toHaveCount(0);
+    await page.locator('p[role=alert]').scrollIntoViewIfNeeded();
+    if (mode === 'denied') await page.screenshot({path: testInfo.outputPath('copy-denied.png')});
+    await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
+      writeText: async (value: string) => { (window as unknown as { copiedValue: string }).copiedValue = value; },
+    } }));
+    await page.getByRole('button', { name: '링크 복사' }).click();
+    await expect(page.getByRole('button', { name: '복사됨!' })).toBeVisible();
+    await expect(page.locator('p[role=alert]')).toHaveCount(0);
+    const copied = await page.evaluate(() => (window as unknown as { copiedValue: string }).copiedValue);
+    expect(new URL(copied).searchParams.get('theme')).toBe('garden');
+    expect(errors).toEqual([]);
+  });
+}
