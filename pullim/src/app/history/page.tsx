@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { loadActions, updateAction, deleteAction, type ActionRecord } from "@/lib/session/action-history";
+import { ACTION_HISTORY_KEY, loadActions, updateAction, deleteAction, type ActionRecord } from "@/lib/session/action-history";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -16,7 +16,15 @@ export default function HistoryPage() {
   };
   useEffect(() => {
     const timer = window.setTimeout(refresh, 0);
-    return () => window.clearTimeout(timer);
+    const onStorage = (event: StorageEvent) => {
+      if (event.storageArea === localStorage &&
+          (event.key === ACTION_HISTORY_KEY || event.key === null)) refresh();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
   const change = (operation: () => void) => {
     try { operation(); refresh(); }
