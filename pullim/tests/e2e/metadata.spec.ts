@@ -33,3 +33,19 @@ for (const query of ['', '?type=unknown', '?type=quiet-strategist&theme=garden']
     }
   });
 }
+
+for (const theme of ['bogus', 'toString', 'garden', 'adventure', 'strategy', 'stargazer', 'apocalypse']) {
+  test(`result theme selects existing metadata and character images: ${theme}`, async ({ page, request }) => {
+    await page.goto(`/result?theme=${theme}&type=quiet-strategist`);
+    const expected = ['bogus', 'toString'].includes(theme) ? 'adventure' : theme;
+    const og = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect(new URL(og!).pathname).toBe(`/images/og/og_${expected}_quiet-strategist.png`);
+    const response = await request.get(new URL(og!).pathname);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('image/png');
+    const character = page.locator(`img[src*="${expected}_quiet-strategist.png"]`);
+    await expect(character).toHaveCount(1);
+    await expect(character).toBeVisible();
+    expect(await page.title()).not.toContain('undefined');
+  });
+}
