@@ -66,6 +66,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   const [imgError, setImgError] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   const shareUrl = typeof window !== "undefined"
     ? `${window.location.origin}/result?theme=${theme}&type=${type.id}`
@@ -75,9 +76,15 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
   const shareText = `${THEME_LABELS[theme]}의 선택 기록을 돌아보기 위한 실험적 유형 요약입니다. 진단이나 검증된 성격 평가, 행동 예측을 제공하지 않습니다.`;
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopyError(false);
+    setCopied(false);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopyError(true);
+    }
   }
 
   const canShare = useSyncExternalStore(subscribeShareSupport, getShareSupport, getServerShareSupport);
@@ -238,6 +245,12 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
           )}
         </button>
       </div>
+
+      {copyError && (
+        <p role="alert" className="text-center text-xs text-red-200">
+          링크를 복사하지 못했습니다. 브라우저 권한을 확인한 뒤 다시 시도해 주세요.
+        </p>
+      )}
 
       {/* 풀림의 태도 예고 */}
       <div
