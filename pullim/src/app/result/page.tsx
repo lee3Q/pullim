@@ -11,6 +11,12 @@ const THEME_LABELS: Record<ThemeType, string> = {
   apocalypse: "종말",
 };
 
+// Query strings are untrusted input, not a ThemeType cast.
+function resultTheme(value: string | undefined): ThemeType {
+  return value && Object.prototype.hasOwnProperty.call(THEME_LABELS, value)
+    ? value as ThemeType : "adventure";
+}
+
 const BASE_URL = "https://pullim.vercel.app";
 
 interface Props {
@@ -19,7 +25,7 @@ interface Props {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
-  const theme = (params.theme || "adventure") as ThemeType;
+  const theme = resultTheme(params.theme);
   const typeId = params.type || "";
   const pt = getPersonalityTypeById(typeId);
 
@@ -73,7 +79,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function ResultPage({ searchParams }: Props) {
   const params = await searchParams;
-  const theme = (params.theme || "adventure") as ThemeType;
+  const theme = resultTheme(params.theme);
   const typeId = params.type || "";
 
   return <ResultClient theme={theme} typeId={typeId} />;
