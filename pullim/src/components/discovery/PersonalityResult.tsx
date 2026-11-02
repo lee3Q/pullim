@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import type { PersonalityType } from "@/lib/personalization/personality-type";
 import type { ProbabilityProfile } from "@/lib/personalization/probability-profile";
@@ -54,6 +54,10 @@ function StatBar({ label, value, color }: { label: [string, string]; value: numb
   );
 }
 
+const subscribeShareSupport = () => () => {};
+const getShareSupport = () => typeof navigator !== "undefined" && typeof navigator.share === "function";
+const getServerShareSupport = () => false;
+
 export default function PersonalityResult({ type, profile, theme, primaryColor, onContinue }: Props) {
   const displayName = type.themedName[theme];
   const displayEmoji = type.themedEmoji[theme];
@@ -67,8 +71,8 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
     ? `${window.location.origin}/result?theme=${theme}&type=${type.id}`
     : `https://pullim.vercel.app/result?theme=${theme}&type=${type.id}`;
 
-  const shareTitle = `나는 "${displayName}" 유형이래!`;
-  const shareText = `${THEME_LABELS[theme]}에서 발견한 나 — ${displayName}. 너도 해볼래?`;
+  const shareTitle = `풀림 - ${displayName} 실험적 유형 요약`;
+  const shareText = `${THEME_LABELS[theme]}의 선택 기록을 돌아보기 위한 실험적 유형 요약입니다. 진단이나 검증된 성격 평가, 행동 예측을 제공하지 않습니다.`;
 
   async function handleCopy() {
     await navigator.clipboard.writeText(shareUrl);
@@ -76,7 +80,7 @@ export default function PersonalityResult({ type, profile, theme, primaryColor, 
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const canShare = typeof navigator !== "undefined" && !!navigator.share;
+  const canShare = useSyncExternalStore(subscribeShareSupport, getShareSupport, getServerShareSupport);
 
   async function handleShare() {
     try {
