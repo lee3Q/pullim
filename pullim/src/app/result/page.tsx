@@ -27,28 +27,28 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   if (!pt) {
     return {
-      title: "풀림 — 3분이면 나를 알 수 있어요",
-      description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+      title: "풀림 - 고민 정리와 작은 행동",
+      description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
       metadataBase: new URL(BASE_URL),
       openGraph: {
-        title: "풀림 — 3분이면 나를 알 수 있어요",
-        description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+        title: "풀림 - 고민 정리와 작은 행동",
+        description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
         images: [{ url: fallbackOgImage, width: 1200, height: 630 }],
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
-        title: "풀림 — 3분이면 나를 알 수 있어요",
-        description: "AI가 당신의 선택을 읽고, 당신도 몰랐던 유형을 알려줍니다",
+        title: "풀림 - 고민 정리와 작은 행동",
+        description: "고민의 사실과 가정을 나누고, 선택지를 살펴본 뒤 작은 행동을 직접 고르는 실험 도구입니다. 진단이나 행동 예측을 제공하지 않습니다.",
         images: [fallbackOgImage],
       },
     };
   }
 
-  const displayName = pt.themedName[theme];
-  const themeLabel = THEME_LABELS[theme];
-  const title = `나는 "${displayName}" 유형이래! — 풀림`;
-  const description = `${themeLabel}에서 발견한 나: ${displayName}. ${pt.description}`;
+  const displayName = pt.themedName[theme] ?? pt.themedName.adventure;
+  const themeLabel = THEME_LABELS[theme] ?? THEME_LABELS.adventure;
+  const title = `풀림 - ${displayName} 실험적 유형 요약`;
+  const description = `${themeLabel}의 선택 기록을 돌아보기 위한 실험적 유형 요약입니다. 진단이나 검증된 성격 평가, 행동 예측을 제공하지 않습니다.`;
 
   const ogImage = `/images/og/og_${theme}_${typeId}.png`;
 
