@@ -2,6 +2,8 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Keep generated output separate from tracked historical evidence.
+  outputDir: "./.playwright-results",
   timeout: 10 * 60 * 1000, // 테스트당 최대 10분 (GLM 느림)
   workers: 1,              // 순차 실행 — 서버 하나, 병렬 X
   use: {

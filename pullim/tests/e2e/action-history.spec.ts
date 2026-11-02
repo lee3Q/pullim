@@ -1,0 +1,30 @@
+import { test, expect } from '@playwright/test';
+const record = { sessionId: 'synthetic-session', action: '오늘 작은 테스트 한 개 작성하기', deadline: '2026-11-04', createdAt: '2026-11-03T00:00:00+09:00', status: 'pending' };
+test('history persists status, handles failed writes, and deletes only selected action', async ({ page }, testInfo) => {
+  await page.goto('/history');
+  await expect(page.getByText('아직 기록이 없습니다.')).toBeVisible();
+  await page.evaluate(value => localStorage.setItem('pullim_action_history_v1', JSON.stringify([value])), record);
+  await page.reload();
+  await expect(page.getByText(record.action)).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('history-mobile.png'), fullPage: true });
+  await page.getByRole('button', { name: '완료', exact: true }).click();
+  await page.reload();
+  await expect(page.getByText('상태: 완료')).toBeVisible();
+  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('synthetic quota'); }; });
+  await page.getByRole('button', { name: '보류', exact: true }).click();
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('변경을 저장하지 못했습니다.');
+  await expect(page.getByText('상태: 완료')).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('history-write-error.png'), fullPage: true });
+  await page.reload();
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: '삭제', exact: true }).click();
+  await expect(page.getByText('아직 기록이 없습니다.')).toBeVisible();
+});
+test('corrupt storage displays error rather than false empty state', async ({ page }, testInfo) => {
+  await page.goto('/history');
+  await page.evaluate(() => localStorage.setItem('pullim_action_history_v1', '{partial'));
+  await page.reload();
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('기록을 읽지 못했습니다.');
+  await expect(page.getByText('아직 기록이 없습니다.')).toBeHidden();
+  await page.screenshot({ path: testInfo.outputPath('history-corrupt.png'), fullPage: true });
+});
