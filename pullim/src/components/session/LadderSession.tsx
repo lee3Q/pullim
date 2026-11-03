@@ -181,6 +181,7 @@ export default function LadderSession({
 
   // 약속 확인 상태 (진입 화면)
   const [activePromise, setActivePromise] = useState<PullimPromise | null>(null);
+  const [promiseError, setPromiseError] = useState<string | null>(null);
   const [promiseChecked, setPromiseChecked] = useState(false);
   const [promiseFeedback, setPromiseFeedback] = useState<string | null>(null);
 
@@ -305,13 +306,28 @@ export default function LadderSession({
     return () => clearTimeout(timer);
   }, [store.currentLevel, theme, phase]);
 
-  // active 약속 로드 (진입 시 한 번)
-  useEffect(() => {
-    const promises = getActivePromises();
-    if (promises.length > 0) {
-      setActivePromise(promises[promises.length - 1]);
+  const loadPromise = useCallback(() => {
+    try {
+      const promises = getActivePromises();
+      setActivePromise(promises[promises.length - 1] ?? null);
+      setPromiseError(null);
+    } catch {
+      setPromiseError("약속 기록을 읽지 못했습니다. 기존 기록은 바꾸지 않았습니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요.");
     }
   }, []);
+  useEffect(() => { loadPromise(); }, [loadPromise]);
+
+  function recordPromise(status: PullimPromise["status"], feedback?: string) {
+    if (!activePromise) return;
+    try {
+      checkPromise(activePromise.id, status);
+      setPromiseError(null);
+      if (feedback) setPromiseFeedback(feedback);
+      else setPromiseChecked(true);
+    } catch {
+      setPromiseError("약속 확인을 저장하지 못했습니다. 기존 기록은 바꾸지 않았습니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요.");
+    }
+  }
 
   // phase가 "session"이 될 때 첫 AI 메시지 요청 (광고 유무와 무관하게 동일 경로)
   useEffect(() => {
@@ -799,6 +815,14 @@ export default function LadderSession({
   // ── 렌더링 ──
   const level = store.currentLevel;
 
+  if (phase === "entry" && promiseError && !activePromise && !promiseChecked) {
+    return <div className="w-full max-w-sm space-y-4">
+      <p role="alert" className="text-sm text-red-200">{promiseError}</p>
+      <button className="rpg-button-ghost px-4 py-3" onClick={loadPromise}>다시 시도</button>
+      <button className="rpg-button-ghost px-4 py-3" onClick={() => setPromiseChecked(true)}>약속 확인 없이 계속</button>
+    </div>;
+  }
+
   // 진입 화면 — 약속 확인 (active 약속 있을 때)
   if (phase === "entry" && activePromise && !promiseChecked) {
     return (
@@ -829,32 +853,27 @@ export default function LadderSession({
               </p>
             </div>
 
+            {promiseError && <div className="space-y-3">
+              <p role="alert" className="text-sm text-red-200">{promiseError}</p>
+              <button className="rpg-button-ghost px-4 py-3" onClick={() => setPromiseChecked(true)}>확인 저장 없이 계속</button>
+            </div>}
             <div className="space-y-3">
               <button
-                onClick={() => {
-                  checkPromise(activePromise.id, "completed");
-                  setPromiseFeedback("대단한데. 기억하고 지켜봤어.");
-                }}
+                onClick={() => recordPromise("completed", "대단한데. 기억하고 지켜봤어.")}
                 className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
                 style={{ color: "var(--fantasy-gold-bright)" }}
               >
                 ✓ 했어
               </button>
               <button
-                onClick={() => {
-                  checkPromise(activePromise.id, "failed");
-                  setPromiseFeedback("괜찮아, 이것도 하나의 발견이야.");
-                }}
+                onClick={() => recordPromise("failed", "괜찮아, 이것도 하나의 발견이야.")}
                 className="rpg-panel-light w-full py-4 rounded-2xl text-sm font-rpg transition-all active:scale-[0.98] hover:scale-[1.01]"
                 style={{ color: "var(--fantasy-text)" }}
               >
                 못했어
               </button>
               <button
-                onClick={() => {
-                  checkPromise(activePromise.id, "skipped");
-                  setPromiseChecked(true);
-                }}
+                onClick={() => recordPromise("skipped")}
                 className="w-full py-2 text-center text-xs font-rpg-sm transition-colors"
                 style={{ color: "rgba(232,213,181,0.60)" }}
               >
@@ -1450,4 +1469,4 @@ function getLengthTrend(
   if (avg < prevAvg * 0.6) return "shorter";
   if (avg > prevAvg * 1.5) return "longer";
   return "stable";
-}
+                    }
