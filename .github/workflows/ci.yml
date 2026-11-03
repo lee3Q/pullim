@@ -44,6 +44,7 @@ jobs:
       - run: >-
           npx playwright test --workers=1
           tests/e2e/action-history.spec.ts
+          tests/e2e/unified-history.spec.ts
           tests/e2e/crisis-confirm-retry.spec.ts
           tests/e2e/ladder-promises.spec.ts
           tests/e2e/ladder-summary-stream.spec.ts
