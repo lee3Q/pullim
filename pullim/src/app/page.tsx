@@ -581,11 +581,17 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="text-center text-xs text-white/25 py-4 relative z-10 space-y-1">
-        <p>데이터는 기기에만 저장되며, 외부로 전송되지 않습니다.</p>
+      <footer className="text-center text-xs text-white/65 py-4 relative z-10 space-y-1">
+        <p>
+          입력한 내용과 이용 기록은 기기나 서버에 저장될 수 있습니다.
+          AI 기능 사용 시 대화 내용 등이 AI 제공사로 전송될 수 있습니다.{" "}
+          <a href="/privacy" className="text-white/80 underline">
+            개인정보 안내
+          </a>
+        </p>
         <p>
           풀림은 전문 상담을 대체하지 않습니다. 위기 시{" "}
-          <a href="tel:109" className="text-white/60 underline">
+          <a href="tel:109" className="text-white/80 underline">
             109
           </a>
           로 연락하세요.
