@@ -15,6 +15,7 @@ import { getActivePromises, checkPromise } from "@/lib/session/promise-store";
 import { LEVEL_LABELS } from "@/lib/session/ladder-types";
 import { useLadderStore } from "@/lib/session/ladder-store";
 import { parseResponse } from "@/lib/session/response-parser";
+import { readSseData } from "@/lib/session/sse-data";
 import { getDemoSummary } from "@/lib/session/demo-ladder";
 import { inferState, buildBehindContext, inferCheatAction, describeBehindInference } from "@/lib/session/behind-the-scenes";
 import type { BehindInference } from "@/lib/session/behind-the-scenes";
@@ -671,25 +672,18 @@ export default function LadderSession({
       if (!res.ok || !res.body) throw new Error("summary failed");
 
       const reader = res.body.getReader();
-      const decoder = new TextDecoder();
       let text = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split("\n")) {
-          if (!line.startsWith("data: ")) continue;
-          const d = line.slice(6);
-          if (d === "[DONE]") continue;
-          try {
-            const parsed = JSON.parse(d);
-            if (parsed.crisis) {
-              onCrisis?.({ message: parsed.message || parsed.text, hotline: "109", riskState: parsed.policy?.riskState });
-              return;
-            }
-            text += parsed.text || "";
-          } catch {}
+      for await (const data of readSseData(reader)) {
+        if (data === "[DONE]") continue;
+        let parsed;
+        try { parsed = JSON.parse(data); }
+        catch { continue; }
+        if (parsed.crisis) {
+          setIsLoading(false);
+          onCrisis?.({ message: parsed.message || parsed.text, hotline: "109", riskState: parsed.policy?.riskState });
+          return;
         }
+        text += parsed.text || "";
       }
       // 태그 제거
       const clean = text
