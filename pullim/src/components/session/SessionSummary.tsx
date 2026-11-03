@@ -55,9 +55,16 @@ export default function SessionSummary({
 
   const [promiseState, setPromiseState] = useState<PromiseState>("suggest");
 
+  const [promiseError, setPromiseError] = useState<string | null>(null);
+
   function handleAccept() {
-    createPromise(example.trigger, example.action, theme);
-    setPromiseState("accepted");
+    try {
+      createPromise(example.trigger, example.action, theme);
+      setPromiseError(null);
+      setPromiseState("accepted");
+    } catch {
+      setPromiseError("약속을 저장하지 못했습니다. 기존 기록은 바꾸지 않았습니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요.");
+    }
   }
 
   function handleReject() {
@@ -112,6 +119,7 @@ export default function SessionSummary({
               </p>
             </div>
 
+            {promiseError && <p role="alert" className="text-sm text-red-200">{promiseError}</p>}
             <div className="flex gap-2">
               <button
                 onClick={handleAccept}
