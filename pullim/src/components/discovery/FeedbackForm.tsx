@@ -13,26 +13,27 @@ export default function FeedbackForm({ personalityType }: Props) {
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const available = isSupabaseAvailable();
 
   async function handleSubmit() {
-    if (rating === 0) return;
+    if (rating === 0 || loading) return;
     setLoading(true);
+    setSubmitError(false);
     try {
       const supabase = getSupabase();
-      if (supabase) {
-        await supabase.from("feedback").insert({
-          personality_type: personalityType,
-          rating,
-          message,
-          user_agent: navigator.userAgent,
-        });
-      }
+      if (!supabase) throw new Error("Feedback storage unavailable");
+      const { error } = await supabase.from("feedback").insert({
+        personality_type: personalityType,
+        rating,
+        message,
+        user_agent: navigator.userAgent,
+      });
+      if (error) throw error;
       setSubmitted(true);
     } catch {
-      // 에러 시 조용히 처리
-      setSubmitted(true);
+      setSubmitError(true);
     } finally {
       setLoading(false);
     }
@@ -108,6 +109,12 @@ export default function FeedbackForm({ personalityType }: Props) {
           fontSize: "14px",
         }}
       />
+
+      {submitError && (
+        <p role="alert" className="text-center text-xs text-red-200">
+          피드백을 보내지 못했습니다. 입력한 내용을 유지했으니 다시 시도해 주세요.
+        </p>
+      )}
 
       {/* 버튼 */}
       {available ? (
