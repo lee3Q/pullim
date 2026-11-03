@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef, useState } from "react";
+
 interface Props {
   message: string;
   hotline: string;
@@ -8,13 +10,31 @@ interface Props {
 }
 
 export default function CrisisAlert({ message, hotline, onClose, riskState }: Props) {
+  const confirmingRef = useRef(false);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState(false);
   const confirmSafe = async () => {
-    const response = await fetch("/api/ultimate/confirm-safety", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answer: "safe" }),
-    });
-    if (response.ok && (await response.json()).policy?.riskState === "open") onClose();
+    if (confirmingRef.current) return;
+    confirmingRef.current = true;
+    setConfirming(true);
+    setConfirmError(false);
+    try {
+      const response = await fetch("/api/ultimate/confirm-safety", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer: "safe" }),
+      });
+      if (!response.ok || (await response.json()).policy?.riskState !== "open") {
+        setConfirmError(true);
+        return;
+      }
+      onClose();
+    } catch {
+      setConfirmError(true);
+    } finally {
+      confirmingRef.current = false;
+      setConfirming(false);
+    }
   };
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -28,9 +48,14 @@ export default function CrisisAlert({ message, hotline, onClose, riskState }: Pr
         <p className="text-center text-sm text-white/60 mb-6">{hotline}</p>
         <div className="flex flex-col gap-2">
           {riskState === "awaiting_confirmation" && (
-            <button onClick={confirmSafe} className="w-full py-3 bg-white/10 text-white rounded-xl">
+            <button onClick={confirmSafe} disabled={confirming} aria-busy={confirming} className="w-full py-3 bg-white/10 text-white rounded-xl">
               지금은 안전합니다
             </button>
+          )}
+          {confirmError && (
+            <p role="alert" className="text-sm text-white/80 text-center">
+              확인을 완료하지 못했습니다. 다시 시도해 주세요.
+            </p>
           )}
           <a
             href="tel:109"
