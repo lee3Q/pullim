@@ -1,0 +1,41 @@
+import { test, expect } from '@playwright/test';
+test.use({ serviceWorkers: 'block' });
+test.setTimeout(45000);
+const promise = {id:'synthetic-promise',createdAt:1,sessionTheme:'모험가',trigger:'테스트를 끝냈을 때',action:'저장한 작은 실험 다시 보기',status:'completed',reflection:'합성 후기'};
+const action = {sessionId:'synthetic-action',action:'확정한 테스트 행동',deadline:null,createdAt:'2026-01-01T00:00:00Z',status:'pending'};
+test('home history shows past Ladder promises alongside confirmed actions without writing either store',async({page},testInfo)=>{
+ await page.goto('/');
+ await page.evaluate(({promise,action})=>{localStorage.setItem('pullim_promises',JSON.stringify([promise]));localStorage.setItem('pullim_action_history_v1',JSON.stringify([action]));},{promise,action});
+ await page.getByRole('button',{name:'내 기록',exact:true}).click();
+ await expect(page.getByRole('region',{name:'Ladder 약속'})).toContainText(promise.action);
+ await expect(page.getByText('약속 상태: 완료')).toBeVisible();
+ await expect(page.getByText('후기: 합성 후기')).toBeVisible();
+ await expect(page.getByRole('region',{name:'확정 행동'})).toContainText(action.action);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.screenshot({path:testInfo.outputPath('unified-history-mobile.png'),fullPage:true});
+ await page.setViewportSize({width:1280,height:900});await page.screenshot({path:testInfo.outputPath('unified-history-desktop.png'),fullPage:true});
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!))).toEqual([promise]);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_action_history_v1')!))).toEqual([action]);
+});
+test('stores fail independently and Ladder cross-tab corruption recovers without a write',async({page,context})=>{
+ await page.goto('/history');
+ await page.evaluate(({promise,action})=>{localStorage.setItem('pullim_promises','{partial');localStorage.setItem('pullim_action_history_v1',JSON.stringify([action]));},{promise,action});await page.reload();
+ await expect(page.getByRole('region',{name:'Ladder 약속'}).getByRole('alert')).toContainText('약속 기록을 읽지 못했습니다.');
+ await expect(page.getByText(action.action)).toBeVisible();
+ expect(await page.evaluate(()=>localStorage.getItem('pullim_promises'))).toBe('{partial');
+ const other=await context.newPage();await other.goto('/history');await other.evaluate(value=>localStorage.setItem('pullim_promises',JSON.stringify([value])),promise);
+ await expect(page.getByText(promise.action)).toBeVisible();await expect(page.getByRole('region',{name:'Ladder 약속'}).getByRole('alert')).toHaveCount(0);
+ await other.evaluate(()=>localStorage.setItem('pullim_promises','{partial'));
+ await expect(page.getByRole('region',{name:'Ladder 약속'}).getByRole('alert')).toBeVisible();await expect(page.getByText(promise.action)).toHaveCount(0);expect(await other.evaluate(()=>localStorage.getItem('pullim_promises'))).toBe('{partial');
+ await other.evaluate(value=>localStorage.setItem('pullim_promises',JSON.stringify([value])),promise);await expect(page.getByText(promise.action)).toBeVisible();
+ await other.evaluate(()=>localStorage.setItem('pullim_action_history_v1','{partial'));
+ await expect(page.getByRole('region',{name:'확정 행동'}).getByRole('alert')).toContainText('기록을 읽지 못했습니다.');await expect(page.getByText(promise.action)).toBeVisible();
+ await other.evaluate(()=>localStorage.clear());await expect(page.getByText('저장한 Ladder 약속이 없습니다.')).toBeVisible();
+});
+test('actual Ladder summary promise survives return to home history',async({page})=>{
+ await page.route('**/api/**',route=>route.fulfill({json:{}}));
+ await page.route('**/api/ultimate/listen',route=>route.fulfill({status:200,contentType:'text/event-stream',body:'data: '+JSON.stringify({text:'[SUMMARY]합성 테스트 요약[/SUMMARY][WRAP_SUGGEST]'})+'\n\ndata: [DONE]\n\n'}));
+ await page.goto('/adventure/synthetic-history?mode=ladder');await page.getByRole('button',{name:/직접 말할게/}).click();await page.getByRole('button',{name:'닫기',exact:true}).click();await page.getByRole('button',{name:'약속할게',exact:true}).click();await expect(page.getByText('기억해뒀어. 다음에 확인할게.')).toBeVisible();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!));expect(saved).toHaveLength(1);
+ await page.goto('/');await page.getByRole('button',{name:'내 기록',exact:true}).click();await expect(page.getByRole('region',{name:'Ladder 약속'})).toContainText(saved[0].action);await expect(page.getByText('약속 상태: 진행 중')).toBeVisible();
+});
