@@ -35,8 +35,12 @@ export function useUserProfile() {
       if (!userId) { setLoading(false); setIsNewUser(true); return; }
 
       // 온보딩 완료 여부 확인
-      const obDone = localStorage.getItem(ONBOARDING_STORAGE_KEY) === "true";
-      setOnboardingDone(obDone);
+      try {
+        setOnboardingDone(localStorage.getItem(ONBOARDING_STORAGE_KEY) === "true");
+      } catch {
+        // The profile API can still load with an existing durable user ID.
+        setOnboardingDone(false);
+      }
 
       // Supabase API 시도
       try {
