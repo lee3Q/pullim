@@ -47,3 +47,19 @@ test('open history follows another tab updates and browser-data clearing', async
   await expect(page.getByText('아직 기록이 없습니다.')).toBeVisible();
   await expect(page.getByText(record.action)).toHaveCount(0);
 });
+
+test('cross-tab corrupt data shows an error and recovers without rewriting storage', async ({ page, context }) => {
+  await page.goto('/history');
+  await page.evaluate(value => localStorage.setItem('pullim_action_history_v1', JSON.stringify([value])), record);
+  await page.reload();
+  await expect(page.getByText(record.action)).toBeVisible();
+  const other = await context.newPage();
+  await other.goto('/history');
+  await other.evaluate(() => localStorage.setItem('pullim_action_history_v1', '{partial'));
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('기록을 읽지 못했습니다.');
+  await expect(page.getByText('아직 기록이 없습니다.')).toHaveCount(0);
+  expect(await other.evaluate(() => localStorage.getItem('pullim_action_history_v1'))).toBe('{partial');
+  await other.evaluate(value => localStorage.setItem('pullim_action_history_v1', JSON.stringify([{ ...value, status: 'deferred' }])), record);
+  await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText('상태: 보류')).toBeVisible();
+});
