@@ -6,10 +6,15 @@ const STORAGE_KEY = "pullim_user_id";
 export function getUserId(): string {
   if (typeof window === "undefined") return "";
 
-  let id = localStorage.getItem(STORAGE_KEY);
-  if (!id) {
-    id = nanoid();
-    localStorage.setItem(STORAGE_KEY, id);
+  try {
+    let id = localStorage.getItem(STORAGE_KEY);
+    if (!id) {
+      id = nanoid();
+      localStorage.setItem(STORAGE_KEY, id);
+    }
+    return id;
+  } catch {
+    // No durable identity is available; do not invent one for profile requests.
+    return "";
   }
-  return id;
 }
