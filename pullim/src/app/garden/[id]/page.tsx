@@ -30,6 +30,7 @@ import GameInput from "@/components/game/GameInput";
 import Link from "next/link";
 import { loadActions, saveAction } from "@/lib/session/action-history";
 import LadderSessionPage from "@/components/session/LadderSessionPage";
+import { readSseData } from "@/lib/session/sse-data";
 
 const theme = getTheme("달빛정원");
 
@@ -299,40 +300,32 @@ export default function GardenSessionPage() {
         setIsStreaming(false);
         return;
       }
-      const decoder = new TextDecoder();
       let fullText = "";
       let listenComplete = false;
       let newSummary = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        for (const line of chunk.split("\n")) {
-          if (!line.startsWith("data: ")) continue;
-          const data = line.slice(6);
-          if (data === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.crisis) {
-              setCrisis({
-                message: parsed.text || parsed.hotlines?.[0]?.name || "",
-                hotline: parsed.hotlines?.[0]?.number || "109",
-                riskState: parsed.policy?.riskState,
-              });
-              setIsStreaming(false);
-              return;
-            }
-            if (parsed.text) fullText += parsed.text;
-            if (parsed.listenSummary) {
-              newSummary = parsed.listenSummary;
-              setListenSummary(parsed.listenSummary);
-            }
-            if (parsed.recommendedCrystals) void parsed.recommendedCrystals;
-            if (parsed.listenComplete) listenComplete = true;
-          } catch {
-            /* ignore */
+      for await (const data of readSseData(reader)) {
+        if (data === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.crisis) {
+            setCrisis({
+              message: parsed.text || parsed.hotlines?.[0]?.name || "",
+              hotline: parsed.hotlines?.[0]?.number || "109",
+              riskState: parsed.policy?.riskState,
+            });
+            setIsStreaming(false);
+            return;
           }
+          if (parsed.text) fullText += parsed.text;
+          if (parsed.listenSummary) {
+            newSummary = parsed.listenSummary;
+            setListenSummary(parsed.listenSummary);
+          }
+          if (parsed.recommendedCrystals) void parsed.recommendedCrystals;
+          if (parsed.listenComplete) listenComplete = true;
+        } catch {
+          /* ignore */
         }
       }
 
@@ -829,4 +822,4 @@ export default function GardenSessionPage() {
       </main>
     </div>
   );
-}
+    }
