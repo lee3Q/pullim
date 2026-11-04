@@ -67,3 +67,64 @@ test('Ladder failed skip does not advance, but explicit unsaved continuation is 
   await expect(page.getByText('오늘은 어떻게 시작할까?')).toBeVisible();
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!)[0].status)).toBe('active');
 });
+
+const older={...record,id:'older',createdAt:1,trigger:'아침에',action:'오래된 약속 물 마시기'};
+const newer={...record,id:'newer',createdAt:2,trigger:'저녁에',action:'최근 약속 책 읽기'};
+test('multiple active promises can be selected without writing, keeping newest default',async({page},testInfo)=>{
+  await page.addInitScript(values=>localStorage.setItem('pullim_promises',JSON.stringify(values)),[older,newer]);
+  await page.goto('/adventure/synthetic?mode=ladder');
+  const choice=page.getByLabel('확인할 약속',{exact:true});
+  await expect(choice).toHaveValue('newer');
+  const before=await page.evaluate(()=>localStorage.getItem('pullim_promises'));
+  await choice.selectOption('older');
+  await expect(page.getByText('→ 오래된 약속 물 마시기',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>localStorage.getItem('pullim_promises'))).toBe(before);
+  await page.screenshot({path:testInfo.outputPath('older-promise-selected.png'),fullPage:true});
+  await page.getByRole('button',{name:'✓ 했어',exact:true}).click();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!));
+  expect(saved[0].status).toBe('completed');expect(saved[1]).toEqual(newer);
+  await expect(page.getByText('대단한데. 기억하고 지켜봤어.')).toBeVisible();
+  await expect(choice).toHaveCount(0);
+});
+test('selected older promise write failure keeps both active and retry updates only selection',async({page})=>{
+  await page.addInitScript(values=>localStorage.setItem('pullim_promises',JSON.stringify(values)),[older,newer]);
+  await page.goto('/adventure/synthetic?mode=ladder');
+  await page.getByLabel('확인할 약속',{exact:true}).selectOption('older');
+  await page.evaluate(()=>{const original=Storage.prototype.setItem;(window as any).restoreWrite=()=>{Storage.prototype.setItem=original};Storage.prototype.setItem=function(k,v){if(k==='pullim_promises')throw new Error('synthetic quota');return original.call(this,k,v)};});
+  await page.getByRole('button',{name:'못했어',exact:true}).click();
+  await expect(page.getByRole('main').getByRole('alert')).toContainText('약속 확인을 저장하지 못했습니다.');
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!)) ).toEqual([older,newer]);
+  await expect(page.getByLabel('확인할 약속',{exact:true})).toHaveValue('older');
+  await page.evaluate(()=>(window as any).restoreWrite());
+  await page.getByRole('button',{name:'못했어',exact:true}).click();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!));
+  expect(saved[0].status).toBe('failed');expect(saved[1]).toEqual(newer);
+});
+test('completed promises are not choices and a single active promise needs no selector',async({page})=>{
+  await page.addInitScript(values=>localStorage.setItem('pullim_promises',JSON.stringify(values)),[{...older,status:'completed'},newer]);
+  await page.goto('/adventure/synthetic?mode=ladder');
+  await expect(page.getByText('지난번 약속 기억해?')).toBeVisible();
+  await expect(page.getByLabel('확인할 약속',{exact:true})).toHaveCount(0);
+  await expect(page.getByText('→ 최근 약속 책 읽기',{exact:true})).toBeVisible();
+});
+test('later applies only to selected older promise without changing other records',async({page})=>{
+  await page.addInitScript(values=>localStorage.setItem('pullim_promises',JSON.stringify(values)),[older,newer]);
+  await page.goto('/adventure/synthetic?mode=ladder');
+  await page.getByLabel('확인할 약속',{exact:true}).selectOption('older');
+  await page.getByRole('button',{name:'나중에 얘기할게',exact:true}).click();
+  await expect(page.getByText('오늘은 어떻게 시작할까?')).toBeVisible();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!));
+  expect(saved[0].status).toBe('skipped');expect(saved[1]).toEqual(newer);
+});
+test('selection can change after failed write without recording either promise',async({page})=>{
+  await page.addInitScript(values=>localStorage.setItem('pullim_promises',JSON.stringify(values)),[older,newer]);
+  await page.goto('/adventure/synthetic?mode=ladder');
+  await page.getByLabel('확인할 약속',{exact:true}).selectOption('older');
+  await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new Error('synthetic quota')};});
+  await page.getByRole('button',{name:'✓ 했어',exact:true}).click();
+  await expect(page.getByRole('main').getByRole('alert')).toBeVisible();
+  await page.getByLabel('확인할 약속',{exact:true}).selectOption('newer');
+  await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText('→ 최근 약속 책 읽기',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('pullim_promises')!))).toEqual([older,newer]);
+});
