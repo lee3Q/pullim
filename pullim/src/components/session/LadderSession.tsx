@@ -182,6 +182,7 @@ export default function LadderSession({
 
   // 약속 확인 상태 (진입 화면)
   const [activePromise, setActivePromise] = useState<PullimPromise | null>(null);
+  const [activePromises, setActivePromises] = useState<PullimPromise[]>([]);
   const [promiseError, setPromiseError] = useState<string | null>(null);
   const [promiseChecked, setPromiseChecked] = useState(false);
   const [promiseFeedback, setPromiseFeedback] = useState<string | null>(null);
@@ -310,6 +311,7 @@ export default function LadderSession({
   const loadPromise = useCallback(() => {
     try {
       const promises = getActivePromises();
+      setActivePromises(promises);
       setActivePromise(promises[promises.length - 1] ?? null);
       setPromiseError(null);
     } catch {
@@ -835,6 +837,21 @@ export default function LadderSession({
 
         {!promiseFeedback ? (
           <>
+            {activePromises.length > 1 && <label className="block text-sm text-white/80 space-y-2">
+              <span>확인할 약속</span>
+              <select
+                aria-label="확인할 약속"
+                className="w-full rounded-lg border border-white/30 bg-[#15121c] text-white px-3 py-3"
+                value={activePromise.id}
+                onChange={event => {
+                  const selected = activePromises.find(promise => promise.id === event.target.value);
+                  if (selected) { setActivePromise(selected); setPromiseError(null); }
+                }}
+              >
+                {[...activePromises].reverse().map(promise => <option key={promise.id} value={promise.id}>{promise.trigger} → {promise.action}</option>)}
+              </select>
+              <span className="block text-xs text-white/60">선택만으로는 기록이 바뀌지 않습니다. 아래 답변은 선택한 약속에만 저장됩니다.</span>
+            </label>}
             <div
               className="rpg-panel rounded-2xl p-5 space-y-3"
             >
@@ -1463,4 +1480,4 @@ function getLengthTrend(
   if (avg < prevAvg * 0.6) return "shorter";
   if (avg > prevAvg * 1.5) return "longer";
   return "stable";
-}
+          }
