@@ -1480,4 +1480,4 @@ function getLengthTrend(
   if (avg < prevAvg * 0.6) return "shorter";
   if (avg > prevAvg * 1.5) return "longer";
   return "stable";
-          }
+}
