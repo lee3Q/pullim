@@ -9,6 +9,7 @@ import type { PullimPromise } from "@/lib/session/ladder-types";
 
 export default function HistoryPage() {
   const router = useRouter();
+  const [exportError, setExportError] = useState<string | null>(null);
   const [records, setRecords] = useState<ActionRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -41,6 +42,26 @@ export default function HistoryPage() {
   const change = (operation: () => void) => {
     try { operation(); refresh(); }
     catch { setError("변경을 저장하지 못했습니다. 기존 화면을 유지합니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요."); }
+  };
+
+  const downloadHistory = () => {
+    if (!window.confirm("확정 행동과 Ladder 약속의 문장·후기가 담긴 개인 파일을 이 기기에 저장할까요? 공유하지 않도록 주의해 주세요.")) return;
+    try {
+      const actions = loadActions(localStorage).map(({ action, deadline, createdAt, status }) =>
+        ({ action, deadline, createdAt, status }));
+      const promises = getPromiseHistory().map(({ createdAt, sessionTheme, trigger, action, status, checkedAt, reflection }) =>
+        ({ createdAt, sessionTheme, trigger, action, status, ...(checkedAt === undefined ? {} : { checkedAt }), ...(reflection === undefined ? {} : { reflection }) }));
+      const contents = JSON.stringify({ format: "pullim-local-history-v1", exportedAt: new Date().toISOString(), actions, promises }, null, 2);
+      const url = URL.createObjectURL(new Blob([contents], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "pullim-local-history.json";
+      document.body.appendChild(link);
+      try { link.click(); } finally { link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000); }
+      setExportError(null);
+    } catch {
+      setExportError("기록 파일을 만들지 못했습니다. 두 기록의 저장 공간과 형식을 확인한 뒤 다시 시도해 주세요. 기존 데이터는 바꾸지 않았습니다.");
+    }
   };
 
   return (
@@ -76,6 +97,11 @@ export default function HistoryPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <div className="rpg-panel px-8 py-10 max-w-sm md:max-w-lg lg:max-w-xl w-full text-center">
           <p className="text-white/60 text-xs mb-4">이 브라우저에 저장한 확정 행동과 Ladder 약속을 따로 보여줍니다. 다른 기기와 동기화되지 않으며, 브라우저 데이터를 지우면 사라집니다.</p>
+          <section aria-label="기록 내려받기" className="mb-6">
+            <button className="rpg-button-ghost px-3 py-2 text-sm" onClick={downloadHistory}>기록 파일 내려받기</button>
+            <p className="text-white/60 text-xs mt-3">확정 행동과 약속의 문장·날짜·상태·후기를 JSON 파일로 저장합니다. 개인 내용이 담기니 보관에 주의해 주세요. 대화 원문·프로필·내부 기록 ID는 포함하지 않습니다. 문장 안의 개인정보는 지워지지 않으며, 앱으로 다시 불러오는 기능은 없습니다.</p>
+            {exportError && <p role="alert" data-testid="history-export-error" className="text-red-200 text-sm mt-3">{exportError}</p>}
+          </section>
           <section aria-label="확정 행동">
           <h2 className="text-white/90 text-base mb-3">확정 행동</h2>
           {error && <div role="alert" className="text-red-200 text-sm mb-4"><p>{error}</p><button className="rpg-button-ghost mt-2 px-3 py-2" onClick={refresh}>다시 시도</button></div>}
