@@ -2,7 +2,8 @@ import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { detectCrisis } from "./crisis-detector";
 import { gateRiskAction } from "./risk-gate";
-import { executeProposal, type DecisionStage } from "./proposal-policy";
+import { executeProposal } from "./proposal-policy";
+import { destination } from "./ultimate-stage";
 import { holdUltimateRequest, type UltimateRoute } from "./ultimate-guard";
 import { commitPolicyState, loadPolicyState, markPolicyEmergency, StalePolicyState, type PolicyState } from "./policy-state-store";
 
@@ -95,19 +96,6 @@ function inputText(route: UltimateRoute, body: Record<string, unknown>): string 
       .map((item) => item.content).filter((item): item is string => typeof item === "string").join("\n");
   }
   return [body.concern, body.listenSummary].filter((item): item is string => typeof item === "string").join("\n");
-}
-function destination(route: UltimateRoute, body: Record<string, unknown>, current: DecisionStage): DecisionStage | null {
-  if (route === "behind_thought") return current;
-  if (route === "listen") return current === "check_in" ? "define_problem" : current === "define_problem" ? current : null;
-  if (route === "research" || route === "ladder_research") return current === "define_problem" || current === "research" ? "research" : null;
-  if (route === "judge") {
-    return body.mode === "logic"
-      ? current === "values" || current === "provisional_decision" || current === "next_action" ? current : null
-      : current === "research" ? current : null;
-  }
-  if (route === "analyze" || route === "ladder_analyze") return current === "research" || current === "values" ? "values" : null;
-  if (route === "debate") return current === "values" ? current : null;
-  return current === "values" || current === "provisional_decision" ? "provisional_decision" : null;
 }
 function blocked(state: State, reason: string, message: string): Response {
   return Response.json({ policy: { status: "blocked", reason, stage: state.stage, riskState: state.riskState,
