@@ -120,22 +120,22 @@ export function getDemoListenResponse(turnCount: number, theme?: DemoTheme) {
 
 export const DEMO_RESEARCH_CARDS: DataCard[] = [
   {
-    title: "📊 창업 생존율 통계",
-    fact: "중소벤처기업부 2025년 조사 기준, 1인 창업 기업의 3년 생존율은 38.1%. 다만 IT/소프트웨어 분야는 47.2%로 평균보다 높다.",
-    source: { name: "중소벤처기업부", url: "" },
-    confidence: "high",
+    title: "📊 [가상 예시] 창업 생존율 수치",
+    fact: "데모용 가상 수치입니다. 실제 조사나 기관의 발표가 아닙니다. 실제 모드에서는 검색된 근거가 여기에 표시됩니다.",
+    source: { name: "가상 예시 (실제 출처 아님)", url: "" },
+    confidence: "low",
   },
   {
-    title: "💡 직장인 창업 사례",
-    fact: "토스 이승건 대표는 치과의사 출신으로, 안정적인 직업을 두고 8번의 실패 끝에 성공. 핵심은 '퇴사 전 6개월 간 주말 창업으로 검증'이었다.",
-    source: { name: "스타트업 사례 연구", url: "" },
-    confidence: "medium",
+    title: "💡 [가상 예시] 직장인 창업 사례",
+    fact: "데모용으로 지어낸 사례입니다. 실존 인물이나 회사와 관계없습니다.",
+    source: { name: "가상 예시 (실제 출처 아님)", url: "" },
+    confidence: "low",
   },
   {
-    title: "🔬 전환 비용 연구",
-    fact: "하버드 비즈니스 리뷰에 따르면, 직장인이 창업 전환 시 최소 6개월 생활비 + 사업 초기 자금을 확보해야 심리적 안정감이 유지된다. 자금 부족은 판단력 저하로 이어진다.",
-    source: { name: "Harvard Business Review", url: "" },
-    confidence: "high",
+    title: "🔬 [가상 예시] 전환 비용 연구",
+    fact: "데모용 가상 문장입니다. 실제 연구나 매체의 주장이 아닙니다.",
+    source: { name: "가상 예시 (실제 출처 아님)", url: "" },
+    confidence: "low",
   },
 ];
 
