@@ -50,6 +50,22 @@ The browser config starts a separate local server with synthetic auth settings
 and blocks service workers so fixture interception is deterministic. These tests
 do not verify a live Auth service, deployed RLS, or account persistence.
 
+## Home discovery and device storage
+
+The home's story result is available in the current screen even when browser
+storage rejects an identity, profile, or selection write. A visible notice says
+that device storage is incomplete and offers retry after permissions or space
+are restored. The current result stays in memory; there is no new persistent
+queue. Copy anything needed before leaving or reloading. Partial writes can
+remain if only one storage operation failed.
+
+The optional existing discovery API call is attempted only after both local
+records and a durable browser identity are available. Clearing the notice means
+local storage succeeded, not that any remote service accepted the record. This
+path still uses a browser-local identifier, not the account UUID used by signed-in
+summary saves. Its server schema/auth policies and deployed persistence are not
+validated by these synthetic UI checks.
+
 ## Decision policy
 
 All six `/api/ultimate/*` conversation routes and the ladder research,
