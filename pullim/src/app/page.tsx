@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { nanoid } from "nanoid";
@@ -21,6 +21,7 @@ import AuthModal from "@/components/AuthModal";
 import { useSettings } from "@/hooks/useSettings";
 import { useBGM } from "@/hooks/useBGM";
 import { useAuth } from "@/hooks/useAuth";
+import { getUserId } from "@/lib/user-id";
 
 // ThemeType ↔ ThemeName 매핑
 const THEME_TO_NAME: Record<ThemeType, ThemeName> = {
@@ -105,6 +106,9 @@ export default function HomePage() {
   const [selectedEntry, setSelectedEntry] = useState<"concern" | "bored" | "curious">("concern");
   const [personalityType, setPersonalityType] = useState<PersonalityType | null>(null);
   const [savedProfile, setSavedProfile] = useState<ProbabilityProfile | null>(null);
+  const [discoverySaveError, setDiscoverySaveError] = useState(false);
+  const discoveryPersisted = useRef(false);
+  const [pendingDiscovery, setPendingDiscovery] = useState<{ profile: ProbabilityProfile; selections: StorySelectionRecord[] } | null>(null);
   const [crisis, setCrisis] = useState<{
     message: string;
     hotline: string;
@@ -150,37 +154,40 @@ export default function HomePage() {
     handleStartSession(THEME_TO_NAME[themeKey], "concern");
   };
 
+  const persistDiscovery = useCallback((profile: ProbabilityProfile, selections: StorySelectionRecord[]) => {
+    if (discoveryPersisted.current) return;
+    let localSaved = true;
+    try {
+      localStorage.setItem("pullim_user_profile", JSON.stringify({ profile, sessionCount: 0, lastSessionAt: new Date().toISOString(), lastSatisfaction: null, completedSessions: 0 }));
+      localStorage.setItem("pullim_discovery", JSON.stringify(selections));
+    } catch {
+      localSaved = false;
+    }
+    const userId = getUserId();
+    const complete = localSaved && !!userId;
+    setDiscoverySaveError(!complete);
+    if (!complete) return;
+    // Synchronous guard also covers queued clicks before React removes the button.
+    discoveryPersisted.current = true;
+    // Existing optional remote path, not evidence that remote storage succeeded.
+    fetch("/api/discovery-selections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, theme: selectedTheme, selections, profile }),
+    }).catch(() => {});
+  }, [selectedTheme]);
+
   const handleDiscoveryComplete = useCallback(
     (profile: ProbabilityProfile, selections: StorySelectionRecord[]) => {
-      try {
-        localStorage.setItem("pullim_user_profile", JSON.stringify({ profile, sessionCount: 0, lastSessionAt: new Date().toISOString(), lastSatisfaction: null, completedSessions: 0 }));
-        localStorage.setItem("pullim_discovery", JSON.stringify(selections));
-      } catch {
-        // localStorage 실패 무시
-      }
-
-      // Supabase 저장 (fire-and-forget)
-      const userId =
-        localStorage.getItem("pullim_user_id") || nanoid(12);
-      localStorage.setItem("pullim_user_id", userId);
-
-      fetch("/api/discovery-selections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId,
-          theme: selectedTheme,
-          selections,
-          profile,
-        }),
-      }).catch(() => {});
-
-      const type = getPersonalityType(profile);
-      setPersonalityType(type);
+      // Result availability does not depend on storage permissions.
+      discoveryPersisted.current = false;
+      setPendingDiscovery({ profile, selections });
+      setPersonalityType(getPersonalityType(profile));
       setSavedProfile(profile);
       setPhase("result");
+      persistDiscovery(profile, selections);
     },
-    [selectedTheme]
+    [persistDiscovery]
   );
 
   const [isNavigating, setIsNavigating] = useState(false);
@@ -515,6 +522,14 @@ export default function HomePage() {
         {/* ── 유형 결과 ── */}
         {phase === "result" && personalityType && savedProfile && (
           <div className="w-full max-w-sm md:max-w-lg lg:max-w-xl animate-in fade-in duration-500">
+            {discoverySaveError && (
+              <div role="alert" className="rounded-2xl border border-white/20 bg-white/5 p-5 mb-5 space-y-3">
+                <p className="text-sm text-white/90 leading-relaxed">이 기기 저장을 끝내지 못했습니다. 결과는 이 화면에서 볼 수 있습니다. 나가거나 새로고침하면 결과를 잃을 수 있으니 필요한 내용은 복사해 주세요. 저장 공간과 권한을 확인한 뒤 다시 시도할 수 있습니다.</p>
+                <button className="w-full rounded-xl border border-white/30 px-4 py-3 text-sm text-white" onClick={() => {
+                  if (pendingDiscovery) persistDiscovery(pendingDiscovery.profile, pendingDiscovery.selections);
+                }}>기기 저장 다시 시도</button>
+              </div>
+            )}
             <PersonalityResult
               type={personalityType}
               profile={savedProfile}
