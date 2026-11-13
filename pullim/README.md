@@ -20,6 +20,36 @@ with HTTP 503 if the secret or durable store is unavailable. Local development
 uses process memory for the synthetic demo; restarting that process starts fresh
 sessions. See `.env.local.example` for the configuration names.
 
+## Signed-in summary save
+
+The ladder's existing account-save path sends the current Supabase bearer to
+`/api/session-save`. The route creates a request-local client, verifies the user
+with Supabase Auth, and requires that identity to match the requested account.
+The existing `sessions` INSERT and SELECT row-level policies still apply.
+Missing, expired, or mismatched authentication cannot save through this route.
+The other browser-local profile/discovery identifiers are separate and are not
+migrated by this path.
+
+A failed or unconfirmed account save keeps the summary visible and offers retry
+for the same account. Each retry reuses an in-memory operation UUID and snapshot;
+it never overwrites an existing row. If the insert already happened but its
+response was lost, a duplicate ID counts as saved only after the existing row is
+read through the same user's RLS and all saved fields match. Leaving or reloading
+the screen discards this retry state. Copy a needed summary before leaving.
+This does not add a durable retry queue or change storage/retention policy.
+
+Synthetic transport and browser checks, without a real account or service:
+
+```sh
+npm test
+node scripts/verify-session-save-http.mjs --out /tmp/session-save-http.json
+npx playwright test --config playwright.session-save.config.ts
+```
+
+The browser config starts a separate local server with synthetic auth settings
+and blocks service workers so fixture interception is deterministic. These tests
+do not verify a live Auth service, deployed RLS, or account persistence.
+
 ## Decision policy
 
 All six `/api/ultimate/*` conversation routes and the ladder research,
