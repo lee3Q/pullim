@@ -51,6 +51,7 @@ jobs:
           tests/e2e/ladder-promises.spec.ts
           tests/e2e/ladder-summary-stream.spec.ts
           tests/e2e/metadata.spec.ts
+          tests/e2e/discovery-storage.spec.ts
           tests/e2e/profile-storage-denied.spec.ts
           tests/e2e/result-share.spec.ts
       - run: npx playwright test --config playwright.feedback.config.ts --workers=1
