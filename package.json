@@ -1,25 +1,37 @@
 {
   "name": "pullim",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Open-source cognitive unraveling & Socratic decision workbench (Web + CLI + TypeScript Engine)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lee3Q/pullim.git"
+  },
+  "keywords": [
+    "decision-making",
+    "socratic-questioning",
+    "metacognition",
+    "implementation-intentions",
+    "cognitive-ladder",
+    "decision-journal",
+    "local-first",
+    "open-source"
+  ],
+  "bin": {
+    "pullim": "./bin/pullim.mjs"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/ --max-warnings 20",
-    "test": "node --test tests/*.test.mjs"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "cli": "node bin/pullim.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@capacitor/android": "^8.3.0",
-    "@capacitor/cli": "^8.3.0",
-    "@capacitor/core": "^8.3.0",
-    "@capacitor/haptics": "^8.0.2",
-    "@capacitor/ios": "^8.3.0",
-    "@capacitor/push-notifications": "^8.0.3",
-    "@capacitor/share": "^8.0.1",
-    "@capacitor/splash-screen": "^8.0.1",
-    "@capacitor/status-bar": "^8.0.2",
     "@google/generative-ai": "^0.24.1",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
@@ -31,7 +43,6 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

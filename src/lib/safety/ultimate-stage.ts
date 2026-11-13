@@ -1,5 +1,5 @@
-import type { DecisionStage } from "./proposal-policy";
-import type { UltimateRoute } from "./ultimate-guard";
+import type { DecisionStage } from "./proposal-policy.ts";
+import type { UltimateRoute } from "./ultimate-guard.ts";
 
 export function destination(route: UltimateRoute, body: Record<string, unknown>, current: DecisionStage): DecisionStage | null {
   if (route === "behind_thought") return current;

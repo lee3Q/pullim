@@ -1,4 +1,4 @@
-import { TIER_A_KEYWORDS, TIER_B_KEYWORDS } from "./crisis-keywords";
+import { TIER_A_KEYWORDS, TIER_B_KEYWORDS } from "./crisis-keywords.ts";
 
 export type CrisisTier = "A" | "B" | null;
 

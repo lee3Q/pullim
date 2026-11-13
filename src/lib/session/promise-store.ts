@@ -1,4 +1,4 @@
-import type { PullimPromise } from "./ladder-types";
+import type { PullimPromise } from "./ladder-types.ts";
 
 const STORAGE_KEY = "pullim_promises";
 

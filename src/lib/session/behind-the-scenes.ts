@@ -1,8 +1,8 @@
 // 이면 사고 엔진: 수집 → 추론 → 조정
 // 사용자에게 보이지 않는 레이어
 
-import type { BehaviorSignals } from "../personalization/behavior-reader";
-import type { LadderLevel, BehindEvent, LadderMessage, ThemeSuggestion } from "./ladder-types";
+import type { BehaviorSignals } from "../personalization/behavior-reader.ts";
+import type { LadderLevel, BehindEvent, LadderMessage, ThemeSuggestion } from "./ladder-types.ts";
 
 export interface BehindInference {
   // 추론 결과
