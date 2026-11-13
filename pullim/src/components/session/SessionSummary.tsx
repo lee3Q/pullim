@@ -8,6 +8,8 @@ interface SessionSummaryProps {
   theme: string;
   onClose: () => void;
   onBackToHome: () => void;
+  accountSaveStatus?: "idle" | "saving" | "saved" | "failed" | "auth-error";
+  onRetryAccountSave?: () => void;
 }
 
 const PROMISE_EXAMPLES: Record<string, Array<{ trigger: string; action: string }>> = {
@@ -45,6 +47,8 @@ export default function SessionSummary({
   theme,
   onClose,
   onBackToHome,
+  accountSaveStatus = "idle",
+  onRetryAccountSave,
 }: SessionSummaryProps) {
   const examples = PROMISE_EXAMPLES[theme] ?? PROMISE_EXAMPLES["모험가"];
   const example = useMemo(
@@ -80,6 +84,17 @@ export default function SessionSummary({
           {summary}
         </p>
       </div>
+
+      {accountSaveStatus !== "idle" && (
+        <div className="rounded-2xl border border-white/15 bg-white/5 p-5 space-y-3" role={accountSaveStatus === "failed" || accountSaveStatus === "auth-error" ? "alert" : "status"}>
+          <p className="text-sm text-white/90 leading-relaxed">
+            {accountSaveStatus === "saving" ? "계정에 요약을 저장하고 있습니다." : accountSaveStatus === "saved" ? "계정에 요약을 저장했습니다." : accountSaveStatus === "auth-error" ? "로그인 상태를 읽지 못해 계정 저장을 시작하지 않았습니다. 요약은 이 화면에 남아 있습니다. 나가기 전 요약을 복사하고 로그인 상태를 확인해 주세요." : "계정에 요약이 저장됐는지 확인하지 못했습니다. 요약은 이 화면에 남아 있습니다. 같은 계정으로 로그인한 뒤 다시 시도해 주세요. 나가기 전 필요하면 요약을 복사해 주세요."}
+          </p>
+          {accountSaveStatus === "failed" && onRetryAccountSave && (
+            <button onClick={onRetryAccountSave} className="w-full rounded-xl border border-white/30 px-4 py-3 text-sm text-white">계정 저장 다시 시도</button>
+          )}
+        </div>
+      )}
 
       {/* 약속 섹션 */}
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 space-y-4">
