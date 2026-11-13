@@ -24,7 +24,8 @@ import { shouldLevelUp, shouldLevelDown, detectFreeTextIntent } from "@/lib/sess
 import type { BehaviorSignals } from "@/lib/personalization/behavior-reader";
 import { updateRecommendationRate } from "@/lib/personalization/probability-profile";
 import { useSettings } from "@/hooks/useSettings";
-import { getAuthUser } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/client";
+import { saveCompletedSession, type CompletedSessionSave } from "@/lib/supabase/session-save-client";
 import AdInterstitial from "@/components/AdInterstitial";
 import { useAdGate } from "@/hooks/useAdGate";
 import { checkToolTrigger, extractTopicSummary } from "@/lib/session/tool-trigger";
@@ -179,6 +180,46 @@ export default function LadderSession({
 
   // 데모 모드 알림
   const [demoNotice, setDemoNotice] = useState(false);
+  const [accountSaveStatus, setAccountSaveStatus] = useState<"idle" | "saving" | "saved" | "failed" | "auth-error">("idle");
+  const pendingAccountSave = useRef<{ userId: string; payload: CompletedSessionSave; running: boolean } | null>(null);
+  const accountSaveGeneration = useRef(0);
+
+  const retryAccountSave = useCallback(async () => {
+    const pending = pendingAccountSave.current;
+    if (!pending || pending.running) return;
+    pending.running = true;
+    setAccountSaveStatus("saving");
+    const saved = await saveCompletedSession(getSupabase(), pending.userId, pending.payload);
+    pending.running = false;
+    if (pendingAccountSave.current === pending) setAccountSaveStatus(saved ? "saved" : "failed");
+  }, []);
+
+  const saveAccountSummary = useCallback((summary: string) => {
+    const generation = ++accountSaveGeneration.current;
+    pendingAccountSave.current = null;
+    setAccountSaveStatus("idle");
+    // Snapshot now, before any asynchronous auth request or later conversation.
+    const payload: CompletedSessionSave = {
+      id: crypto.randomUUID(), session_id: store.sessionId, theme, summary,
+      turn_count: store.turnCount, cheat_count: store.cheatCount,
+      messages_count: store.messages.length, entry_mode: entryMode,
+      created_at: new Date().toISOString(),
+    };
+    const client = getSupabase();
+    if (!client) return;
+    client.auth.getSession().then(({ data, error }) => {
+      if (accountSaveGeneration.current !== generation) return;
+      if (error) { setAccountSaveStatus("auth-error"); return; }
+      const user = data.session?.user;
+      if (!user) return;
+      // This local identity only scopes retries. The route verifies it with Auth.
+      pendingAccountSave.current = { userId: user.id, payload, running: false };
+      void retryAccountSave();
+    }).catch(() => {
+      if (accountSaveGeneration.current === generation) setAccountSaveStatus("auth-error");
+    });
+  }, [store, theme, entryMode, retryAccountSave]);
+
 
   // 약속 확인 상태 (진입 화면)
   const [activePromise, setActivePromise] = useState<PullimPromise | null>(null);
@@ -523,6 +564,9 @@ export default function LadderSession({
 
         // 세션 종료 제안 감지
         if (result.wrapSuggest && result.summary) {
+          accountSaveGeneration.current++;
+          pendingAccountSave.current = null;
+          setAccountSaveStatus("idle");
           store.endSession(result.summary);
           setPhase("ad-end");
         }
@@ -631,6 +675,9 @@ export default function LadderSession({
 
   // ── 세션 요약 생성 ──
   const generateSummary = useCallback(async () => {
+    accountSaveGeneration.current++;
+    pendingAccountSave.current = null;
+    setAccountSaveStatus("idle");
     setIsLoading(true);
     // 대화에서 핵심 추출
     const userMessages = store.messages
@@ -694,51 +741,15 @@ export default function LadderSession({
         .trim();
       const finalSummary = clean || "오늘 이야기를 나눴어.";
       store.endSession(finalSummary);
-      // fire-and-forget: 로그인 유저면 Supabase에도 저장
-      getAuthUser().then((authUser) => {
-        if (!authUser) return;
-        fetch("/api/session-save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: authUser.id,
-            session_id: store.sessionId,
-            theme,
-            summary: finalSummary,
-            turn_count: store.turnCount,
-            cheat_count: store.cheatCount,
-            messages_count: store.messages.length,
-            entry_mode: entryMode,
-            created_at: new Date().toISOString(),
-          }),
-        }).catch(() => {});
-      });
+      saveAccountSummary(finalSummary);
     } catch {
       const fallbackSummary = getDemoSummary(theme);
       store.endSession(fallbackSummary);
-      // fire-and-forget: 로그인 유저면 Supabase에도 저장
-      getAuthUser().then((authUser) => {
-        if (!authUser) return;
-        fetch("/api/session-save", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: authUser.id,
-            session_id: store.sessionId,
-            theme,
-            summary: fallbackSummary,
-            turn_count: store.turnCount,
-            cheat_count: store.cheatCount,
-            messages_count: store.messages.length,
-            entry_mode: entryMode,
-            created_at: new Date().toISOString(),
-          }),
-        }).catch(() => {});
-      });
+      saveAccountSummary(fallbackSummary);
     }
     setIsLoading(false);
     setPhase("ad-end");
-  }, [store, theme, entryMode, onCrisis]);
+  }, [store, theme, onCrisis, saveAccountSummary]);
 
   // ── 치트 선택지 ──
   const handleCheat = useCallback(() => {
@@ -1007,6 +1018,8 @@ export default function LadderSession({
       <SessionSummary
         summary={store.summary}
         theme={theme}
+        accountSaveStatus={accountSaveStatus}
+        onRetryAccountSave={() => { void retryAccountSave(); }}
         onClose={() => {
           store.endSession(store.summary!); // keep summary
           setPhase("session");
