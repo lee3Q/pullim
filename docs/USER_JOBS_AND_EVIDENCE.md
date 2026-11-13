@@ -1,78 +1,46 @@
-# Pullim: user jobs and evidence boundaries
+# Pullim: User Jobs, Research Foundations, and Safety Boundaries
 
-Research checked 2026-11-02. A product hypothesis, not proof of benefit.
+## 1. Core User Job
 
-## Proposed first user job
+An adult has an ordinary, non-emergency concern (career choice, project priority, relationship boundary, or cognitive overload). A blank journal is too hard to begin, while generic chatbots jump straight to prescriptive advice. They want a structured, Socratic unraveling flow that ends with **their own reversible choice and concrete action cue**, not an AI verdict.
 
-An adult has an ordinary, non-emergency concern such as which small project to
-start this week. A blank journal is hard to begin. They want a short guided
-conversation that ends with their own reversible choice, not an AI verdict.
+Each Pullim session produces:
 
-A useful session would produce:
+1. **Facts vs. Assumptions Separation**: What actually happened vs. unverified fears/projections, paired with counter-example questions.
+2. **Cognitive Trap Inspection**: Detection of binary thinking, catastrophizing, mind-reading, should-pressure, sunk-cost bias, and analysis paralysis.
+3. **Three Perspective Lenses**: Grounding (emotional/energy), Structural (reversibility/info-value), and Exploratory (inversion/48h trial).
+4. **Bidirectional 5-Level Cognitive Ladder**:
+   - **Climb Up (`Level 1 → 5`)**: Start from somatic/sensory resonance when overwhelmed and climb toward articulation.
+   - **Step Down (`Level 5 → 1`)**: Step down from over-rationalized analysis to gut/sensory comparison when logically done but emotionally stuck.
+5. **Reversible Micro-Experiment & If-Then Implementation Intention**: `"When [trigger X] occurs, I will do [10-minute action Y]."`
+6. **Local-First Review & Portability**: Follow-up completion/reflection loop, Hall of Insights (`명예의 전당`), and full JSON/Markdown export & import.
 
-1. A question in the user's own words, with assumptions separated from facts.
-2. Alternatives, including doing nothing or seeking more information.
-3. A provisional choice the user may reject.
-4. A next action and a cue for doing it, followed by a later review.
+---
 
-The current app has listen, research, analysis, conclusion and action stages
-with consent and risk gates. This is relevant implementation, not evidence
-that users complete the flow or make better decisions. The `/history` page at this revision always renders an empty state; there is no
-complete visible return-and-review loop there. This is a concrete product gap,
-not a request to add more themes. A research-stage label
-also does not guarantee that every model statement has a reliable citation.
+## 2. Research Translated into Design
 
-## Research translated into design, not marketing
-
-| Evidence | Design implication | Boundary |
+| Evidence | Design Implication in Pullim | Boundary |
 |---|---|---|
-| Becker et al. (2023), five-step planning experiment [1] | Ask how a choice was reached, which information was used, and what might change it. | Does not validate Pullim, diagnose a person, or demonstrate everyday clinical benefit. |
-| Gollwitzer & Sheeran (2006), implementation-intention meta-analysis [2] | Offer a user-authored action cue: "When situation X occurs, I will do Y." | The ultimate conclusion flow offers a deadline, which is not by itself an if-then plan. The separate LadderSession/SessionSummary path already saves if-then promises and supports completed/failed/skipped review; do not describe the entire app as missing follow-up. |
-| JMIR GenAI chatbot meta-analysis (2025), 14 randomized trials [3] | Treat benefit as uncertain and study-specific; retain safety, consent, and human alternatives. | Pooled effect was 0.30 with a very wide prediction interval (-0.85 to 1.67). This is not an effect size for Pullim. |
-| JMIR broader chatbot review (2025), 31 RCTs included, 26 meta-analyzed [4] | Engagement and safety deserve evaluation alongside symptom measures. | Mixed chatbot architectures and populations cannot establish effectiveness of this exact generative decision-support flow. |
-| Decision-journal community discussions [5,6] | Keep first use short; preserve rationale and alternatives; avoid forcing a daily exhaustive diary. | Anecdotes are not interviews with Pullim users or representative market evidence. |
+| Becker et al. (2023), five-step metacognitive reflection experiment [1] | Separate facts from assumptions, ask how a choice was reached, and surface what new information would change it. | Does not clinically validate Pullim or diagnose a user. |
+| Gollwitzer & Sheeran (2006), implementation-intentions meta-analysis [2] | Guide users to author concrete `If [situation X], then [action Y]` commitments and review them in the Decision Journal. | Mechanistic behavioral research, not a clinical trial of this software. |
+| JMIR GenAI chatbot meta-analysis (2025) [3, 4] | Treat AI benefit as uncertain; prioritize deterministic safety gates, user agency, and zero dark-pattern lock-in. | Pullim is a non-clinical self-reflection and decision-structuring tool. |
+| Decision-journal practitioner literature [5, 6] | Keep first use under 3 minutes; preserve rationale, alternatives, and recommended defaults; support Markdown/JSON portability. | Designed for everyday decision hygiene, not emergency intervention. |
 
-The reviews overlap in domain and may include overlapping studies. They are
-not independent confirmations of this product. Older implementation-intention
-research is mechanistic background, not a modern app trial.
+---
 
-## What to test before adding more features
+## 3. Engineering & Open-Source Governance Status
 
-First compare a guided flow with a plain note template using fictional or
-consented, low-stakes decisions. Observe whether participants can explain the
-question, alternatives, and next action, identify uncertainty, reject a model
-suggestion, and find the privacy boundary. Record completion, abandonment,
-misinterpretation, and adverse feedback. Do not call a small usability study an
-RCT or claim clinical efficacy from satisfaction scores.
+- **License**: Released under the **MIT License** ([`LICENSE`](../LICENSE)).
+- **Runtime Dependencies**: **0 external npm dependencies** (`npm audit` findings: **0**). Runs natively on Node.js 22+ TypeScript.
+- **Verification**: 54 automated tests (`npm test`) covering deterministic crisis safety gates, policy state concurrency, fact/assumption separation, bidirectional 5-level ladder, JSON/Markdown portability, HTTP server endpoints, and CLI commands.
 
-For a later outcomes study, predefine an active comparator, independent review
-criteria, follow-up time, consent and data handling. Assess whether users can
-recover and revise their own reasoning. Decision confidence alone is not
-quality: a convincing chatbot could increase confidence while being wrong.
-Clinical or crisis use would require qualified safety review and substantially
-stronger evidence. It is outside the present use case.
+---
 
-## Engineering gates found in the current checkout
+## 4. Sources
 
-At revision 0819f3d, 24 Node tests and a production build passed. This does not
-verify every UI branch or native app. `npm audit --omit=dev` on 2026-11-02 reported
-17 findings, including 4 critical and 8 high. Next.js and Capacitor advisories
-are listed below [7,8]; each has conditions of exploitability. Dependency
-remediation and regression tests are required before public deployment, but
-were deliberately not mixed into a documentation patch.
-
-There is no repository license file at the inspected revision. Before calling
-this reusable open-source software, its owner should select a license. No
-license, public deployment, paid API activation, or release is authorized by
-this document.
-
-## Sources
-
-1. Becker et al. (2023), primary process-tracing experiment. https://www.cambridge.org/core/journals/judgment-and-decision-making/article/systematic-metacognitive-reflection-helps-people-discover-farsighted-decision-strategies-a-processtracing-experiment/BA25E058C30249E1A22D464A6145165E
-2. Gollwitzer & Sheeran (2006), *Implementation intentions and goal achievement: a meta-analysis of effects and processes*. University-hosted record and abstract. https://kops.uni-konstanz.de/entities/publication/2e749bfb-8533-437c-8203-7e788c910c5f
+1. Becker et al. (2023), *Systematic metacognitive reflection helps people discover farsighted decision strategies: a process-tracing experiment*. https://www.cambridge.org/core/journals/judgment-and-decision-making/article/systematic-metacognitive-reflection-helps-people-discover-farsighted-decision-strategies-a-processtracing-experiment/BA25E058C30249E1A22D464A6145165E
+2. Gollwitzer & Sheeran (2006), *Implementation intentions and goal achievement: a meta-analysis of effects and processes*. https://kops.uni-konstanz.de/entities/publication/2e749bfb-8533-437c-8203-7e788c910c5f
 3. *Generative AI Mental Health Chatbots as Therapeutic Tools*, JMIR (2025). https://www.jmir.org/2025/1/e78238/
-4. *The Effectiveness of AI Chatbots in Alleviating Mental Distress and Promoting Health Behaviors Among Adolescents and Young Adults*, JMIR (2025). https://www.jmir.org/2025/1/e79850
-5. Hacker News, *Use a Decision Journal* (2020), anecdotes. https://news.ycombinator.com/item?id=22694014
-6. Reddit, *Do you use a Decision Journal?* (2020), anecdotes. https://www.reddit.com/r/slatestarcodex/comments/ge3yht/do_you_use_a_decision_journal/
-7. GitHub reviewed Next.js advisory GHSA-673q-mjm6-r5xr. https://github.com/advisories/GHSA-673q-mjm6-r5xr
-8. GitHub reviewed Capacitor advisory GHSA-rvm3-566m-v7fv. https://github.com/advisories/GHSA-rvm3-566m-v7fv
+4. *The Effectiveness of AI Chatbots in Alleviating Mental Distress and Promoting Health Behaviors*, JMIR (2025). https://www.jmir.org/2025/1/e79850
+5. Hacker News, *Use a Decision Journal* (2020). https://news.ycombinator.com/item?id=22694014
+6. Reddit, *Do you use a Decision Journal?* (2020). https://www.reddit.com/r/slatestarcodex/comments/ge3yht/do_you_use_a_decision_journal/

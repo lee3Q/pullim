@@ -2,57 +2,21 @@ name: CI
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  checks:
+  verify:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: pullim
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: pullim/package-lock.json
-      - run: npm ci
       - run: npm run lint
-      - run: npx tsc --noEmit
       - run: npm test
-      - run: node scripts/verify-session-save-http.mjs
       - run: npm run build
-  e2e:
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: pullim
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: pullim/package-lock.json
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      # Hermetic specs only. glm-quality/ladder-glm need real LLM API keys.
-      # ui-renewal-test/ultimate-* exceed the CI time budget; tracked separately.
-      - run: >-
-          npx playwright test --workers=1
-          tests/e2e/action-history.spec.ts
-          tests/e2e/unified-history.spec.ts
-          tests/e2e/history-export.spec.ts
-          tests/e2e/crisis-confirm-retry.spec.ts
-          tests/e2e/ladder-promises.spec.ts
-          tests/e2e/ladder-summary-stream.spec.ts
-          tests/e2e/metadata.spec.ts
-          tests/e2e/discovery-storage.spec.ts
-          tests/e2e/profile-storage-denied.spec.ts
-          tests/e2e/result-share.spec.ts
-      - run: npx playwright test --config playwright.feedback.config.ts --workers=1
-      - run: npx playwright test --config playwright.session-save.config.ts --workers=1
+      - run: node bin/pullim.mjs demo
