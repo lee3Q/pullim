@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { test } from "node:test";
+import { readFile } from "node:fs/promises";
+import net from "node:net";
 import { createPullimServer } from "../src/server/workbench-server.ts";
 
 const exec = promisify(execFile);
@@ -110,4 +112,69 @@ test("CLI commands (demo, unravel, ladder, crisis-check) execute cleanly", async
   ]);
   const crisisJson = JSON.parse(crisisOut);
   assert.equal(crisisJson.tier, "A");
+});
+
+test("security boundaries reject unapproved provider endpoints and oversized JSON", async (t) => {
+  const server = createPullimServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const rejected = await fetch(`${baseUrl}/api/unravel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      concern: "일반적인 고민",
+      config: { provider: "openai", apiKey: "synthetic-secret", baseUrl: "http://127.0.0.1:9" },
+    }),
+  });
+  assert.equal(rejected.status, 200);
+  const rejectedData = await rejected.json();
+  assert.equal(rejectedData.providerUsed, "builtin");
+  assert.match(rejectedData.fallbackReason, /연결 실패/);
+
+  const oversized = await fetch(`${baseUrl}/api/crisis-check`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Content-Length": String(1024 * 1024 + 1) },
+    body: "{" + "\"text\":\"" + "x".repeat(1024 * 1024 - 10) + "\"}",
+  });
+  assert.equal(oversized.status, 413);
+  assert.equal((await oversized.json()).error, "Request body is too large");
+});
+
+test("workbench HTML escapes untrusted renderer fields and has no dynamic inline handlers", async (t) => {
+  const server = createPullimServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const html = await (await fetch(`http://127.0.0.1:${server.address().port}/`)).text();
+  assert.match(html, /function escapeHtml/);
+  const uiSource = await readFile(new URL("../src/server/workbench-ui.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(uiSource, /onclick=\\\"commitActionFromUnravel/);
+  assert.doesNotMatch(uiSource, /onclick=\\\"stepLadder\(\{type:'select_option'/);
+});
+
+
+test("chunked oversized JSON returns 413 and health remains available", async (t) => {
+  const server = createPullimServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const port = server.address().port;
+  const response = await new Promise((resolve, reject) => {
+    const socket = net.createConnection({ host: "127.0.0.1", port });
+    let data = "";
+    socket.setEncoding("utf8");
+    socket.on("data", (chunk) => { data += chunk; });
+    socket.on("error", reject);
+    socket.on("end", () => resolve(data));
+    socket.on("connect", () => {
+      socket.write("POST /api/crisis-check HTTP/1.1\r\nHost: 127.0.0.1\r\nTransfer-Encoding: chunked\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n");
+      const chunk = "a".repeat(256 * 1024);
+      for (let i = 0; i < 5; i += 1) socket.write(`${chunk.length.toString(16)}\r\n${chunk}\r\n`);
+      socket.end("0\r\n\r\n");
+    });
+  });
+  assert.match(response, /HTTP\/1\.1 413/);
+  assert.match(response, /Request body is too large/);
+  const health = await fetch(`http://127.0.0.1:${port}/api/health`);
+  assert.equal(health.status, 200);
 });

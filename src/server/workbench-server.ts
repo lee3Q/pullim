@@ -19,10 +19,29 @@ import { exportUnravelToMarkdown } from "../lib/core/journal-portability.ts";
 import { detectCrisis } from "../lib/safety/crisis-detector.ts";
 import { getSessionSaveAccess } from "../lib/supabase/session-save-auth.ts";
 
+const MAX_JSON_BODY_BYTES = 1024 * 1024;
+
+class RequestBodyTooLargeError extends Error {
+  status = 413;
+  constructor() { super("Request body is too large"); }
+}
+
 async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknown>> {
+  const contentLength = Number(req.headers["content-length"] || 0);
+  if (Number.isFinite(contentLength) && contentLength > MAX_JSON_BODY_BYTES) {
+    req.resume();
+    throw new RequestBodyTooLargeError();
+  }
   const chunks: Buffer[] = [];
+  let received = 0;
   for await (const chunk of req) {
-    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+    const buffer = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
+    received += buffer.byteLength;
+    if (received > MAX_JSON_BODY_BYTES) {
+      req.resume();
+      throw new RequestBodyTooLargeError();
+    }
+    chunks.push(buffer);
   }
   const raw = Buffer.concat(chunks).toString("utf8").trim();
   if (!raw) return {};
@@ -227,9 +246,12 @@ export function createPullimServer(): http.Server {
 
       sendJson(res, 404, { error: "Not found" });
     } catch (err) {
-      sendJson(res, 400, {
-        error: err instanceof Error ? err.message : "Bad request",
-      });
+      const status = err instanceof RequestBodyTooLargeError ? err.status : 400;
+      if (!res.headersSent) {
+        sendJson(res, status, {
+          error: err instanceof Error ? err.message : "Bad request",
+        });
+      }
     }
   });
 }
