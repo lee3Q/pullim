@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { test } from "node:test";
+import { readFile } from "node:fs/promises";
 import { createPullimServer } from "../src/server/workbench-server.ts";
 
 const exec = promisify(execFile);
@@ -110,4 +111,43 @@ test("CLI commands (demo, unravel, ladder, crisis-check) execute cleanly", async
   ]);
   const crisisJson = JSON.parse(crisisOut);
   assert.equal(crisisJson.tier, "A");
+});
+
+test("security boundaries reject unapproved provider endpoints and oversized JSON", async (t) => {
+  const server = createPullimServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const baseUrl = `http://127.0.0.1:${server.address().port}`;
+
+  const rejected = await fetch(`${baseUrl}/api/unravel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      concern: "일반적인 고민",
+      config: { provider: "openai", apiKey: "synthetic-secret", baseUrl: "http://127.0.0.1:9" },
+    }),
+  });
+  assert.equal(rejected.status, 200);
+  const rejectedData = await rejected.json();
+  assert.equal(rejectedData.providerUsed, "builtin");
+  assert.match(rejectedData.fallbackReason, /연결 실패/);
+
+  const oversized = await fetch(`${baseUrl}/api/crisis-check`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Content-Length": String(1024 * 1024 + 1) },
+    body: "{" + "\"text\":\"" + "x".repeat(1024 * 1024 - 10) + "\"}",
+  });
+  assert.equal(oversized.status, 413);
+  assert.equal((await oversized.json()).error, "Request body is too large");
+});
+
+test("workbench HTML escapes untrusted renderer fields and has no dynamic inline handlers", async (t) => {
+  const server = createPullimServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+  const html = await (await fetch(`http://127.0.0.1:${server.address().port}/`)).text();
+  assert.match(html, /function escapeHtml/);
+  const uiSource = await readFile(new URL("../src/server/workbench-ui.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(uiSource, /onclick=\\\"commitActionFromUnravel/);
+  assert.doesNotMatch(uiSource, /onclick=\\\"stepLadder\(\{type:'select_option'/);
 });

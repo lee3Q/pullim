@@ -19,6 +19,26 @@ export interface ProviderConfig {
   model?: string;
 }
 
+function isLoopbackHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+export function validateProviderBaseUrl(provider: OpenSourceProviderType, candidate: string): string {
+  let url: URL;
+  try { url = new URL(candidate); } catch { throw new Error("Provider base URL is invalid"); }
+  if (url.username || url.password) throw new Error("Provider base URL is not allowed");
+  if (provider === "ollama") {
+    if (url.protocol !== "http:" || !isLoopbackHostname(url.hostname) || url.port === "") {
+      throw new Error("Ollama base URL must be an explicit loopback HTTP address");
+    }
+  } else if (provider === "openai") {
+    if (url.protocol !== "https:" || url.origin !== "https://api.openai.com" || url.pathname !== "/v1") {
+      throw new Error("OpenAI base URL must be https://api.openai.com/v1");
+    }
+  }
+  return url.toString().replace(/\/$/, "");
+}
+
 export interface EnhancedUnravelResponse {
   result: UnravelResult;
   providerUsed: OpenSourceProviderType;
@@ -44,11 +64,10 @@ async function callExternalProvider(
   const systemPrompt = buildSocraticSystemPrompt(lens);
 
   if (config.provider === "ollama") {
-    const baseUrl = (
-      config.baseUrl ||
-      process.env.OLLAMA_BASE_URL ||
-      "http://127.0.0.1:11434"
-    ).replace(/\/$/, "");
+    const baseUrl = validateProviderBaseUrl(
+      "ollama",
+      config.baseUrl || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434",
+    );
     const model = config.model || process.env.OLLAMA_MODEL || "llama3.2";
     const res = await fetch(`${baseUrl}/api/chat`, {
       method: "POST",
@@ -73,11 +92,10 @@ async function callExternalProvider(
   if (config.provider === "openai") {
     const apiKey = config.apiKey || process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("OpenAI API key not configured");
-    const baseUrl = (
-      config.baseUrl ||
-      process.env.OPENAI_BASE_URL ||
-      "https://api.openai.com/v1"
-    ).replace(/\/$/, "");
+    const baseUrl = validateProviderBaseUrl(
+      "openai",
+      config.baseUrl || process.env.OPENAI_BASE_URL || "https://api.openai.com/v1",
+    );
     const model = config.model || "gpt-4o-mini";
     const res = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",

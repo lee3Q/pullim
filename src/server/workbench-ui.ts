@@ -381,6 +381,12 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
       document.getElementById("settings-drawer").classList.add("hidden");
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[character]));
+    }
+
     function loadEngineConfig() {
       try {
         const raw = localStorage.getItem(ENGINE_CFG_KEY);
@@ -416,11 +422,11 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         return;
       }
       const hotlines = (crisisResponse.hotlines || [])
-        .map(h => "<li><strong>" + h.name + " (" + h.number + ")</strong> — " + h.description + "</li>")
+        .map(h => "<li><strong>" + escapeHtml(h.name) + " (" + escapeHtml(h.number) + ")</strong> — " + escapeHtml(h.description) + "</li>")
         .join("");
       banner.innerHTML =
         "<h3 style='margin-top:0'>⚠️ 안전과 보호가 가장 먼저입니다</h3>" +
-        "<p>" + crisisResponse.userMessage + "</p>" +
+        "<p>" + escapeHtml(crisisResponse.userMessage) + "</p>" +
         "<ul>" + hotlines + "</ul>";
       banner.classList.remove("hidden");
     }
@@ -452,45 +458,45 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         return;
       }
 
-      const factsHtml = r.facts.map(f => "<li><strong>[사실]</strong> " + f + "</li>").join("");
+      const factsHtml = r.facts.map(f => "<li><strong>[사실]</strong> " + escapeHtml(f) + "</li>").join("");
       const assumptionsHtml = r.assumptions.map(a =>
         "<li style='margin-bottom:8px'><strong>[가정]</strong> " + a.statement +
-        "<div class='muted'>↳ 점검 질문: " + a.checkQuestion + "</div></li>"
+        "<div class='muted'>↳ 점검 질문: " + escapeHtml(a.checkQuestion) + "</div></li>"
       ).join("");
       const trapsHtml = r.cognitiveTraps.map(t =>
-        "<div style='margin-bottom:10px'><strong>• " + t.name + "</strong>: " + t.evidence +
-        "<div class='muted'>↳ 전환 질문: " + t.reframeQuestion + "</div></div>"
+        "<div style='margin-bottom:10px'><strong>• " + escapeHtml(t.name) + "</strong>: " + t.evidence +
+        "<div class='muted'>↳ 전환 질문: " + escapeHtml(t.reframeQuestion) + "</div></div>"
       ).join("");
       const lensesHtml = r.lenses.map(l =>
         "<div class='card' style='margin-bottom:0'>" +
-        "<div class='badge'>" + l.badge + "</div>" +
-        "<h4 style='margin:10px 0 6px'>" + l.title + "</h4>" +
-        "<p class='muted'>" + l.summary + "</p>" +
-        "<p style='font-size:0.92rem'><strong>소크라테스 질문:</strong> " + l.socraticQuestion + "</p>" +
+        "<div class='badge'>" + escapeHtml(l.badge) + "</div>" +
+        "<h4 style='margin:10px 0 6px'>" + escapeHtml(l.title) + "</h4>" +
+        "<p class='muted'>" + escapeHtml(l.summary) + "</p>" +
+        "<p style='font-size:0.92rem'><strong>소크라테스 질문:</strong> " + escapeHtml(l.socraticQuestion) + "</p>" +
         "</div>"
       ).join("");
       const optionsHtml = r.options.map(o =>
         "<div class='option-card " + (o.recommended ? "recommended" : "") + "'>" +
-        "<div><strong>" + o.title + "</strong>" +
+        "<div><strong>" + escapeHtml(o.title) + "</strong>" +
         (o.recommended ? "<span class='rec-pill'>✦ 추천 기본값</span>" : "") +
         " <span class='muted'>(" + o.costMinutes + "분 · 가역성 " + o.reversibility + ")</span></div>" +
-        "<div class='muted' style='margin:4px 0 10px'>" + o.description + "</div>" +
-        "<button onclick=\\"commitActionFromUnravel('" + o.title.replace(/'/g, "") + "')\\">이 실험을 확정 행동으로 저장</button>" +
+        "<div class='muted' style='margin:4px 0 10px'>" + escapeHtml(o.description) + "</div>" +
+        "<button data-action=\\"commit-action\\" data-title=\\"" + escapeHtml(o.title) + "\\">이 실험을 확정 행동으로 저장</button>" +
         "</div>"
       ).join("");
 
       out.innerHTML =
-        (data.aiSynthesisNote ? "<div class='card'><strong>🤖 연결된 LLM 코멘트 (" + data.modelUsed + "):</strong><p>" + data.aiSynthesisNote + "</p></div>" : "") +
+        (data.aiSynthesisNote ? "<div class='card'><strong>🤖 연결된 LLM 코멘트 (" + escapeHtml(data.modelUsed) + "):</strong><p>" + escapeHtml(data.aiSynthesisNote) + "</p></div>" : "") +
         "<div class='card'>" +
           "<div style='display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;'>" +
             "<span class='badge'>핵심 질문 재정의</span>" +
             "<div style='display:flex; gap:8px;'>" +
-              "<button onclick=\\"startLadderFromConcern('" + r.recommendedLadderDirection + "')\\">🪜 권장 사다리(" + (r.recommendedLadderDirection === "down" ? "내려가기 L5→L1" : "올라가기 L1→L5") + ")로 이어가기</button>" +
+              "<button data-action=\\"start-ladder\\" data-direction=\\"" + escapeHtml(r.recommendedLadderDirection) + "\\">🪜 권장 사다리(" + (r.recommendedLadderDirection === "down" ? "내려가기 L5→L1" : "올라가기 L1→L5") + ")로 이어가기</button>" +
               "<button onclick='copyMarkdownReport()'>📋 Markdown 리포트 복사</button>" +
             "</div>" +
           "</div>" +
-          "<h3 style='margin:10px 0 6px'>" + r.reframedQuestion + "</h3>" +
-          "<p class='muted' style='margin:0'>핵심 갈등: " + r.coreTension + "</p>" +
+          "<h3 style='margin:10px 0 6px'>" + escapeHtml(r.reframedQuestion) + "</h3>" +
+          "<p class='muted' style='margin:0'>핵심 갈등: " + escapeHtml(r.coreTension) + "</p>" +
         "</div>" +
         "<div class='grid-2'>" +
           "<div class='card'><h3 style='margin-top:0'>1. 사실(Fact) vs 가정(Assumption) 분리</h3><ul>" + factsHtml + assumptionsHtml + "</ul></div>" +
@@ -610,9 +616,9 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
       ).join(" ");
 
       const optsHtml = card.options.map(o =>
-        "<button class='option-card " + (o.recommended ? "recommended" : "") + "' onclick=\\"stepLadder({type:'select_option',optionId:'" + o.id + "',userText:document.getElementById('ladder-free')?.value||''})\\">" +
-          "<div><strong>" + o.label + "</strong>" + (o.recommended ? "<span class='rec-pill'>✦ 추천</span>" : "") + "</div>" +
-          "<div class='muted'>" + o.subtext + "</div>" +
+        "<button class='option-card " + (o.recommended ? "recommended" : "") + "' data-action=\\"select-option\\" data-option-id=\\"" + escapeHtml(o.id) + "\\">" +
+          "<div><strong>" + escapeHtml(o.label) + "</strong>" + (o.recommended ? "<span class='rec-pill'>✦ 추천</span>" : "") + "</div>" +
+          "<div class='muted'>" + escapeHtml(o.subtext) + "</div>" +
         "</button>"
       ).join("");
 
@@ -625,11 +631,11 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
               "<button onclick=\\"stepLadder({type:'flip_angle'})\\">🔄 다른 각도로 찔러줘 (Flip)</button>" +
             "</div>" +
           "</div>" +
-          (s.latestFacetShift?.detected ? "<div class='card' style='background:var(--accent-soft); border-color:var(--accent)'>" + s.latestFacetShift.message + "</div>" : "") +
-          "<h3>" + card.levelName + " — " + card.question + "</h3>" +
-          "<p class='muted'>" + card.helperNote + "</p>" +
+          (s.latestFacetShift?.detected ? "<div class='card' style='background:var(--accent-soft); border-color:var(--accent)'>" + escapeHtml(s.latestFacetShift.message) + "</div>" : "") +
+          "<h3>" + escapeHtml(card.levelName) + " — " + escapeHtml(card.question) + "</h3>" +
+          "<p class='muted'>" + escapeHtml(card.helperNote) + "</p>" +
           "<div>" + optsHtml + "</div>" +
-          "<input id='ladder-free' placeholder=\\"" + card.freeTextPlaceholder + "\\" style='margin-top:8px' />" +
+          "<input id='ladder-free' placeholder=\\"" + escapeHtml(card.freeTextPlaceholder) + "\\" style='margin-top:8px' />" +
         "</div>";
     }
 
@@ -643,11 +649,11 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         ? "<p class='muted'>아직 저장된 확정 행동이 없습니다.</p>"
         : actions.map(a =>
             "<div class='option-card'>" +
-              "<div><strong>" + a.action + "</strong> <span class='badge'>" + a.status + "</span></div>" +
-              "<div class='muted'>기한: " + (a.deadline || "없음") + "</div>" +
+              "<div><strong>" + escapeHtml(a.action) + "</strong> <span class='badge'>" + escapeHtml(a.status) + "</span></div>" +
+              "<div class='muted'>기한: " + escapeHtml(a.deadline || "없음") + "</div>" +
               "<div style='margin-top:8px; display:flex; gap:6px'>" +
-                "<button onclick=\\"updateActionStatus('" + a.sessionId + "','completed')\\">완료</button>" +
-                "<button onclick=\\"updateActionStatus('" + a.sessionId + "','deferred')\\">보류</button>" +
+                "<button data-action=\\"action-status\\" data-id=\\"" + escapeHtml(a.sessionId) + "\\" data-status=\\"completed\\">완료</button>" +
+                "<button data-action=\\"action-status\\" data-id=\\"" + escapeHtml(a.sessionId) + "\\" data-status=\\"deferred\\">보류</button>" +
               "</div>" +
             "</div>"
           ).join("");
@@ -656,12 +662,12 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         ? "<p class='muted'>아직 저장된 If-Then 약속이 없습니다.</p>"
         : promises.map(p =>
             "<div class='option-card'>" +
-              "<div class='muted'>만약: " + p.trigger + "</div>" +
-              "<div><strong>→ " + p.action + "</strong> <span class='badge'>" + p.status + "</span></div>" +
-              (p.reflection ? "<div class='muted' style='margin-top:4px'>회고: " + p.reflection + "</div>" : "") +
+              "<div class='muted'>만약: " + escapeHtml(p.trigger) + "</div>" +
+              "<div><strong>→ " + escapeHtml(p.action) + "</strong> <span class='badge'>" + escapeHtml(p.status) + "</span></div>" +
+              (p.reflection ? "<div class='muted' style='margin-top:4px'>회고: " + escapeHtml(p.reflection) + "</div>" : "") +
               "<div style='margin-top:8px; display:flex; gap:6px'>" +
-                "<button onclick=\\"updatePromiseStatus('" + p.id + "','completed')\\">실행 완료</button>" +
-                "<button onclick=\\"updatePromiseStatus('" + p.id + "','skipped')\\">나중에</button>" +
+                "<button data-action=\\"promise-status\\" data-id=\\"" + escapeHtml(p.id) + "\\" data-status=\\"completed\\">실행 완료</button>" +
+                "<button data-action=\\"promise-status\\" data-id=\\"" + escapeHtml(p.id) + "\\" data-status=\\"skipped\\">나중에</button>" +
               "</div>" +
             "</div>"
           ).join("");
@@ -670,7 +676,7 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         ? "<p class='muted'>아직 등재된 핵심 통찰이 없습니다.</p>"
         : insights.map(i =>
             "<div class='option-card recommended'>" +
-              "<div><strong>✦ \\"" + i.insightText + "\\"</strong></div>" +
+              "<div><strong>✦ \\"" + escapeHtml(i.insightText) + "\\"</strong></div>" +
               "<div class='muted'>" + (i.reframedQuestion || "") + "</div>" +
             "</div>"
           ).join("");
@@ -684,7 +690,7 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
       document.getElementById("journal-profile").innerHTML = dims.map(([key, left, right]) => {
         const val = profile?.[key]?.value ?? 0;
         const pct = Math.round(((val + 1) / 2) * 100);
-        return "<div><div style='display:flex; justify-content:space-between; font-size:0.82rem'><span>" + left + "</span><span>" + right + "</span></div>" +
+        return "<div><div style='display:flex; justify-content:space-between; font-size:0.82rem'><span>" + escapeHtml(left) + "</span><span>" + escapeHtml(right) + "</span></div>" +
           "<div class='dim-bar'><div class='dim-fill' style='width:" + pct + "%'></div></div></div>";
       }).join("");
     }
@@ -731,7 +737,7 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         ...actions.map(a => "- [" + (a.status === "completed" ? "x" : " ") + "] " + a.action),
         "",
         "## If-Then 약속",
-        ...promises.map(p => "- [" + (p.status === "completed" ? "x" : " ") + "] 만약 " + p.trigger + " → " + p.action),
+        ...promises.map(p => "- [" + (p.status === "completed" ? "x" : " ") + "] 만약 " + escapeHtml(p.trigger) + " → " + escapeHtml(p.action)),
         "",
         "## 명예의 전당 (핵심 통찰)",
         ...insights.map(i => "- ✦ " + i.insightText)
@@ -758,6 +764,17 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         document.getElementById("journal-status").textContent = "⚠️ 백업 파일 형식을 확인해 주세요.";
       }
     }
+
+    document.addEventListener("click", event => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      if (action === "commit-action") commitActionFromUnravel(button.dataset.title || "");
+      if (action === "start-ladder") startLadderFromConcern(button.dataset.direction || "up");
+      if (action === "select-option") stepLadder({ type: "select_option", optionId: button.dataset.optionId, userText: document.getElementById("ladder-free")?.value || "" });
+      if (action === "action-status") updateActionStatus(button.dataset.id || "", button.dataset.status || "");
+      if (action === "promise-status") updatePromiseStatus(button.dataset.id || "", button.dataset.status || "");
+    });
 
     switchTab("${initialTab}");
   </script>
