@@ -38,7 +38,7 @@ async function readJsonBody(req: IncomingMessage): Promise<Record<string, unknow
     const buffer = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
     received += buffer.byteLength;
     if (received > MAX_JSON_BODY_BYTES) {
-      req.destroy();
+      req.resume();
       throw new RequestBodyTooLargeError();
     }
     chunks.push(buffer);

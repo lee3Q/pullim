@@ -5,7 +5,7 @@
 - Restrict server-side BYOK provider destinations.
 - Cap HTTP JSON bodies at 1 MiB with a 413 response.
 - Escape untrusted renderer text and move affected dynamic actions to data attributes.
-- Add focused adversarial regression tests.
+- Add focused adversarial regression tests for declared-length and chunked body limits.
 
 ## Contract
 
@@ -13,11 +13,11 @@ Built-in processing remains local. OpenAI BYOK uses the official HTTPS v1 endpoi
 
 ## Reproduction and patch rationale
 
-The audit reproduced API-key and concern exfiltration through arbitrary `baseUrl`, HTML/inline-handler injection through user and LLM text, and memory amplification from unbounded JSON buffering. The patch places the smallest enforceable boundaries at the provider fetch and shared body reader, then escapes affected UI fields without changing local storage or BYOK defaults.
+The audit reproduced API-key and concern exfiltration through arbitrary `baseUrl`, HTML/inline-handler injection through user and LLM text, and memory amplification from unbounded JSON buffering. The follow-up review also identified three missed renderer fields and a chunked-body connection reset. The patch places the smallest enforceable boundaries at the provider fetch and shared body reader, then escapes affected UI fields without changing local storage or BYOK defaults.
 
 ## Verification
 
-Run `npm test`, `npm run lint`, `npm run build`, and the focused HTTP adversarial tests. Record the exact commands and commit SHA in the final audit evidence.
+Run `npm test`, `npm run lint`, `npm run build`, and the focused HTTP adversarial tests. The follow-up covers raw chunked overflow and verifies `/api/health` remains available. Record the exact commands and commit SHA in the final audit evidence.
 
 ## Unknowns and rollback
 

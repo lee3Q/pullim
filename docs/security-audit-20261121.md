@@ -8,7 +8,7 @@ F-01, F-02, and F-03 were independently confirmed by the supplied security, UX/a
 
 Pullim remains local-first. The built-in engine sends no concern to an external provider. BYOK OpenAI uses only `https://api.openai.com/v1`. Ollama overrides are restricted to explicit loopback HTTP URLs with a port. Rejected provider configuration falls back to the deterministic engine without contacting the rejected address. Every JSON POST body is capped at 1 MiB and returns 413 when the declared or received body exceeds the cap.
 
-The web renderer escapes untrusted text before inserting HTML and dynamic renderer actions use data attributes handled by a listener. Existing static UI handlers remain a compatibility surface for the current inline script and should be migrated with the surrounding UI event wiring in a separate change.
+The web renderer escapes all identified untrusted text before inserting HTML. Dynamic renderer actions use data attributes handled by a listener. Fixed static controls retain their existing behavior.
 
 ## Patch rationale
 
@@ -16,7 +16,7 @@ The URL policy prevents arbitrary server-side fetches and key forwarding while p
 
 ## Tests
 
-`npm test`, `npm run lint`, and `npm run build` are run with the login-shell Node/npm PATH. Focused adversarial tests cover an unapproved OpenAI URL, a 413 body-size boundary, and the renderer source contract. The supplied baseline also records 54 passing Node tests before this patch.
+`npm test`, `npm run lint`, and `npm run build` are run with the login-shell Node/npm PATH. Focused adversarial tests cover an unapproved OpenAI URL, both declared-length and chunked 413 body-size boundaries, health availability after rejection, and the renderer source contract. The supplied baseline also records 54 passing Node tests before this patch.
 
 ## Unknowns
 

@@ -460,11 +460,11 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
 
       const factsHtml = r.facts.map(f => "<li><strong>[사실]</strong> " + escapeHtml(f) + "</li>").join("");
       const assumptionsHtml = r.assumptions.map(a =>
-        "<li style='margin-bottom:8px'><strong>[가정]</strong> " + a.statement +
+        "<li style='margin-bottom:8px'><strong>[가정]</strong> " + escapeHtml(a.statement) +
         "<div class='muted'>↳ 점검 질문: " + escapeHtml(a.checkQuestion) + "</div></li>"
       ).join("");
       const trapsHtml = r.cognitiveTraps.map(t =>
-        "<div style='margin-bottom:10px'><strong>• " + escapeHtml(t.name) + "</strong>: " + t.evidence +
+        "<div style='margin-bottom:10px'><strong>• " + escapeHtml(t.name) + "</strong>: " + escapeHtml(t.evidence) +
         "<div class='muted'>↳ 전환 질문: " + escapeHtml(t.reframeQuestion) + "</div></div>"
       ).join("");
       const lensesHtml = r.lenses.map(l =>
@@ -677,7 +677,7 @@ export function renderWorkbenchHtml(initialTab: "unravel" | "ladder" | "journal"
         : insights.map(i =>
             "<div class='option-card recommended'>" +
               "<div><strong>✦ \\"" + escapeHtml(i.insightText) + "\\"</strong></div>" +
-              "<div class='muted'>" + (i.reframedQuestion || "") + "</div>" +
+              "<div class='muted'>" + escapeHtml(i.reframedQuestion || "") + "</div>" +
             "</div>"
           ).join("");
 
